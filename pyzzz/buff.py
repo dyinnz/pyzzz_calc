@@ -1,6 +1,6 @@
-import copy
+from typing import Optional
 
-from model import ContextData, StatKind, StatValue
+from pyzzz.model import AttackKind, ContextData, StatKind, StatValue
 
 
 class Buff:
@@ -10,25 +10,25 @@ class Buff:
         self.source = kw.get("source", "")
         self.cov = kw.get("cov", 1.0)
         self.duration = kw.get("duration", 0.0)  # zero for static buf
+        self.condition: Optional[ContextData] = kw.get("condition", None)
 
-    def produce(self, context: ContextData):
+    def produce(self, context: ContextData) -> StatValue:
         if self.active(context):
             return StatValue(self.stat.value * self.cov, self.stat.kind)
         return StatValue.empty()
 
-    def active(self, _: ContextData):
+    def active(self, c: ContextData) -> bool:
+        if self.condition:
+            if c.contains(self.condition):
+                return True
+            return False
         return True
 
-    def coverage(self):
+    def coverage(self) -> float:
         return self.cov
 
     def __str__(self):
-        return f"{self.stat} from '{self.source}'"
-
-
-WeaponBuff = Buff(StatValue(0.075, StatKind.ATK_PERCENT), source="weapon")
-ATKBuff = Buff(StatValue(840, StatKind.ATK_FLAT), source="flat")
-
-Suit4DMGPercent = Buff(StatValue(0.4, StatKind.DMG_PERCENT), cov=0.75, source="suit4")
-PartnerDMGPercent = Buff(StatValue(0.2, StatKind.DMG_PERCENT), source="partener")
-CoreSkillDMGPercent = Buff(StatValue(0.833, StatKind.CRIT_MULTI), source="core skill")
+        if self.cov < 1.0:
+            return f"{self.stat} * {self.cov} from '{self.source}'"
+        else:
+            return f"{self.stat} from '{self.source}'"

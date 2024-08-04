@@ -4,6 +4,6 @@ from pyzzz.model import StatKind, StatValue
 
 
 def test_stat():
-    kind = StatKind.DMG_PERCENT
-    assert "DMG_PERCENT" in str(kind)
+    kind = StatKind.DMG_RATIO
+    assert "dmg_ratio" in str(kind)
 

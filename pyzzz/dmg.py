@@ -1,20 +1,14 @@
+import copy
 import math
 from functools import reduce
+from typing import Optional, Union
 
-from build import Build, test_build
-from model import (
-    AgentData,
-    ContextData,
-    Disc,
-    DiscList,
-    StatKind,
-    StatValue,
-    WeaponData,
-)
+from pyzzz.build import Build, test_build_summary
+from pyzzz.model import *
 
 
 class Number:
-    def __init__(self, v=0.0, source=""):
+    def __init__(self, v, source=""):
         if isinstance(v, Number):
             self.v = v.value()
             self.source = v.source
@@ -44,7 +38,7 @@ class Number:
 
     def __str__(self):
         if abs(self.v) > 1.0 or self.v == 0.0:
-            return f"{self.v}"
+            return f"{self.v:.3f}".rstrip("0").rstrip(".")
         else:
             return f"{self.v * 100.0:.1f}%"
 
@@ -54,73 +48,61 @@ class LazyAdd:
         self.numbers = [Number(n) for n in numbers]
         self.source = source
 
-    def add(self, n):
+    def add(self, n: Union[float, Number]):
         self.numbers.append(Number(n))
 
+    def set(self, n: Union[float, Number]):
+        self.numbers = [Number(n)]
+
     def value(self):
-        return reduce(lambda x, y: x + y, self.numbers, Number()).value()
+        return reduce(lambda x, y: x + y, self.numbers, Number(0.0)).value()
 
     def __str__(self):
+        if not self.numbers:
+            return "0"
         s = "+".join([str(n) for n in self.numbers])
         if len(self.numbers) > 1:
             s = "(" + s + ")"
         return s
 
 
+class ListMultiplier(LazyAdd):
+    def __init__(self, numbers=None):
+        if not numbers:
+            numbers = [1.0]
+        LazyAdd.__init__(self, numbers)
+
+    def calc(self):
+        return self
+
+
 # 1.1
 class ATK:
     def __init__(self):
-        self.agent = Number()
-        self.weapon = Number()
-        self.static_percent = LazyAdd([1.0])
+        self.agent = Number(0.0)
+        self.weapon = Number(0.0)
+        self.static_ratio = LazyAdd([1.0])
         self.static_flat = LazyAdd([])
-        self.dynamic_percent = LazyAdd([1.0])
+        self.dynamic_ratio = LazyAdd([1.0])
         self.dynamic_flat = LazyAdd([])
-        pass
 
     def calc(self):
         return (
-            (self.agent + self.weapon) * self.static_percent + self.static_flat
-        ) * self.dynamic_percent + self.dynamic_flat
+            (self.agent + self.weapon) * self.static_ratio + self.static_flat
+        ) * self.dynamic_ratio + self.dynamic_flat
 
     def __str__(self):
-        return f"[ ( {self.agent} + {self.weapon}) * {self.static_percent} + {self.static_flat} ] * {self.dynamic_percent} + {self.dynamic_flat}"
+        return f"( ( ({self.agent} + {self.weapon}) * {self.static_ratio} + {self.static_flat} ) * {self.dynamic_ratio} + {self.dynamic_flat} )"
 
 
 # 1.2
-class SkillMultiplier:
-    def __init__(self):
-        self.value = LazyAdd([1.0])
-
-    def calc(self):
-        return self.value
-
-    def __str__(self):
-        return f"{self.value}"
-
+SkillMultiplier = ListMultiplier
 
 # 2
-class DMGPercentMultiplier:
-    def __init__(self):
-        self.item = LazyAdd([1.0])
-
-    def calc(self):
-        return self.item
-
-    def __str__(self):
-        return f"{self.item}"
-
+DMGMultiplier = ListMultiplier
 
 # 3
-class ResistanceMutiplier:
-    def __init__(self):
-        self.item = LazyAdd([1.0])
-
-    def calc(self):
-        return self.item
-
-    def __str__(self):
-        return f"{self.item}"
+ResistanceMutiplier = ListMultiplier
 
 
 # 4
@@ -133,23 +115,33 @@ class DefenseMultiplier:
         return math.floor(0.1551 * level * level + 3.141 * level + 47.2049)
 
     def __init__(self, **kw):
-        self.agent_level = kw.get("agent_level", 50)
-        self.enemy_level = kw.get("enemy_level", 70)
-        self.enemy_base = kw.get("enemy_base", 50)
+        self._agent_level = kw.get("agent_level", 60)
+        self._enemy_level = kw.get("enemy_level", 70)
+        self._enemy_base = kw.get("enemy_base", 60)
 
-        self.agent = Number(self.defense_func(self.agent_level))
-        self.enemy = Number(self.defense_func(self.enemy_level) * self.enemy_base / 50)
+        self.agent = Number(self.defense_func(self._agent_level))
+        self.enemy = Number(
+            self.defense_func(self._enemy_level) * self._enemy_base / 50
+        )
 
-        self.pen_percent = LazyAdd([])
+        self.pen_ratio = LazyAdd([])
         self.pen_flat = LazyAdd([0.0])
+
+    def set_agent_level(self, level):
+        self._agent_level = level
+        self.agent = Number(self.defense_func(self._agent_level))
+
+    def set_enemy_level(self, level):
+        self._enemy_level = level
+        self.enemy = Number(self.defense_func(self._enemy_level))
 
     def calc(self):
         return self.agent / (
-            self.agent + self.enemy * (Number(1.0) - self.pen_percent) - self.pen_flat
+            self.agent + self.enemy * (Number(1.0) - self.pen_ratio) - self.pen_flat
         )
 
     def __str__(self):
-        pen = Number(1.0) - self.pen_percent
+        pen = Number(1.0) - self.pen_ratio
         return f"( {self.agent} / ({self.agent} + {self.enemy} * {pen} - {self.pen_flat}) )"
 
 
@@ -157,82 +149,76 @@ class DefenseMultiplier:
 class CriticalMultiplier:
 
     def __init__(self):
-        self.prob = LazyAdd([])
+        self.ratio = LazyAdd([])
         self.multi = LazyAdd([])
 
     def calc(self):
-        return Number(1.0) + Number(self.prob.value() * self.multi.value())
+        return Number(1.0) + Number(self.ratio.value() * self.multi.value())
 
     def __str__(self):
-        return f"(1.0 + {self.prob} * {self.multi})"
+        return f"(1.0 + {self.ratio} * {self.multi})"
 
 
 # 7
-class DazeMultiplier:
-
-    def __init__(self):
-        self.multi = LazyAdd([Number(1.0)])
-
-    def calc(self):
-        return self.multi
-
-    def __str__(self):
-        return f"{self.multi}"
+DazeMultiplier = ListMultiplier
 
 
 class DMG:
     def __init__(self):
         self.atk = ATK()
         self.skill = SkillMultiplier()
-        self.dmg_percent = DMGPercentMultiplier()
+        self.dmg_ratio = DMGMultiplier()
         self.resistance = ResistanceMutiplier()
         self.defense = DefenseMultiplier()
         self.critical = CriticalMultiplier()
         self.daze = DazeMultiplier()
 
-    def calc(self, daze=False):
+    def calc(self):
         v = (
             self.atk.calc()
             * self.skill.calc()
-            * self.dmg_percent.calc()
+            * self.dmg_ratio.calc()
             * self.resistance.calc()
             * self.defense.calc()
             * self.critical.calc()
+            * self.daze.calc()
         )
-        if daze:
-            v *= self.daze.calc()
         return v
 
     def apply_stat(self, stat: StatValue, source="", dynamic=False):
         number = Number(stat.value, source)
-        if stat.kind == StatKind.ATK_PERCENT:
+        if stat.kind == StatKind.ATK_RATIO:
             if dynamic:
-                self.atk.dynamic_percent.add(number)
+                self.atk.dynamic_ratio.add(number)
             else:
-                self.atk.static_percent.add(number)
+                self.atk.static_ratio.add(number)
         elif stat.kind == StatKind.ATK_FLAT:
             if dynamic:
                 self.atk.dynamic_flat.add(number)
             else:
                 self.atk.static_flat.add(number)
-        elif stat.kind == StatKind.CRIT_PROB:
-            self.critical.prob.add(number)
+        elif stat.kind == StatKind.CRIT_RATIO:
+            self.critical.ratio.add(number)
         elif stat.kind == StatKind.CRIT_MULTI:
             self.critical.multi.add(number)
-        elif stat.kind == StatKind.PEN_PERCENT:
-            self.defense.pen_percent.add(number)
+        elif stat.kind == StatKind.PEN_RATIO:
+            self.defense.pen_ratio.add(number)
         elif stat.kind == StatKind.PEN_FLAT:
             self.defense.pen_flat.add(number)
-        elif stat.kind == StatKind.DMG_PERCENT:
-            self.dmg_percent.item.add(number)
+        elif stat.kind == StatKind.DMG_RATIO:
+            self.dmg_ratio.add(number)
+        elif stat.kind == StatKind.RES_RATIO:
+            self.resistance.add(number)
+        elif stat.kind == StatKind.STUN_DMG_RATIO:
+            self.daze.add(number)
 
-    def apply_agent(self, agent: AgentData):
+    def apply_agent_data(self, agent: AgentData):
         self.atk.agent = Number(agent.atk, "Agent basic ATK")
-        self.defense.agent_level = Number(agent.level)
-        self.critical.prob.add(Number(agent.crit_prob, "Agent basic CRIT_PROB"))
-        self.critical.multi.add(Number(agent.crit_muilti, "Agent basic CRIT_MULTI"))
+        self.defense.set_agent_level(agent.level)
+        self.critical.ratio.add(Number(agent.crit_ratio, "Agent basic CRIT_RATIO"))
+        self.critical.multi.add(Number(agent.crit_multi, "Agent basic CRIT_MULTI"))
 
-    def apply_weapon(self, weapon: WeaponData):
+    def apply_weapon_data(self, weapon: WeaponData):
         self.atk.weapon = Number(weapon.atk, "Weapon basic ATK")
         self.apply_stat(weapon.primary, "Weapon primary stat")
 
@@ -241,17 +227,29 @@ class DMG:
         for s in disc.secondaries:
             self.apply_stat(s, f"Disc-{disc.index} {disc.kind} secondary")
 
-    def apply_discs(self, discs: DiscList):
+    def apply_discs(self, discs: DiscGroup):
+        for s in discs.suit2_stats:
+            self.apply_stat(s)
+
+        if discs.summary:
+            self.apply_disc(discs.summary)
+            return
+
         for disc in discs.discs:
-            self.apply_disc(disc)
+            if not disc.empty():
+                self.apply_disc(disc)
 
     def apply_build_static(self, b: Build):
-        self.apply_agent(b.agent)
-        self.apply_weapon(b.weapon)
+        self.apply_agent_data(b.agent.data)
+        self.apply_weapon_data(b.weapon.data)
         self.apply_discs(b.discs)
+        for stat in b.extra:
+            self.apply_stat(stat)
 
     def apply_build_dynamic(self, b: Build, context: ContextData):
-        for buff in b.buffs:
+        if context.daze:
+            self.daze.add(Number(0.5, "Basic daze ratio"))
+        for buff in b.buffs.values():
             stat = buff.produce(context)
             if stat:
                 self.apply_stat(stat, source=buff.source, dynamic=True)
@@ -259,14 +257,15 @@ class DMG:
     def apply_build_all(self, b: Build, context: ContextData):
         self.apply_build_static(b)
         self.apply_build_dynamic(b, context)
-        if context.daze:
-            self.daze.multi.add(Number(context.daze, "Basic daze ratio"))
+
+    def one_line(self):
+        return f"{self.atk} * {self.skill} * {self.dmg_ratio} * {self.resistance} * {self.defense} * {self.critical} * {self.daze} = {self.calc()}"
 
     def __str__(self):
         return (
             f"{self.atk}             \t# base\n"
             + f"* {self.skill}       \t# skill\n"
-            + f"* {self.dmg_percent} \t# dmg_percent\n"
+            + f"* {self.dmg_ratio} \t# dmg_ratio\n"
             + f"* {self.resistance}  \t# resistance\n"
             + f"* {self.defense}     \t# defense\n"
             + f"* {self.critical}    \t# critical\n"
@@ -275,14 +274,129 @@ class DMG:
         )
 
 
-def test_dmg():
-    dmg = DMG()
-    build = test_build()
-    context = ContextData()
-    dmg.apply_build_all(build, context)
-    print(build)
-    print(dmg)
+class Combo:
+    def __init__(
+        self,
+        attacks: AttackList,
+        build: Build,
+        context: Optional[ContextData] = None,
+    ):
+        if not context:
+            context = ContextData()
+
+        self.attacks = attacks
+        self.build = build
+        self.context = context
+        self.dmgs = []
+
+    def calc(self, build=None, context=None):
+        if not build:
+            build = self.build
+        if not context:
+            context = self.context
+
+        base_dmg = DMG()
+        base_dmg.apply_build_static(build)
+
+        self.dmgs = []
+        for attack_cb in self.attacks.attacks:
+            attack = attack_cb(build.agent)
+
+            c = copy.deepcopy(context)
+            c.atk_kind = attack.kind
+            c.atk_attr = attack.attribute
+
+            dmg = copy.deepcopy(base_dmg)
+            dmg.apply_build_dynamic(build, c)
+            dmg.skill.set(attack.multi)
+            self.dmgs.append(dmg)
+
+        value = 0.0
+        for dmg in self.dmgs:
+            value += dmg.calc().value()
+        return value
+
+    def delta(self):
+        print(self.build)
+
+        base = self.calc()
+        print(self)
+
+        def impl(extra):
+            build = copy.copy(self.build).replace_extra(extra)
+            new = self.calc(build, self.context)
+            print(self)
+            print(f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by {extra}\n")
+
+        impl([StatValue(0.03, StatKind.ATK_RATIO)])
+        impl([(StatValue(0.03, StatKind.DMG_RATIO))])
+        impl([(StatValue(0.024, StatKind.CRIT_RATIO))])
+        impl([(StatValue(0.048, StatKind.CRIT_MULTI))])
+
+        disc5 = self.build.discs.at(5).primary
+        if disc5.kind == StatKind.ATK_RATIO:
+            impl(
+                [
+                    (StatValue(-0.3, StatKind.ATK_RATIO)),
+                    (StatValue(0.3, StatKind.DMG_RATIO)),
+                ]
+            )
+            impl(
+                [
+                    (StatValue(-0.3, StatKind.ATK_RATIO)),
+                    (StatValue(-0.1, StatKind.DMG_RATIO)),
+                    (StatValue(0.32, StatKind.PEN_RATIO)),
+                ]
+            )
+        elif disc5.kind == StatKind.DMG_RATIO:
+            impl(
+                [
+                    (StatValue(-0.3, StatKind.DMG_RATIO)),
+                    (StatValue(0.3, StatKind.ATK_RATIO)),
+                ]
+            )
+            impl(
+                [
+                    (StatValue(-0.3, StatKind.DMG_RATIO)),
+                    (StatValue(-0.1, StatKind.DMG_RATIO)),
+                    (StatValue(0.32, StatKind.PEN_RATIO)),
+                ]
+            )
+
+        def level60():
+            build = copy.deepcopy(self.build)
+            build.agent.data.level = 60
+            new = self.calc(build, self.context)
+            print(self)
+            print(f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by L50->L60\n")
+
+        level60()
+
+        def skill11():
+            build = copy.deepcopy(self.build)
+            build.agent.skill_levels = SkillLevels(6, 11, 11, 11, 11, 11)
+            new = self.calc(build, self.context)
+            print(self)
+            print(f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by skill-11\n")
+
+        skill11()
+
+    def __str__(self):
+        s = ""
+        for dmg in self.dmgs:
+            s += str(dmg.one_line())
+            s += "\n"
+        s += f"In total = {self.calc()}"
+        return s
+
+
+def test_combo():
+    from pyzzz.agents.ellen import Ellen
+
+    attacks = AttackList([Ellen.EX1, Ellen.A3])
+    combo = Combo(attacks, test_build_summary())
+    combo.delta()
 
 
 if __name__ == "__main__":
-    test_dmg()
+    test_combo()
