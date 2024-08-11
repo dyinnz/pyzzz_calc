@@ -1,9 +1,11 @@
 import copy
 import math
+from dataclasses import replace
 from functools import reduce
 from typing import Optional, Union
 
-from pyzzz.build import Build, test_build_summary
+from pyzzz import build, weapons
+from pyzzz.build import Build
 from pyzzz.model import *
 
 
@@ -37,6 +39,7 @@ class Number:
         return self.v
 
     def __str__(self):
+        # return f"{self.v:.3f}".rstrip("0").rstrip(".")
         if abs(self.v) > 1.0 or self.v == 0.0:
             return f"{self.v:.3f}".rstrip("0").rstrip(".")
         else:
@@ -117,7 +120,7 @@ class DefenseMultiplier:
     def __init__(self, **kw):
         self._agent_level = kw.get("agent_level", 60)
         self._enemy_level = kw.get("enemy_level", 70)
-        self._enemy_base = kw.get("enemy_base", 60)
+        self._enemy_base = kw.get("enemy_base", 50)
 
         self.agent = Number(self.defense_func(self._agent_level))
         self.enemy = Number(
@@ -153,10 +156,17 @@ class CriticalMultiplier:
         self.multi = LazyAdd([])
 
     def calc(self):
-        return Number(1.0) + Number(self.ratio.value() * self.multi.value())
+        ratio = self.ratio.value()
+        if ratio > 1.0:
+            ratio = 1.0
+        return Number(1.0) + Number(ratio * self.multi.value())
 
     def __str__(self):
-        return f"(1.0 + {self.ratio} * {self.multi})"
+        ratio = self.ratio.value()
+        if ratio > 1.0:
+            return f"(1.0 + 1.0 * {self.multi})"
+        else:
+            return f"(1.0 + {self.ratio} * {self.multi})"
 
 
 # 7
@@ -213,7 +223,7 @@ class DMG:
             self.daze.add(number)
 
     def apply_agent_data(self, agent: AgentData):
-        self.atk.agent = Number(agent.atk, "Agent basic ATK")
+        self.atk.agent = Number(agent.atk_base, "Agent basic ATK")
         self.defense.set_agent_level(agent.level)
         self.critical.ratio.add(Number(agent.crit_ratio, "Agent basic CRIT_RATIO"))
         self.critical.multi.add(Number(agent.crit_multi, "Agent basic CRIT_MULTI"))
@@ -240,7 +250,7 @@ class DMG:
                 self.apply_disc(disc)
 
     def apply_build_static(self, b: Build):
-        self.apply_agent_data(b.agent.data)
+        self.apply_agent_data(b.agent.base)
         self.apply_weapon_data(b.weapon.data)
         self.apply_discs(b.discs)
         for stat in b.extra:
@@ -321,82 +331,228 @@ class Combo:
 
         base = self.calc()
         print(self)
+        print(f"base line {self.attacks} : {base}")
 
         def impl(extra):
             build = copy.copy(self.build).replace_extra(extra)
+            build.calc_static_agent()
+            build.collect_buffs()
             new = self.calc(build, self.context)
             print(self)
             print(f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by {extra}\n")
 
+        impl([StatValue(9, StatKind.PEN_FLAT)])
+        impl([StatValue(19, StatKind.ATK_FLAT)])
         impl([StatValue(0.03, StatKind.ATK_RATIO)])
-        impl([(StatValue(0.03, StatKind.DMG_RATIO))])
-        impl([(StatValue(0.024, StatKind.CRIT_RATIO))])
-        impl([(StatValue(0.048, StatKind.CRIT_MULTI))])
+        impl([StatValue(0.03, StatKind.DMG_RATIO)])
+        impl([StatValue(0.024, StatKind.CRIT_RATIO)])
+        impl([StatValue(-0.024, StatKind.CRIT_RATIO)])
+        impl([StatValue(0.048, StatKind.CRIT_MULTI)])
+        impl([StatValue(0.024, StatKind.PEN_RATIO)])
+
+        disc4 = self.build.discs.at(4).primary
+        if disc4.kind == StatKind.CRIT_RATIO:
+            impl(
+                [
+                    StatValue(-0.24, StatKind.CRIT_RATIO),
+                    StatValue(+0.48, StatKind.CRIT_MULTI),
+                ]
+            )
+        elif disc4.kind == StatKind.CRIT_MULTI:
+            impl(
+                [
+                    StatValue(+0.24, StatKind.CRIT_RATIO),
+                    StatValue(-0.48, StatKind.CRIT_MULTI),
+                ]
+            )
 
         disc5 = self.build.discs.at(5).primary
         if disc5.kind == StatKind.ATK_RATIO:
             impl(
                 [
-                    (StatValue(-0.3, StatKind.ATK_RATIO)),
-                    (StatValue(0.3, StatKind.DMG_RATIO)),
+                    StatValue(-0.3, StatKind.ATK_RATIO),
+                    StatValue(0.3, StatKind.DMG_RATIO),
                 ]
             )
             impl(
                 [
-                    (StatValue(-0.3, StatKind.ATK_RATIO)),
-                    (StatValue(-0.1, StatKind.DMG_RATIO)),
-                    (StatValue(0.32, StatKind.PEN_RATIO)),
+                    # self.build.discs.suit2_stats[0].negative(),
+                    StatValue(-0.3, StatKind.ATK_RATIO),
+                    StatValue(0.24, StatKind.PEN_RATIO),
                 ]
             )
         elif disc5.kind == StatKind.DMG_RATIO:
             impl(
                 [
-                    (StatValue(-0.3, StatKind.DMG_RATIO)),
-                    (StatValue(0.3, StatKind.ATK_RATIO)),
+                    StatValue(-0.3, StatKind.DMG_RATIO),
+                    StatValue(0.3, StatKind.ATK_RATIO),
                 ]
             )
             impl(
                 [
-                    (StatValue(-0.3, StatKind.DMG_RATIO)),
-                    (StatValue(-0.1, StatKind.DMG_RATIO)),
-                    (StatValue(0.32, StatKind.PEN_RATIO)),
+                    # self.build.discs.suit2_stats[0].negative(),
+                    StatValue(-0.3, StatKind.DMG_RATIO),
+                    StatValue(0.24, StatKind.PEN_RATIO),
+                ]
+            )
+        elif disc5.kind == StatKind.PEN_RATIO:
+            impl(
+                [
+                    StatValue(+0.3, StatKind.DMG_RATIO),
+                    StatValue(-0.24, StatKind.PEN_RATIO),
+                ]
+            )
+            impl(
+                [
+                    StatValue(+0.3, StatKind.ATK_RATIO),
+                    StatValue(-0.24, StatKind.PEN_RATIO),
                 ]
             )
 
-        def level60():
+
+        def level_up(level=60):
             build = copy.deepcopy(self.build)
-            build.agent.data.level = 60
+            agent_new = copy.deepcopy(build.agent).set_stats(level)
+            agent_old = copy.deepcopy(build.agent).set_stats(build.agent.level)
+            build.agent.base.level = level
+            build.agent.base = build.agent.base + (agent_new.base - agent_old.base)
+            build.calc_static_agent()
+
             new = self.calc(build, self.context)
             print(self)
-            print(f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by L50->L60\n")
+            print(
+                f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by agent level {build.agent.level}->{level}\n"
+            )
 
-        level60()
+        if self.build.agent.static.level < 60:
+            level_up(60)
 
-        def skill11():
+        def weapon60():
             build = copy.deepcopy(self.build)
-            build.agent.skill_levels = SkillLevels(6, 11, 11, 11, 11, 11)
+            weapon_new = copy.deepcopy(build.weapon)
+            weapon_new.set_stats(60)
+            weapon_old = copy.deepcopy(build.weapon)
+            weapon_old.set_stats(build.weapon._level)
+
+            build.weapon.data.level = 60
+            build.weapon.data = build.weapon.data + (weapon_new.data - weapon_old.data)
+            build.calc_static_agent()
+
             new = self.calc(build, self.context)
             print(self)
-            print(f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by skill-11\n")
+            print(
+                f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by weapon L50->L60\n"
+            )
 
-        skill11()
+        if self.build.weapon.data.level < 60:
+            weapon60()
+
+        def core():
+            skills = self.build.agent.skill_levels
+            build = copy.deepcopy(self.build)
+            build.agent.set_stats(skill_levels=replace(skills, core=skills.core + 1))
+            build.calc_static_agent()
+            build.collect_buffs()
+
+            new = self.calc(build, self.context)
+            print(self)
+            print(
+                f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by core {skills.core}->{skills.core+1}\n"
+            )
+
+        core()
+
+        def basic():
+            skills = self.build.agent.skill_levels
+            build = copy.deepcopy(self.build)
+            build.agent.set_stats(skill_levels=replace(skills, basic=skills.basic + 1))
+            new = self.calc(build, self.context)
+            print(self)
+            print(
+                f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by basic {skills.basic}->{skills.basic+1}\n"
+            )
+
+        basic()
+
+        # def deep_sea():
+        #     build = copy.deepcopy(self.build).replace_weapon(
+        #         weapons.create_weapon("DeepSeaVisitor")
+        #     )
+        #     build.replace_extra([
+        #             StatValue(-0.24, StatKind.CRIT_RATIO),
+        #             StatValue(+0.48, StatKind.CRIT_MULTI),
+        #             self.build.discs.suit2_stats[0].negative(),
+        #             StatValue(-0.3, StatKind.ATK_RATIO),
+        #             StatValue(0.32, StatKind.PEN_RATIO),
+        #         ])
+        #     print(build)
+        #     new = self.calc(build, self.context)
+        #     print(self)
+        #     print(
+        #         f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by weapon deep sea\n"
+        #     )
+        # deep_sea()
 
     def __str__(self):
+        v = 0.0
         s = ""
         for dmg in self.dmgs:
+            v += dmg.calc().value()
             s += str(dmg.one_line())
             s += "\n"
-        s += f"In total = {self.calc()}"
+        s += f"In total = {v}"
         return s
 
 
 def test_combo():
     from pyzzz.agents.ellen import Ellen
 
-    attacks = AttackList([Ellen.EX1, Ellen.A3])
-    combo = Combo(attacks, test_build_summary())
+    # attacks = AttackList([Ellen.Final])
+    # b = build.test_build_full()
+    # b.collect_buffs()
+    # combo = Combo(attacks, b)
+    # combo.delta()
+
+    # attacks = AttackList([Ellen.EX1, Ellen.A3])
+    # b = build.test_build_full()
+    # b.collect_buffs()
+    # combo = Combo(attacks, b)
+    # combo.delta()
+
+    attacks = AttackList([Ellen.A1, Ellen.A2, Ellen.A3])
+    b = build.test_build_full()
+    b.collect_buffs()
+    combo = Combo(attacks, b)
+    combo.delta()
+
+    # attacks = AttackList([Ellen.Chain])
+    # b = build.test_build_full()
+    # b.collect_buffs()
+    # combo = Combo(attacks, b)
+    # combo.delta()
+
+
+def test_combo2():
+    from pyzzz.agents.soukaku import Soukaku
+
+    # attacks = AttackList([Soukaku.A1, Soukaku.A2, Soukaku.A3])
+    attacks = AttackList([Soukaku.Dodge, Soukaku.A3])
+    # attacks = AttackList([Soukaku.Chain])
+    b = build.test_build_full2()
+    b.collect_buffs()
+    combo = Combo(attacks, b)
+    combo.delta()
+
+
+def test_combo3():
+    from pyzzz.agents.lycaon import Lycaon
+
+    attacks = AttackList([Lycaon.Chain])
+    b = build.test_build_full3()
+    b.collect_buffs()
+    combo = Combo(attacks, b)
     combo.delta()
 
 
 if __name__ == "__main__":
-    test_combo()
+    test_combo2()

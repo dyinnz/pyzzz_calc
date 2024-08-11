@@ -1,6 +1,3 @@
-from typing import Optional
-
-from pyzzz import dataset
 from pyzzz.agents.agent import Agent
 from pyzzz.buff import Buff
 from pyzzz.model import (
@@ -17,19 +14,108 @@ from pyzzz.model import (
 
 class Soukaku(Agent):
     def __init__(
-        self, level=60, skill_levels: Optional[SkillLevels] = None, core_skill_atk=1000
+        self,
+        level=60,
+        skill_levels: SkillLevels | None = None,
+        core_skill_atk=None,
+        repetition=5,
     ):
-        Agent.__init__(self, skill_levels=skill_levels)
+        name = "Soukaku"
+        Agent.__init__(
+            self,
+            name=name,
+            level=level,
+            skill_levels=skill_levels,
+            repetition=repetition,
+        )
 
-        self.name = "Soukaku"
         self.cn_name = "苍角"
         self.load_cn_data(self.cn_name)
 
-        self.core_skill_atk = core_skill_atk
+        self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
+
+        self.a1 = self._skill["普通攻击：打年糕（霜染刃旗）-一段"]
+        self.a2 = self._skill["普通攻击：打年糕（霜染刃旗）-二段"]
+        self.a3 = self._skill["普通攻击：打年糕（霜染刃旗）-三段"]
+
+        self.e1 = self._skill["特殊技：吹凉便当-一段"]
+        self.e2 = self._skill["特殊技：吹凉便当-终结段"]
+
+        self.ex1 = self._skill["强化特殊技：扇走蚊虫-风场"]
+        self.ex2 = self._skill["强化特殊技：扇走蚊虫-连续攻击"]
+
+        self.ey1 = self._skill["特殊技：集合啦！-展旗"]
+        self.ey2 = self._skill["特殊技：集合啦！-快速展旗"]
+        self.ey3 = self._skill["特殊技：集合啦！-收旗攻击"]
+
+        self.dogde = self._skill["闪避反击：别抢零食-"]
+        self.chain = self._skill["连携技：鹅鸡斩-"]
+        self.final = self._skill["终结技：大份鹅鸡斩-"]
+
+    def A1(self):
+        value = self.a1["dmg"] + self.a1["dmg_grow"] * (self.skill_levels.basic - 1)
+        return Attack(AttackKind.Basic, Attribute.Ice, value)
+
+    def A2(self):
+        value = self.a2["dmg"] + self.a2["dmg_grow"] * (self.skill_levels.basic - 1)
+        return Attack(AttackKind.Basic, Attribute.Ice, value)
+
+    def A3(self):
+        value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)
+        return Attack(AttackKind.Basic, Attribute.Ice, value)
+
+    def E1(self):
+        value = self.e1["dmg"] + self.e1["dmg_grow"] * (self.skill_levels.special - 1)
+        return Attack(AttackKind.Special, Attribute.Ice, value)
+
+    def E2(self):
+        value = self.e2["dmg"] + self.e2["dmg_grow"] * (self.skill_levels.special - 1)
+        return Attack(AttackKind.Special, Attribute.Ice, value)
+
+    def EX1(self):
+        value = self.ex1["dmg"] + self.ex1["dmg_grow"] * (self.skill_levels.special - 1)
+        return Attack(AttackKind.SpecialEx, Attribute.Ice, value)
+
+    def EX2(self):
+        value = self.ex2["dmg"] + self.ex2["dmg_grow"] * (self.skill_levels.special - 1)
+        return Attack(AttackKind.SpecialEx, Attribute.Ice, value)
+
+    def EY1(self):
+        value = self.ey1["dmg"] + self.ey1["dmg_grow"] * (self.skill_levels.special - 1)
+        return Attack(AttackKind.Special, Attribute.Ice, value)
+
+    def EY2(self):
+        value = self.ey1["dmg"] + self.ey2["dmg_grow"] * (self.skill_levels.special - 1)
+        return Attack(AttackKind.Special, Attribute.Ice, value)
+
+    def EY3(self):
+        value = self.ey3["dmg"] + self.ey3["dmg_grow"] * (self.skill_levels.special - 1)
+        return Attack(AttackKind.Special, Attribute.Ice, value)
+
+    def Dodge(self):
+        value = self.dogde["dmg"] + self.dogde["dmg_grow"] * (
+            self.skill_levels.special - 1
+        )
+        return Attack(AttackKind.Dodge, Attribute.Ice, value)
+
+    def Chain(self):
+        value = self.chain["dmg"] + self.chain["dmg_grow"] * (
+            self.skill_levels.special - 1
+        )
+        return Attack(AttackKind.Chain, Attribute.Ice, value)
+
+    def Final(self):
+        value = self.final["dmg"] + self.final["dmg_grow"] * (
+            self.skill_levels.special - 1
+        )
+        return Attack(AttackKind.Final, Attribute.Ice, value)
 
     def core_skill(self):
+        m = [0, 12.5, 15, 17, 18, 19, 20][self.skill_levels.core] / 100 * 2
+        value = self.static.static_atk() * m
+        value = min(1000, value)
         return Buff(
-            StatValue(self.core_skill_atk, StatKind.ATK_FLAT),
+            StatValue(value, StatKind.ATK_FLAT),
             source="Soukaku core skill atk dynamic flat",
         )
 
@@ -37,8 +123,27 @@ class Soukaku(Agent):
         return Buff(
             StatValue(0.2, StatKind.DMG_RATIO),
             condition=ContextData(atk_attr=Attribute.Ice),
-            source="Soukaku extra skill ice ratio",
+            source="Soukaku extra skill ice dmg ratio",
         )
 
-    def buffs(self):
-        return [self.core_skill(), self.extra_skill()]
+    def rep4(self):
+        return Buff(
+            StatValue(0.1, StatKind.RES_RATIO),
+            condition=ContextData(atk_attr=Attribute.Ice),
+            source="Soukaku rep4 ice res ratio",
+        )
+
+    def rep6(self):
+        return Buff(
+            StatValue(0.45, StatKind.DMG_RATIO),
+            condition=ContextData(atk_attr=Attribute.Ice, atk_kind=AttackKind.Basic),
+            source="Soukaku rep6 ice dmg ratio",
+        )
+
+    def buffs(self, _: bool = True):
+        res = [self.core_skill(), self.extra_skill()]
+        if self._repetition >= 4:
+            res.append(self.rep4())
+        if self._repetition >= 6:
+            res.append(self.rep6())
+        return res

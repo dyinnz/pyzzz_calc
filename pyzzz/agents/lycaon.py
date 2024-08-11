@@ -1,6 +1,3 @@
-from typing import Optional
-
-from pyzzz import dataset
 from pyzzz.agents.agent import Agent
 from pyzzz.buff import Buff
 from pyzzz.model import (
@@ -16,26 +13,40 @@ from pyzzz.model import (
 
 
 class Lycaon(Agent):
-    def __init__(self, level=60, skill_levels: Optional[SkillLevels] = None):
-        Agent.__init__(self, skill_levels=skill_levels)
+    def __init__(self, level=60, skill_levels: SkillLevels | None = None, repetition=0):
+        name = "Lycaon"
+        Agent.__init__(
+            self,
+            name=name,
+            level=level,
+            skill_levels=skill_levels,
+            repetition=repetition,
+        )
 
-        self.name = "Lycaon"
         self.cn_name = "莱卡恩"
         self.load_cn_data(self.cn_name)
+
+        self.chain = self._skill["连携技：遵命-"]
+
+    def Chain(self):
+        value = self.chain["dmg"] + self.chain["dmg_grow"] * (
+            self.skill_levels.special - 1
+        )
+        return Attack(AttackKind.Chain, Attribute.Ice, value)
 
     def core_skill(self):
         return Buff(
             StatValue(-0.25, StatKind.RES_RATIO),
             condition=ContextData(atk_attr=Attribute.Ice),
-            source=f"{self.name} core skill Ice DMG RES",
+            source=f"{self._name} core skill Ice DMG RES",
         )
 
     def extra_skill(self):
         return Buff(
             StatValue(0.35, StatKind.STUN_DMG_RATIO),
             condition=ContextData(daze=True),
-            source=f"{self.name} extra skill Stun DMG Multiplier",
+            source=f"{self._name} extra skill Stun DMG Multiplier",
         )
 
-    def buffs(self):
+    def buffs(self, _: bool = True):
         return [self.core_skill(), self.extra_skill()]

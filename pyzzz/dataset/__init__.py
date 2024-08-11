@@ -1,8 +1,9 @@
+import copy
 import csv
 import os
 from functools import lru_cache
 
-from pyzzz.model import AgentData, StatValue
+from pyzzz.model import AgentData, StatKind, StatValue, WeaponGrowth
 
 file_path = os.path.realpath(__file__)
 directory = os.path.dirname(file_path)
@@ -19,8 +20,10 @@ def load_agents_basic():
     with open(directory + "/agents_basic.csv") as file:
         spamreader = csv.reader(file, delimiter="\t")
         for row in spamreader:
+            name = row[0]
+
             agent = AgentData()
-            agent.name = row[0]
+            # agent.name = row[0]
             agent.level = 60
             # agent.hp = float(row[1])
             # agent.atk = float(row[2])
@@ -36,7 +39,7 @@ def load_agents_basic():
             agent.atk = float(row[12])
             agent.defense = float(row[13])
 
-            agents[agent.name] = agent
+            agents[name] = agent
 
     return agents
 
@@ -97,3 +100,147 @@ def load_weapons():
             weapons[name] = weapon
 
     return weapons
+
+
+@lru_cache
+def load_zzz_gg_agents_json():
+    import json
+
+    with open(directory + "/zzz.gg.agents.json") as file:
+        return json.load(file)
+
+
+@lru_cache
+def load_zzz_gg_agents():
+    def remove_skills_talents(agent):
+        agent.pop("Skills")
+        agent.pop("Talents")
+        return agent
+
+    json = load_zzz_gg_agents_json()
+
+    properties_list = json["properties"]
+    properties_by_id = {prop["PropID"]: prop for prop in properties_list}
+    # fix strange id
+    properties_by_id[20101] = properties_by_id[201]
+    properties_by_id[21101] = properties_by_id[211]
+    properties_by_id[23101] = properties_by_id[231]
+
+    elements_by_id = {
+        item["DamageElementID"]: item["Name"] for item in json["elements"]
+    }
+    professions_by_id = {item["ID"]: item["Name"] for item in json["professions"]}
+
+    agents_list = json["characters"]
+    for agent in agents_list:
+        remove_skills_talents(agent)
+    # 0
+    id2name = {agent["ID"]: agent["Name"] for agent in agents_list}
+
+    # 1
+    agents_dict = {agent["Name"]: agent for agent in agents_list}
+    for v in agents_dict.values():
+        v["ElementTypeName"] = elements_by_id[v["ElementTypes"][0]]
+        v["ProfessionName"] = professions_by_id[v["WeaponType"]]
+
+    # 2
+    ascensions_dict = {}
+    ascensions_list = json["ascension"]
+    for ascension in ascensions_list:
+        id = ascension["AvatarID"]
+        if id not in id2name:
+            continue
+
+        name = id2name[id]
+        rank = ascension["Rank"]
+        agent_asc = ascensions_dict.get(name, {})
+        agent_asc[rank] = ascension
+        ascensions_dict[name] = agent_asc
+
+    passives_dict = {}
+    passives_list = json["passives"]
+    for passive in passives_list:
+        id = passive["AvatarID"]
+        if id not in id2name:
+            continue
+
+        extra = passive["Extra"]
+        props = {
+            properties_by_id[prop["Property"]]["Name"]: prop["Value"] for prop in extra
+        }
+
+        name = id2name[id]
+        max_level = passive["MaxLevel"]
+        agent_passive = passives_dict.get(name, {})
+        agent_passive[max_level] = props
+        passives_dict[name] = agent_passive
+
+    return dict(agents=agents_dict, ascensions=ascensions_dict, passives=passives_dict)
+
+
+@lru_cache
+def load_zzz_gg_weapons_json():
+    import json
+
+    with open(directory + "/zzz.gg.weapons.json") as file:
+        return json.load(file)
+
+
+@lru_cache
+def load_zzz_gg_weapons():
+
+    json = load_zzz_gg_weapons_json()
+
+    professions_by_id = {item["ID"]: item["Name"] for item in json["professions"]}
+
+    model_ascension: dict[int, list[WeaponGrowth]] = {}
+    model_leveling: dict[int, list[WeaponGrowth]] = {}
+    weapons = {}
+
+    ascensions = json["ascension"]
+    for item in ascensions:
+        model = item["Rarity"]
+        model_asc = model_ascension.get(model, [])
+
+        growth = WeaponGrowth()
+        growth.atk_rate = item["StarRate"] / 1e4
+        growth.primary_rate = item["RandRate"] / 1e4
+        model_asc.append(growth)
+
+        model_ascension[model] = model_asc
+
+    levelings = json["leveling"]
+    for item in levelings:
+        model = item["Rarity"]
+        model_lv = model_leveling.get(model, [])
+
+        growth = WeaponGrowth()
+        growth.atk_rate = item["EnhanceRate"] / 1e4
+        model_lv.append(growth)
+
+        model_leveling[model] = model_lv
+
+    engines = json["engines"]
+    weapons = {item["Name"].replace(" ", ""): item for item in engines}
+    for v in weapons.values():
+        v["ProfessionName"] = professions_by_id[v["Type"]]
+
+    return dict(weapons=weapons, levelings=model_leveling, ascensions=model_ascension)
+
+
+ZZZ_GG_STAT_PASSIVE = {
+    "ATK": StatKind.ATK_FLAT,
+    "Impact": StatKind.IMPACT,
+    "CRIT Rate": StatKind.CRIT_RATIO,
+    "CRIT DMG": StatKind.CRIT_MULTI,
+    "Energy Regen": StatKind.ENERGY_REGEN,
+    "Anomaly Mastery": StatKind.ATTR_MASTER,
+    "Anomaly Proficiency": StatKind.ANOMALY,
+    "PEN Ratio": StatKind.PEN_RATIO,
+}
+
+
+ZZZ_GG_STAT_PRIMARY = copy.deepcopy(ZZZ_GG_STAT_PASSIVE)
+ZZZ_GG_STAT_PRIMARY["ATK"] = StatKind.ATK_RATIO
+ZZZ_GG_STAT_PRIMARY["DEF"] = StatKind.DEF_RATIO
+ZZZ_GG_STAT_PRIMARY["HP"] = StatKind.HP_RATIO

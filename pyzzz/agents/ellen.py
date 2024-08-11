@@ -1,6 +1,3 @@
-from typing import Optional
-
-from pyzzz import dataset
 from pyzzz.agents.agent import Agent
 from pyzzz.buff import Buff
 from pyzzz.model import (
@@ -16,21 +13,26 @@ from pyzzz.model import (
 
 
 class Ellen(Agent):
-    def __init__(self, level=60, skill_levels: Optional[SkillLevels] = None):
-        Agent.__init__(self, skill_levels=skill_levels)
+    def __init__(self, level=60, skill_levels: SkillLevels | None = None, repetition=0):
+        name = "Ellen"
+        Agent.__init__(
+            self,
+            name=name,
+            level=level,
+            skill_levels=skill_levels,
+            repetition=repetition,
+        )
 
-        self.name = "Ellen"
         self.cn_name = "艾莲"
+        self.load_cn_data(self.cn_name)
 
-        self.data: AgentData = dataset.load_agents_basic()[self.cn_name]
-        self.skill = dataset.load_skills()[self.cn_name]
-
-        self.a1 = self.skill["普通攻击：急冻修剪法-一段"]
-        self.a2 = self.skill["普通攻击：急冻修剪法-二段"]
-        self.a3 = self.skill["普通攻击：急冻修剪法-三段"]
-        self.ex1 = self.skill["强化特殊技：横扫-"]
-        self.ex2 = self.skill["强化特殊技：鲨卷风-"]
-        self.f = self.skill["终结技：永冬狂宴-"]
+        self.a1 = self._skill["普通攻击：急冻修剪法-一段"]
+        self.a2 = self._skill["普通攻击：急冻修剪法-二段"]
+        self.a3 = self._skill["普通攻击：急冻修剪法-三段"]
+        self.ex1 = self._skill["强化特殊技：横扫-"]
+        self.ex2 = self._skill["强化特殊技：鲨卷风-"]
+        self.chain = self._skill["连携技：雪崩-"]
+        self.f = self._skill["终结技：永冬狂宴-"]
 
     def A1(self):
         value = self.a1["dmg"] + self.a1["dmg_grow"] * (self.skill_levels.basic - 1)
@@ -52,6 +54,10 @@ class Ellen(Agent):
         value = self.ex2["dmg"] + self.ex2["dmg_grow"] * (self.skill_levels.special - 1)
         return Attack(AttackKind.SpecialEx, Attribute.Ice, value)
 
+    def Chain(self):
+        value = self.chain["dmg"] + self.chain["dmg_grow"] * (self.skill_levels.chain - 1)
+        return Attack(AttackKind.Chain, Attribute.Ice, value)
+
     def Final(self):
         value = self.f["dmg"] + self.f["dmg_grow"] * (self.skill_levels.chain - 1)
         return Attack(AttackKind.Final, Attribute.Ice, value)
@@ -61,13 +67,13 @@ class Ellen(Agent):
         return Buff(
             StatValue(multi[self.skill_levels.core], StatKind.CRIT_MULTI),
             condition=ContextData(atk_kind=AttackKind.Basic),
-            source="Allen core skill",
+            source="Ellen core skill",
         )
 
     def extra_skill(self):
         return Buff(
-            StatValue(0.3, StatKind.DMG_RATIO), source="Allen extra skill ice ratio"
+            StatValue(0.3, StatKind.DMG_RATIO), source="Ellen extra skill ice ratio"
         )
 
-    def buffs(self):
+    def buffs(self, _: bool = True):
         return [self.core_skill(), self.extra_skill()]

@@ -1,6 +1,6 @@
+import math
 from dataclasses import dataclass, field
 from enum import StrEnum, auto
-from typing import Optional
 
 from pyzzz import util
 
@@ -8,6 +8,7 @@ from pyzzz import util
 class StatKind(StrEnum):
     STAT_EMPTY = auto()
 
+    ATK_BASE = auto()
     ATK_RATIO = auto()
     ATK_FLAT = auto()
     CRIT_RATIO = auto()
@@ -19,6 +20,7 @@ class StatKind(StrEnum):
     PEN_RATIO = auto()
     PEN_FLAT = auto()
 
+    ATTR_MASTER = auto()
     ANOMALY = auto()
     IMPACT = auto()
     ENERGY_REGEN = auto()
@@ -34,7 +36,7 @@ class StatValue:
     kind: StatKind
 
     @staticmethod
-    def empty():
+    def create_empty():
         return StatValue(0, StatKind.STAT_EMPTY)
 
     def __bool__(self):
@@ -45,6 +47,16 @@ class StatValue:
             return f"{self.kind}:{self.value:.3f}".rstrip("0").rstrip(".")
         else:
             return f"{self.kind}:{self.value * 100.0:.1f}%"
+
+    def __sub__(self, rhs):
+        if self.kind != rhs.kind:
+            raise Exception(f"not same kind {self.kind} - {rhs.kind}")
+        return StatValue(self.value - rhs.value, self.kind)
+
+    def __add__(self, rhs):
+        if self.kind != rhs.kind:
+            raise Exception(f"not same kind {self.kind} - {rhs.kind}")
+        return StatValue(self.value + rhs.value, self.kind)
 
     def negative(self):
         return StatValue(-self.value, self.kind)
@@ -84,6 +96,7 @@ class Attribute(StrEnum):
 class AttackKind(StrEnum):
     All = auto()
     Basic = auto()
+    Dash = auto()
     Dodge = auto()  # 闪避反击
     Assit = auto()  # 支援攻击
     Special = auto()
@@ -132,6 +145,22 @@ class DiscKind(StrEnum):
         return f"Disk.{self.name}"
 
 
+def get_suit2_stat(kind: DiscKind) -> StatValue:
+
+    mapping = {
+        DiscKind.Fanged_Metal: StatValue(0.10, StatKind.DMG_RATIO),
+        DiscKind.Polar_Metal: StatValue(0.10, StatKind.DMG_RATIO),
+        DiscKind.Thunder_Metal: StatValue(0.10, StatKind.DMG_RATIO),
+        DiscKind.Chaotic_Metal: StatValue(0.10, StatKind.DMG_RATIO),
+        DiscKind.Inferno_Metal: StatValue(0.10, StatKind.DMG_RATIO),
+        DiscKind.Hormone_Punk: StatValue(0.10, StatKind.ATK_RATIO),
+        DiscKind.Puffer_Electro: StatValue(0.08, StatKind.PEN_RATIO),
+        DiscKind.Woodpecker_Electro: StatValue(0.08, StatKind.CRIT_RATIO),
+    }
+
+    return mapping.get(kind, StatValue.create_empty())
+
+
 @dataclass
 class Disc:
     index: int
@@ -160,29 +189,34 @@ class DiscGroup:
     suit2: list[DiscKind] = field(default_factory=list)
     suit2_stats: list[StatValue] = field(default_factory=list)
     suit4: DiscKind = DiscKind.Empty
-    summary: Optional[Disc] = None
+    summary: Disc | None = None
 
-    def set(self, n, disc):
-        self.discs[n - 1] = disc
+    def set(self, disc: Disc):
+        self.discs[disc.index - 1] = disc
 
     def at(self, n):
         return self.discs[n - 1]
 
-    def make_suits(self):
+    def generate_suits(self):
         counts = {}
         for disc in self.discs:
             counts[disc.kind] = counts.get(disc.kind, 0) + 1
         self.suit2 = []
-        for k, c in counts.items():
+        sorted_item = sorted(counts.items(), key=lambda t: t[1])
+        for k, c in sorted_item:
             if c >= 2:
                 self.suit2.append(k)
-            elif c >= 4:
+            if c >= 4:
                 self.suit4 = k
+        self.suit2_stats = [get_suit2_stat(k) for k in self.suit2]
 
-    def make_summary(self, summary: Disc, suit2: list[DiscKind], suit4: DiscKind):
+    def make_summary(
+        self, summary: Disc, suit2: list[DiscKind], suit4: DiscKind | None
+    ):
         self.summary = summary
         self.suit2 = [k for k in suit2 if str(k).endswith("metal")]
-        self.suit4 = suit4
+        self.suit4 = suit4 if suit4 else DiscKind.Empty
+        self.suit2_stats = [get_suit2_stat(k) for k in self.suit2]
 
     def __repr__(self):
         s = "Discs:\n"
@@ -213,6 +247,14 @@ class SkillLevels:
     chain: int = 11
     assit: int = 11
 
+    def __post_init__(self):
+        self.core = min(6, self.core)
+        self.basic = min(12, self.basic)
+        self.dodge = min(12, self.dodge)
+        self.special = min(12, self.special)
+        self.chain = min(12, self.chain)
+        self.assit = min(12, self.assit)
+
 
 @dataclass
 class SkillMutil:
@@ -220,13 +262,47 @@ class SkillMutil:
     grow: float = 0.0
 
 
+class Profession(StrEnum):
+    All = auto()
+    Attack = auto()
+    Stun = auto()
+    Anomaly = auto()
+    Support = auto()
+    Defense = auto()
+
+
+class Camp(StrEnum):
+    Unknown = auto()
+    Cunning_Hares = auto()
+    Obol_Squad = auto()
+    Victoria_Housekeeping = auto()
+    Belobog_Heavy_Industries = auto()
+    Section_6 = auto()
+    Sons_of_Calydon = auto()
+    Public_Security = auto()
+
+    @staticmethod
+    def from_full_name(name: str):
+        return {
+            "Belobog Heavy Industries": Camp.Belobog_Heavy_Industries,
+            "Cunning Hares": Camp.Cunning_Hares,
+            "Hollow Special Operations Section 6": Camp.Section_6,
+            "New Eridu Public Security": Camp.Public_Security,
+            "Obol Squad": Camp.Obol_Squad,
+            "Sons of Calydon": Camp.Sons_of_Calydon,
+            "Victoria Housekeeping Co.": Camp.Victoria_Housekeeping,
+        }[name]
+
+
 @dataclass
 class AgentData:
     # NOTE: static data, buff not included here
-    name: str = ""
-
     level: int = 0
-    atk: float = 0.0
+
+    atk_base: float = 0.0
+    atk_weapon: float = 0.0
+    atk_flat: float = 0.0
+    atk_ratio: float = 0.0
     crit_ratio: float = 0.05
     crit_multi: float = 0.50
 
@@ -234,9 +310,97 @@ class AgentData:
     hp: float = field(default=0.0, repr=False)
     defense: float = field(default=0.0, repr=False)
     impact: float = 0.0
-    anomaiy_proficiency: float = 0.0
     attribte_master: float = 0.0
+    anomaiy_proficiency: float = 0.0
     energy_regen: float = field(default=0.0, repr=False)
+
+    pen_ratio: float = 0.0
+    pen_flat: float = 0.0
+    dmg_ratio: float = 0.0
+
+    def static_atk(self):
+        return math.floor(
+            (self.atk_base + self.atk_weapon) * (1.0 + self.atk_ratio) + self.atk_flat
+        )
+
+    def apply_stat(self, stat: StatValue):
+        if stat.kind == StatKind.STAT_EMPTY:
+            pass
+        elif stat.kind == StatKind.ATK_BASE:
+            self.atk_base += stat.value
+        elif stat.kind == StatKind.ATK_RATIO:
+            self.atk_ratio += stat.value
+        elif stat.kind == StatKind.ATK_FLAT:
+            self.atk_flat += stat.value
+        elif stat.kind == StatKind.CRIT_RATIO:
+            self.crit_ratio += stat.value
+        elif stat.kind == StatKind.CRIT_MULTI:
+            self.crit_multi += stat.value
+        elif stat.kind == StatKind.PEN_RATIO:
+            self.pen_ratio += stat.value
+        elif stat.kind == StatKind.PEN_FLAT:
+            self.pen_flat += stat.value
+        elif stat.kind == StatKind.DMG_RATIO:
+            self.dmg_ratio += stat.value
+
+        elif stat.kind == StatKind.HP_FLAT:
+            self.hp += stat.value
+        elif stat.kind == StatKind.DEF_FLAT:
+            self.defense += stat.value
+        elif stat.kind == StatKind.IMPACT:
+            self.impact += stat.value
+        elif stat.kind == StatKind.ENERGY_REGEN:
+            self.energy_regen += stat.value
+        else:
+            raise Exception(f"not supported stat kind {stat.kind} for agent data")
+
+    def __sub__(self, rhs):
+        return AgentData(
+            0,
+            self.atk_base - rhs.atk_base,
+            self.atk_weapon - rhs.atk_weapon,
+            self.atk_flat - rhs.atk_flat,
+            self.atk_ratio - rhs.atk_ratio,
+            self.crit_ratio - rhs.crit_ratio,
+            self.crit_multi - rhs.crit_multi,
+            self.hp - rhs.hp,
+            self.defense - rhs.defense,
+            self.impact - rhs.impact,
+            self.anomaiy_proficiency - rhs.anomaiy_proficiency,
+            self.attribte_master - rhs.attribte_master,
+            self.energy_regen - rhs.energy_regen,
+            self.pen_ratio - rhs.pen_ratio,
+            self.pen_flat - rhs.pen_flat,
+            self.dmg_ratio - rhs.dmg_ratio,
+        )
+
+    def __add__(self, rhs):
+        return AgentData(
+            self.level,
+            self.atk_base + rhs.atk_base,
+            self.atk_weapon + rhs.atk_weapon,
+            self.atk_flat + rhs.atk_flat,
+            self.atk_ratio + rhs.atk_ratio,
+            self.crit_ratio + rhs.crit_ratio,
+            self.crit_multi + rhs.crit_multi,
+            self.hp + rhs.hp,
+            self.defense + rhs.defense,
+            self.impact + rhs.impact,
+            self.anomaiy_proficiency + rhs.anomaiy_proficiency,
+            self.attribte_master + rhs.attribte_master,
+            self.energy_regen + rhs.energy_regen,
+            self.pen_ratio + rhs.pen_ratio,
+            self.pen_flat + rhs.pen_flat,
+            self.dmg_ratio + rhs.dmg_ratio,
+        )
+
+
+@dataclass
+class AgentDataWithGrowth:
+    init: AgentData = field(default_factory=AgentData)
+    atk_growth: float = 0.0
+    hp_growth: float = 0.0
+    defense_growth: float = 0.0
 
 
 @dataclass
@@ -246,12 +410,24 @@ class WeaponData:
     atk: float
     primary: StatValue
 
+    def __sub__(self, rhs):
+        return WeaponData(0, self.atk - rhs.atk, self.primary - rhs.primary)
+
+    def __add__(self, rhs):
+        return WeaponData(self.level, self.atk + rhs.atk, self.primary + rhs.primary)
+
+
+@dataclass
+class WeaponGrowth:
+    atk_rate: float = 0.0
+    primary_rate: float = 0.0
+
 
 @dataclass
 class ContextData:
     # agent -> moster
-    atk_attr: Optional[Attribute] = None
-    atk_kind: Optional[AttackKind] = None
+    atk_attr: Attribute | None = None
+    atk_kind: AttackKind | None = None
     assault: bool = False
 
     # moster

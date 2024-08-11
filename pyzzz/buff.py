@@ -10,18 +10,24 @@ class Buff:
         self.source = kw.get("source", "")
         self.cov = kw.get("cov", 1.0)
         self.duration = kw.get("duration", 0.0)  # zero for static buf
-        self.condition: Optional[ContextData] = kw.get("condition", None)
+        self.condition: list[ContextData] = []
+        if cond := kw.get("condition", None):
+            if isinstance(cond, list):
+                self.condition.extend(cond)
+            else:
+                self.condition.append(cond)
 
     def produce(self, context: ContextData) -> StatValue:
         if self.active(context):
             return StatValue(self.stat.value * self.cov, self.stat.kind)
-        return StatValue.empty()
+        return StatValue.create_empty()
 
-    def active(self, c: ContextData) -> bool:
+    def active(self, context: ContextData) -> bool:
         if self.condition:
-            if c.contains(self.condition):
-                return True
-            return False
+            for cond in self.condition:
+                if context.contains(cond):
+                    return True
+                return False
         return True
 
     def coverage(self) -> float:
