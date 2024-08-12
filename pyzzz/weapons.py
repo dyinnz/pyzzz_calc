@@ -181,8 +181,3 @@ def create_weapon(name: str, **kw):
         "DeepSeaVisitor": DeepSeaVisitor,
         "PreciousFossilizedCore": PreciousFossilizedCore,
     }[name](**kw)
-
-
-if __name__ == "__main__":
-    weapon = CannonRotor()
-    print(weapon)

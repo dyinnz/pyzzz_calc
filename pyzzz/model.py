@@ -249,11 +249,11 @@ class SkillLevels:
 
     def __post_init__(self):
         self.core = min(6, self.core)
-        self.basic = min(12, self.basic)
-        self.dodge = min(12, self.dodge)
-        self.special = min(12, self.special)
-        self.chain = min(12, self.chain)
-        self.assit = min(12, self.assit)
+        self.basic = min(15, self.basic)
+        self.dodge = min(15, self.dodge)
+        self.special = min(15, self.special)
+        self.chain = min(15, self.chain)
+        self.assit = min(15, self.assit)
 
 
 @dataclass

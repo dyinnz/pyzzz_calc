@@ -1,5 +1,3 @@
-from context import pyzzz
-
 from pyzzz.model import StatKind, StatValue
 
 

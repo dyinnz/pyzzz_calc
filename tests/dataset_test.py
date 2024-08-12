@@ -21,7 +21,7 @@ def remove_skills_talents(agent):
     return agent
 
 
-js = dataset.load_zzz_gg()
+js = dataset.load_zzz_gg_agents_json()
 
 agents_list = js["characters"]
 for agent in agents_list:

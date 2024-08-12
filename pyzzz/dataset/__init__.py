@@ -113,8 +113,8 @@ def load_zzz_gg_agents_json():
 @lru_cache
 def load_zzz_gg_agents():
     def remove_skills_talents(agent):
-        agent.pop("Skills")
-        agent.pop("Talents")
+        # agent.pop("Skills")
+        # agent.pop("Talents")
         return agent
 
     json = load_zzz_gg_agents_json()
