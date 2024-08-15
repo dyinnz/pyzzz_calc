@@ -137,7 +137,7 @@ class Soukaku(Agent):
 
     def rep4(self):
         return Buff(
-            StatValue(0.1, StatKind.RES_RATIO),
+            StatValue(-0.1, StatKind.RES_RATIO),
             condition=ContextData(atk_attr=Attribute.Ice),
             source="Soukaku rep4 ice res ratio",
         )

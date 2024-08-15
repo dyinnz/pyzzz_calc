@@ -141,35 +141,35 @@ const e = [
           Level: 1,
           AbilityName: "Metal Cat Claws",
           AbilityDes:
-            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>20%</color>. The equipper's DMG increases by <color=#2BAD00>25%</color> when attacking the enemy from behind.",
+            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>20%</color>. The equipper's DMG increases by <color=#2BAD00>25%</color> when hitting the enemy from behind.",
         },
         {
           WeaponID: 14102,
           Level: 2,
           AbilityName: "Metal Cat Claws",
           AbilityDes:
-            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>25%</color>. The equipper's DMG increases by <color=#2BAD00>31.5%</color> when attacking the enemy from behind.",
+            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>25%</color>. The equipper's DMG increases by <color=#2BAD00>31.5%</color> when hitting the enemy from behind.",
         },
         {
           WeaponID: 14102,
           Level: 3,
           AbilityName: "Metal Cat Claws",
           AbilityDes:
-            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>30%</color>. The equipper's DMG increases by <color=#2BAD00>38%</color> when attacking the enemy from behind.",
+            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>30%</color>. The equipper's DMG increases by <color=#2BAD00>38%</color> when hitting the enemy from behind.",
         },
         {
           WeaponID: 14102,
           Level: 4,
           AbilityName: "Metal Cat Claws",
           AbilityDes:
-            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>35%</color>. The equipper's DMG increases by <color=#2BAD00>44%</color> when attacking the enemy from behind.",
+            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>35%</color>. The equipper's DMG increases by <color=#2BAD00>44%</color> when hitting the enemy from behind.",
         },
         {
           WeaponID: 14102,
           Level: 5,
           AbilityName: "Metal Cat Claws",
           AbilityDes:
-            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>40%</color>. The equipper's DMG increases by <color=#2BAD00>50%</color> when attacking the enemy from behind.",
+            "Increases <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>40%</color>. The equipper's DMG increases by <color=#2BAD00>50%</color> when hitting the enemy from behind.",
         },
       ],
       Name: "Steel Cushion",
@@ -252,7 +252,7 @@ const e = [
         ShowForm: "{0:0.#%}",
       },
       Type: 2,
-      Desc: `This W-Engine is renowned for its ultra power. Modified by Koleda, its energy level has almost exceeded the safety limit. Although this W-Engine is entirely designed for damage output, and the Speedup and Incineration functions have been merged into one, this is precisely what Koleda wanted.
+      Desc: `This W-Engine is renowned for its ultra power. Modified by Koleda, its energy level has almost exceeded the safety limit. Although this W-Engine is entirely designed for damage output, and the Speedup and Blaze functions have been merged into one, this is precisely what Koleda wanted.
 
 <color=#959595>"I've got a clear shot at your shins, you know? So you'd better think twice before saying I'm short, got it?" — Koleda, warning a rude business partner</color>`,
       Abilities: [
@@ -492,7 +492,7 @@ When using a <color=#ffffff>Special Attack</color> or <color=#ffffff>EX Special 
         ShowForm: "{0:0.#%}",
       },
       Type: 4,
-      Desc: `A special W-Engine with multiple layers embedded inside. It contains a special Ether charging layer that can quickly recharge special Bangboo and custom-made combat equipment. Even though this W-Engine looks like a cruel confinement chamber, Rina's Bangboo seem to enjoy sneaking in there to recharge their batteries. They even treat resting inside as a cozy reward.
+      Desc: `A special W-Engine with multiple layers embedded inside. It contains a special Ether charging layer that can quickly recharge special-model Bangboo and custom-made combat equipment. Even though this W-Engine looks like a cruel confinement chamber, Rina's Bangboo seem to enjoy sneaking in there to recharge their batteries. They even treat resting inside as a cozy reward.
 
 <color=#959595>"Shhh... The two little ones are resting; if they're woken suddenly they'll be sure to cause a ruckus. Let's avoid making any noise while we enjoy our tea." — Rina, giving a gentle reminder as she serves tea to friends</color>`,
       Abilities: [
@@ -552,7 +552,7 @@ When using a <color=#ffffff>Special Attack</color> or <color=#ffffff>EX Special 
         ShowForm: "{0:0.#%}",
       },
       Type: 1,
-      Desc: `The latest tactical W-Engine used by Public Security's elite Hollow squads. It uses a powerful Ether energy source to supply all combat equipment with explosive power for a short period of time. Although the W-Engines of many elite squad members often suffer from prolonged combat, Zhu Yuan's is in perfect condition. She treats it with utmost care, keeping it looking completely brand new.
+      Desc: `The latest tactical W-Engine used by Public Security's elite Hollow squads. It uses a powerful Ether energy source to supply all combat equipment with explosive power for a short period of time. Although the W-Engines of many elite squad members often suffer from prolonged combat, Zhu Yuan's is in perfect condition. She treats it with utmost care and carefully maintains it, keeping it looking completely brand new.
 
 <color=#959595>"Non-woven fabric, brush, lubricant, rust remover... alright, ready to go. Timer... starting now!" — Zhu Yuan, timing herself as she starts maintenance, aiming to beat her previous record</color>`,
       Abilities: [
@@ -595,6 +595,126 @@ When using a <color=#ffffff>Special Attack</color> or <color=#ffffff>EX Special 
       Name: "Riot Suppressor Mark VI",
       Rarity: 4,
       Icon: "Weapon_S_1241.png",
+    },
+    {
+      ItemID: 14125,
+      Text: "Weapon_S_1251",
+      BaseProperty: {
+        Property: 12101,
+        Value: 48,
+        Name: "Base ATK",
+        ShowForm: "{0:0.#}",
+      },
+      RandProperty: {
+        Property: 12202,
+        Value: 720,
+        Name: "Impact",
+        ShowForm: "{0:0.#%}",
+      },
+      Type: 2,
+      Desc: `A custom stun W-Engine made for an Automaton referencing the combat style and abilities of one. Energy is stored within, then lashes outwards upon conversion. The texture seeks to imitate fine artistry that was once highly sought after in ancient civilizations: Burn to procure what is sleek and elegant, shatter to create what is unyielding and sharp; this heat-proof pot bears a sacred bird shape with, as its name suggests, a unique pattern of ice-cracked celadon... but actually that pattern was drawn on.
+
+<color=#959595>"It fares well in preserving temperature, and I can drink hot water whenever I need even in a Hollow." —Qingyi, giving her honest and carefully contemplated review</color>`,
+      Abilities: [
+        {
+          WeaponID: 14125,
+          Level: 1,
+          AbilityName: "Ringing Melody",
+          AbilityDes:
+            "When a <color=#ffffff>Basic Attack</color> hits an enemy, gain 1 stack of <color=#ffffff>Tea-riffic</color>. Each stack of <color=#ffffff>Tea-riffic</color> increases the user's Impact by <color=#2BAD00>0.7%</color>, stacking up to 30 times, and lasting for 8s. The duration of each stack is calculated separately. Upon acquiring <color=#ffffff>Tea-riffic</color>, if the equipper possesses stacks of <color=#ffffff>Tea-riffic</color> greater than or equal to 15, all squad members' DMG is increased by <color=#2BAD00>20%</color> for 10s. Passive effects of the same name do not stack.",
+        },
+        {
+          WeaponID: 14125,
+          Level: 2,
+          AbilityName: "Ringing Melody",
+          AbilityDes:
+            "When a <color=#ffffff>Basic Attack</color> hits an enemy, gain 1 stack of <color=#ffffff>Tea-riffic</color>. Each stack of <color=#ffffff>Tea-riffic</color> increases the user's Impact by <color=#2BAD00>0.88%</color>, stacking up to 30 times, and lasting for 8s. The duration of each stack is calculated separately. Upon acquiring <color=#ffffff>Tea-riffic</color>, if the equipper possesses stacks of <color=#ffffff>Tea-riffic</color> greater than or equal to 15, all squad members' DMG is increased by <color=#2BAD00>23%</color> for 10s. Passive effects of the same name do not stack.",
+        },
+        {
+          WeaponID: 14125,
+          Level: 3,
+          AbilityName: "Ringing Melody",
+          AbilityDes:
+            "When a <color=#ffffff>Basic Attack</color> hits an enemy, gain 1 stack of <color=#ffffff>Tea-riffic</color>. Each stack of <color=#ffffff>Tea-riffic</color> increases the user's Impact by <color=#2BAD00>1.05%</color>, stacking up to 30 times, and lasting for 8s. The duration of each stack is calculated separately. Upon acquiring <color=#ffffff>Tea-riffic</color>, if the equipper possesses stacks of <color=#ffffff>Tea-riffic</color> greater than or equal to 15, all squad members' DMG is increased by <color=#2BAD00>26%</color> for 10s. Passive effects of the same name do not stack.",
+        },
+        {
+          WeaponID: 14125,
+          Level: 4,
+          AbilityName: "Ringing Melody",
+          AbilityDes:
+            "When a <color=#ffffff>Basic Attack</color> hits an enemy, gain 1 stack of <color=#ffffff>Tea-riffic</color>. Each stack of <color=#ffffff>Tea-riffic</color> increases the user's Impact by <color=#2BAD00>1.22%</color>, stacking up to 30 times, and lasting for 8s. The duration of each stack is calculated separately. Upon acquiring <color=#ffffff>Tea-riffic</color>, if the equipper possesses stacks of <color=#ffffff>Tea-riffic</color> greater than or equal to 15, all squad members' DMG is increased by <color=#2BAD00>29%</color> for 10s. Passive effects of the same name do not stack.",
+        },
+        {
+          WeaponID: 14125,
+          Level: 5,
+          AbilityName: "Ringing Melody",
+          AbilityDes:
+            "When a <color=#ffffff>Basic Attack</color> hits an enemy, gain 1 stack of <color=#ffffff>Tea-riffic</color>. Each stack of <color=#ffffff>Tea-riffic</color> increases the user's Impact by <color=#2BAD00>1.4%</color>, stacking up to 30 times, and lasting for 8s. The duration of each stack is calculated separately. Upon acquiring <color=#ffffff>Tea-riffic</color>, if the equipper possesses stacks of <color=#ffffff>Tea-riffic</color> greater than or equal to 15, all squad members' DMG is increased by <color=#2BAD00>32%</color> for 10s. Passive effects of the same name do not stack.",
+        },
+      ],
+      Name: "Ice-Jade Teapot",
+      Rarity: 4,
+      Icon: "Weapon_S_1251.png",
+    },
+    {
+      ItemID: 14126,
+      Text: "Weapon_S_1261",
+      BaseProperty: {
+        Property: 12101,
+        Value: 48,
+        Name: "Base ATK",
+        ShowForm: "{0:0.#}",
+      },
+      RandProperty: {
+        Property: 31203,
+        Value: 36,
+        Name: "Anomaly Proficiency",
+        ShowForm: "{0:0}",
+      },
+      Type: 3,
+      Desc: `A deadly W-Engine from unknown sources, modified personally by Jane Doe with the intent to deal severe physical damage and Anomaly. The power circulation system within ensures the affliction of Anomalies and the edges of the exterior have been honed until they're razor-sharp to inflict unexpected tearing damage.
+
+<color=#959595>"What, am I meant to adhere to duel ettiquete with an Ethereal? Isn't it polite to end its pain in the quickest way possible?" —Jane, in response to "aren't your combat techniques a little too cruel"</color>`,
+      Abilities: [
+        {
+          WeaponID: 14126,
+          Level: 1,
+          AbilityName: "Indulge in the Hunt",
+          AbilityDes:
+            "Upon activating a <color=#ffffff>Dash Attack</color>, gain 1 stack of <color=#ffffff>Predatory Instinct</color>. Each stack of <color=#ffffff>Predatory Instinct</color> increases the equipper's Physical DMG by <color=#2BAD00>12%</color> for 8s, stacking up to 3 times. This effect can trigger once every 0.5s and repeated triggers reset the duration. When entering combat or triggering <color=#ffffff>Perfect Dodge</color>, gain 3 stacks of <color=#ffffff>Predatory Instinct</color>. While <color=#ffffff>Predatory Instinct</color> is at maximum stacks, the equipper's Anomaly Buildup Rate increases by <color=#2BAD00>40%</color>.",
+        },
+        {
+          WeaponID: 14126,
+          Level: 2,
+          AbilityName: "Indulge in the Hunt",
+          AbilityDes:
+            "Upon activating a <color=#ffffff>Dash Attack</color>, gain 1 stack of <color=#ffffff>Predatory Instinct</color>. Each stack of <color=#ffffff>Predatory Instinct</color> increases the equipper's Physical DMG by <color=#2BAD00>15%</color> for 8s, stacking up to 3 times. This effect can trigger once every 0.5s and repeated triggers reset the duration. When entering combat or triggering <color=#ffffff>Perfect Dodge</color>, gain 3 stacks of <color=#ffffff>Predatory Instinct</color>. While <color=#ffffff>Predatory Instinct</color> is at maximum stacks, the equipper's Anomaly Buildup Rate increases by <color=#2BAD00>50%</color>.",
+        },
+        {
+          WeaponID: 14126,
+          Level: 3,
+          AbilityName: "Indulge in the Hunt",
+          AbilityDes:
+            "Upon activating a <color=#ffffff>Dash Attack</color>, gain 1 stack of <color=#ffffff>Predatory Instinct</color>. Each stack of <color=#ffffff>Predatory Instinct</color> increases the equipper's Physical DMG by <color=#2BAD00>18%</color> for 8s, stacking up to 3 times. This effect can trigger once every 0.5s and repeated triggers reset the duration. When entering combat or triggering <color=#ffffff>Perfect Dodge</color>, gain 3 stacks of <color=#ffffff>Predatory Instinct</color>. While <color=#ffffff>Predatory Instinct</color> is at maximum stacks, the equipper's Anomaly Buildup Rate increases by <color=#2BAD00>60%</color>.",
+        },
+        {
+          WeaponID: 14126,
+          Level: 4,
+          AbilityName: "Indulge in the Hunt",
+          AbilityDes:
+            "Upon activating a <color=#ffffff>Dash Attack</color>, gain 1 stack of <color=#ffffff>Predatory Instinct</color>. Each stack of <color=#ffffff>Predatory Instinct</color> increases the equipper's Physical DMG by <color=#2BAD00>21%</color> for 8s, stacking up to 3 times. This effect can trigger once every 0.5s and repeated triggers reset the duration. When entering combat or triggering <color=#ffffff>Perfect Dodge</color>, gain 3 stacks of <color=#ffffff>Predatory Instinct</color>. While <color=#ffffff>Predatory Instinct</color> is at maximum stacks, the equipper's Anomaly Buildup Rate increases by <color=#2BAD00>70%</color>.",
+        },
+        {
+          WeaponID: 14126,
+          Level: 5,
+          AbilityName: "Indulge in the Hunt",
+          AbilityDes:
+            "Upon activating a <color=#ffffff>Dash Attack</color>, gain 1 stack of <color=#ffffff>Predatory Instinct</color>. Each stack of <color=#ffffff>Predatory Instinct</color> increases the equipper's Physical DMG by <color=#2BAD00>24%</color> for 8s, stacking up to 3 times. This effect can trigger once every 0.5s and repeated triggers reset the duration. When entering combat or triggering <color=#ffffff>Perfect Dodge</color>, gain 3 stacks of <color=#ffffff>Predatory Instinct</color>. While <color=#ffffff>Predatory Instinct</color> is at maximum stacks, the equipper's Anomaly Buildup Rate increases by <color=#2BAD00>80%</color>.",
+        },
+      ],
+      Name: "Sharpened Stinger",
+      Rarity: 4,
+      Icon: "Weapon_S_1261.png",
     },
     {
       ItemID: 13001,
@@ -793,35 +913,35 @@ P.S. The internal optical components have not undergone anti-corruption treatmen
         {
           WeaponID: 13004,
           Level: 1,
-          AbilityName: "Knight Plummel",
+          AbilityName: "Knight's Combo",
           AbilityDes:
             "Launching a <color=#ffffff>Dodge Counter</color> or <color=#ffffff>Quick Assist</color> increases the equipper's ATK by <color=#2BAD00>12%</color> for 12s.",
         },
         {
           WeaponID: 13004,
           Level: 2,
-          AbilityName: "Knight Plummel",
+          AbilityName: "Knight's Combo",
           AbilityDes:
             "Launching a <color=#ffffff>Dodge Counter</color> or <color=#ffffff>Quick Assist</color> increases the equipper's ATK by <color=#2BAD00>13.8%</color> for 12s.",
         },
         {
           WeaponID: 13004,
           Level: 3,
-          AbilityName: "Knight Plummel",
+          AbilityName: "Knight's Combo",
           AbilityDes:
             "Launching a <color=#ffffff>Dodge Counter</color> or <color=#ffffff>Quick Assist</color> increases the equipper's ATK by <color=#2BAD00>15.6%</color> for 12s.",
         },
         {
           WeaponID: 13004,
           Level: 4,
-          AbilityName: "Knight Plummel",
+          AbilityName: "Knight's Combo",
           AbilityDes:
             "Launching a <color=#ffffff>Dodge Counter</color> or <color=#ffffff>Quick Assist</color> increases the equipper's ATK by <color=#2BAD00>17.4%</color> for 12s.",
         },
         {
           WeaponID: 13004,
           Level: 5,
-          AbilityName: "Knight Plummel",
+          AbilityName: "Knight's Combo",
           AbilityDes:
             "Launching a <color=#ffffff>Dodge Counter</color> or <color=#ffffff>Quick Assist</color> increases the equipper's ATK by <color=#2BAD00>19.2%</color> for 12s.",
         },
@@ -1238,6 +1358,64 @@ P.S. The internal optical components have not undergone anti-corruption treatmen
       Icon: "Weapon_A_Common_11.png",
     },
     {
+      ItemID: 13013,
+      Text: "Weapon_A_Common_13",
+      BaseProperty: {
+        Property: 12101,
+        Value: 40,
+        Name: "Base ATK",
+        ShowForm: "{0:0.#}",
+      },
+      RandProperty: {
+        Property: 12102,
+        Value: 1e3,
+        Name: "ATK",
+        ShowForm: "{0:0.#%}",
+      },
+      Type: 1,
+      Desc: "A W-Engine that represents the brilliance and magnificence of flowers, seemingly crafted from the most luxurious materials. However, after finally dismantling the Ether-powered premium anti-theft device, an experienced thief will discover with terror that this W-Engine... is gilded.",
+      Abilities: [
+        {
+          WeaponID: 13013,
+          Level: 1,
+          AbilityName: "Extraordinary Anti-Theft Measures",
+          AbilityDes:
+            "ATK increases by <color=#2BAD00>6</color>%, and DMG dealt by <color=#ffffff>EX Special Attacks</color> increases by <color=#2BAD00>15%</color>.",
+        },
+        {
+          WeaponID: 13013,
+          Level: 2,
+          AbilityName: "Extraordinary Anti-Theft Measures",
+          AbilityDes:
+            "ATK increases by <color=#2BAD00>6.9</color>%, and DMG dealt by <color=#ffffff>EX Special Attacks</color> increases by <color=#2BAD00>17.2%</color>.",
+        },
+        {
+          WeaponID: 13013,
+          Level: 3,
+          AbilityName: "Extraordinary Anti-Theft Measures",
+          AbilityDes:
+            "ATK increases by <color=#2BAD00>7.8</color>%, and DMG dealt by <color=#ffffff>EX Special Attacks</color> increases by <color=#2BAD00>19.5%</color>.",
+        },
+        {
+          WeaponID: 13013,
+          Level: 4,
+          AbilityName: "Extraordinary Anti-Theft Measures",
+          AbilityDes:
+            "ATK increases by <color=#2BAD00>8.7</color>%, and DMG dealt by <color=#ffffff>EX Special Attacks</color> increases by <color=#2BAD00>21.8%</color>.",
+        },
+        {
+          WeaponID: 13013,
+          Level: 5,
+          AbilityName: "Extraordinary Anti-Theft Measures",
+          AbilityDes:
+            "ATK increases by <color=#2BAD00>9.6</color>%, and DMG dealt by <color=#ffffff>EX Special Attacks</color> increases by <color=#2BAD00>24%</color>.",
+        },
+      ],
+      Name: "Gilded Blossom",
+      Rarity: 3,
+      Icon: "Weapon_A_Common_13.png",
+    },
+    {
       ItemID: 13101,
       Text: "Weapon_A_1011",
       BaseProperty: {
@@ -1253,7 +1431,7 @@ P.S. The internal optical components have not undergone anti-corruption treatmen
         ShowForm: "{0:0.#%}",
       },
       Type: 2,
-      Desc: `This customized W-Engine Core focuses on power storage and has been modified to enhance power storage functions. It can effectively boost Zap damage output for weapons, and is the gadget store owner's pièce de résistance. Not long after, Anby made some tweaks based on user habits, but judging by how serious and careful she is while conducting each maintenance session, these are probably not the safest of modifications.
+      Desc: `This customized W-Engine Core focuses on power storage and has been modified to enhance power storage functions. It can effectively boost Zap damage output for weapons, and is the gadget store owner's piece de resistance. Not long after, Anby made some tweaks based on user habits, but judging by how serious and careful she is while conducting each maintenance session, these are probably not the safest of modifications.
 
 <color=#959595>"Weapons SHOULD be dangerous. If it can't shock me, then how is it going to shock the enemy?" — Anby's response while carefully performing maintenance</color>`,
       Abilities: [
@@ -1442,35 +1620,35 @@ P.S. The internal optical components have not undergone anti-corruption treatmen
           Level: 1,
           AbilityName: "Knight Beam: Change",
           AbilityDes:
-            "Increases the equipper's <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>36%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
+            "Increases the equipper's <color=#f0d12b>Physical DMG</color> against the target by <color=#2BAD00>36%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
         },
         {
           WeaponID: 13108,
           Level: 2,
           AbilityName: "Knight Beam: Change",
           AbilityDes:
-            "Increases the equipper's <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>41%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
+            "Increases the equipper's <color=#f0d12b>Physical DMG</color> against the target by <color=#2BAD00>41%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
         },
         {
           WeaponID: 13108,
           Level: 3,
           AbilityName: "Knight Beam: Change",
           AbilityDes:
-            "Increases the equipper's <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>46.5%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
+            "Increases the equipper's <color=#f0d12b>Physical DMG</color> against the target by <color=#2BAD00>46.5%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
         },
         {
           WeaponID: 13108,
           Level: 4,
           AbilityName: "Knight Beam: Change",
           AbilityDes:
-            "Increases the equipper's <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>52%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
+            "Increases the equipper's <color=#f0d12b>Physical DMG</color> against the target by <color=#2BAD00>52%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
         },
         {
           WeaponID: 13108,
           Level: 5,
           AbilityName: "Knight Beam: Change",
           AbilityDes:
-            "Increases the equipper's <color=#f0d12b>Physical DMG</color> by <color=#2BAD00>57.5%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
+            "Increases the equipper's <color=#f0d12b>Physical DMG</color> against the target by <color=#2BAD00>57.5%</color> for 8s upon hitting an enemy at least 6 meters away with a <color=#ffffff>Basic Attack</color> or <color=#ffffff>Dash Attack</color>.",
         },
       ],
       Name: "Starlight Engine Replica",
@@ -1622,35 +1800,35 @@ P.S. The internal optical components have not undergone anti-corruption treatmen
           Level: 1,
           AbilityName: "Visage of Greed",
           AbilityDes:
-            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>15%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>2%</color> for 12s, stacking up to 4 times. Retriggering refreshes duration. Passive effects of the same name do not stack.",
+            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>15%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>2%</color> for 12s, stacking up to 4 times. Repeated triggers reset the duration. Passive effects of the same name do not stack.",
         },
         {
           WeaponID: 13113,
           Level: 2,
           AbilityName: "Visage of Greed",
           AbilityDes:
-            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>17.5%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>2.3%</color> for 12s, stacking up to 4 times. Retriggering refreshes duration. Passive effects of the same name do not stack.",
+            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>17.5%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>2.3%</color> for 12s, stacking up to 4 times. Repeated triggers reset the duration. Passive effects of the same name do not stack.",
         },
         {
           WeaponID: 13113,
           Level: 3,
           AbilityName: "Visage of Greed",
           AbilityDes:
-            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>20%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>2.6%</color> for 12s, stacking up to 4 times. Retriggering refreshes duration. Passive effects of the same name do not stack.",
+            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>20%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>2.6%</color> for 12s, stacking up to 4 times. Repeated triggers reset the duration. Passive effects of the same name do not stack.",
         },
         {
           WeaponID: 13113,
           Level: 4,
           AbilityName: "Visage of Greed",
           AbilityDes:
-            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>22%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>2.9%</color> for 12s, stacking up to 4 times. Retriggering refreshes duration. Passive effects of the same name do not stack.",
+            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>22%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>2.9%</color> for 12s, stacking up to 4 times. Repeated triggers reset the duration. Passive effects of the same name do not stack.",
         },
         {
           WeaponID: 13113,
           Level: 5,
           AbilityName: "Visage of Greed",
           AbilityDes:
-            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>24%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>3.2%</color> for 12s, stacking up to 4 times. Retriggering refreshes duration. Passive effects of the same name do not stack.",
+            "Increases <color=#98eff0>Ice DMG</color> by <color=#2BAD00>24%</color>. When launching an <color=#ffffff>EX Special Attack</color>, all squad members' ATK increases by <color=#2BAD00>3.2%</color> for 12s, stacking up to 4 times. Repeated triggers reset the duration. Passive effects of the same name do not stack.",
         },
       ],
       Name: "Bashful Demon",
@@ -1682,40 +1860,100 @@ P.S. The internal optical components have not undergone anti-corruption treatmen
           Level: 1,
           AbilityName: "Stampede Accident",
           AbilityDes:
-            "When any friendly unit in the squad attacks and hits an enemy, all squad members' ATK increases by <color=#2BAD00>2.5%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
+            "When any friendly unit in the squad attacks and hits an enemy, all friendly units' ATK increases by <color=#2BAD00>2.5%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
         },
         {
           WeaponID: 13115,
           Level: 2,
           AbilityName: "Stampede Accident",
           AbilityDes:
-            "When any friendly unit in the squad attacks and hits an enemy, all squad members' ATK increases by <color=#2BAD00>2.8%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
+            "When any friendly unit in the squad attacks and hits an enemy, all friendly units' ATK increases by <color=#2BAD00>2.8%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
         },
         {
           WeaponID: 13115,
           Level: 3,
           AbilityName: "Stampede Accident",
           AbilityDes:
-            "When any friendly unit in the squad attacks and hits an enemy, all squad members' ATK increases by <color=#2BAD00>3.2%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
+            "When any friendly unit in the squad attacks and hits an enemy, all friendly units' ATK increases by <color=#2BAD00>3.2%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
         },
         {
           WeaponID: 13115,
           Level: 4,
           AbilityName: "Stampede Accident",
           AbilityDes:
-            "When any friendly unit in the squad attacks and hits an enemy, all squad members' ATK increases by <color=#2BAD00>3.6%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
+            "When any friendly unit in the squad attacks and hits an enemy, all friendly units' ATK increases by <color=#2BAD00>3.6%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
         },
         {
           WeaponID: 13115,
           Level: 5,
           AbilityName: "Stampede Accident",
           AbilityDes:
-            "When any friendly unit in the squad attacks and hits an enemy, all squad members' ATK increases by <color=#2BAD00>4%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
+            "When any friendly unit in the squad attacks and hits an enemy, all friendly units' ATK increases by <color=#2BAD00>4%</color> for 8s, stacking up to 4 times. The duration of each stack is calculated separately, and each friendly unit can provide 1 stack of the buff. Passive effects of the same name do not stack.",
         },
       ],
       Name: "Kaboom the Cannon",
       Rarity: 3,
       Icon: "Weapon_A_1151.png",
+    },
+    {
+      ItemID: 13127,
+      Text: "Weapon_A_1271",
+      BaseProperty: {
+        Property: 12101,
+        Value: 42,
+        Name: "Base ATK",
+        ShowForm: "{0:0.#}",
+      },
+      RandProperty: {
+        Property: 12102,
+        Value: 1e3,
+        Name: "ATK",
+        ShowForm: "{0:0.#%}",
+      },
+      Type: 5,
+      Desc: `A defensive W-Engine independently researched and created by Public Security with special emphasis on enhancing the energy conversion ability in its shield. Rumor has it that this model of W-Engine became the standard for all supporting units in Hollow operations due to an unknown member of the top brass pushing for mass production.
+
+<color=#959595>"Even if you took it apart and rebuilt it into an actual physical shield, it would still be extremely sturdy... but it really is super heavy!" —Seth, musing aloud as he studies the extremely expensive material of the W-Engine</color>`,
+      Abilities: [
+        {
+          WeaponID: 13127,
+          Level: 1,
+          AbilityName: "Standard Blocking Technique",
+          AbilityDes:
+            "While Shielded, the equipper's Energy Regen increases by 0.4/s. The Anomaly Buildup accumulated by <color=#ffffff>EX Special Attacks</color>/<color=#ffffff>Assist Follow-Ups</color> increase by <color=#2BAD00>36%</color>/<color=#2BAD00>36%</color>.",
+        },
+        {
+          WeaponID: 13127,
+          Level: 2,
+          AbilityName: "Standard Blocking Technique",
+          AbilityDes:
+            "While Shielded, the equipper's Energy Regen increases by 0.46/s. The Anomaly Buildup accumulated by <color=#ffffff>EX Special Attacks</color>/<color=#ffffff>Assist Follow-Ups</color> increase by <color=#2BAD00>40%</color>/<color=#2BAD00>40%</color>.",
+        },
+        {
+          WeaponID: 13127,
+          Level: 3,
+          AbilityName: "Standard Blocking Technique",
+          AbilityDes:
+            "While Shielded, the equipper's Energy Regen increases by 0.52/s. The Anomaly Buildup accumulated by <color=#ffffff>EX Special Attacks</color>/<color=#ffffff>Assist Follow-Ups</color> increase by <color=#2BAD00>45%</color>/<color=#2BAD00>45%</color>.",
+        },
+        {
+          WeaponID: 13127,
+          Level: 4,
+          AbilityName: "Standard Blocking Technique",
+          AbilityDes:
+            "While Shielded, the equipper's Energy Regen increases by 0.58/s. The Anomaly Buildup accumulated by <color=#ffffff>EX Special Attacks</color>/<color=#ffffff>Assist Follow-Ups</color> increase by <color=#2BAD00>50%</color>/<color=#2BAD00>50%</color>.",
+        },
+        {
+          WeaponID: 13127,
+          Level: 5,
+          AbilityName: "Standard Blocking Technique",
+          AbilityDes:
+            "While Shielded, the equipper's Energy Regen increases by 0.64/s. The Anomaly Buildup accumulated by <color=#ffffff>EX Special Attacks</color>/<color=#ffffff>Assist Follow-Ups</color> increase by <color=#2BAD00>55%</color>/<color=#2BAD00>55%</color>.",
+        },
+      ],
+      Name: "Peacekeeper - Specialized",
+      Rarity: 3,
+      Icon: "Weapon_A_1271.png",
     },
     {
       ItemID: 13128,
@@ -1733,7 +1971,7 @@ P.S. The internal optical components have not undergone anti-corruption treatmen
         ShowForm: "{0:0.#%}",
       },
       Type: 3,
-      Desc: `This energy W-Engine, modded from spare parts of a truck's engine, converts the original cylinder into an energy storage unit, which is highly advantageous. It placed first in the internal Chototsumōshin competition, surpassing many heavy-duty motorbikes and even a truck driven by Piper herself.
+      Desc: `This energy W-Engine, modded from spare parts of a truck's engine, converts the original cylinder into an energy storage unit, which is highly advantageous. It placed first in the internal Leaps and Bounds competition, surpassing many heavy-duty motorbikes and even a truck driven by Piper herself.
 
 <color=#959595>"Too bad there's no way to carry cargo... Maybe we can hang it on the tusks?" — Piper, top-notch logistics driver</color>`,
       Abilities: [
@@ -1800,35 +2038,35 @@ Increases the equipper's ATK by <color=#2BAD00>12.8%</color>, increases the equi
           Level: 1,
           AbilityName: "Oversized Barrel",
           AbilityDes:
-            "Increases ATK by <color=#2BAD00>7.5%</color>. Attacks that land a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>8</color>s.",
+            "Increases ATK by <color=#2BAD00>7.5%</color>. Landing a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>8</color>s.",
         },
         {
           WeaponID: 14001,
           Level: 2,
           AbilityName: "Oversized Barrel",
           AbilityDes:
-            "Increases ATK by <color=#2BAD00>8.6%</color>. Attacks that land a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>7.5</color>s.",
+            "Increases ATK by <color=#2BAD00>8.6%</color>. Landing a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>7.5</color>s.",
         },
         {
           WeaponID: 14001,
           Level: 3,
           AbilityName: "Oversized Barrel",
           AbilityDes:
-            "Increases ATK by <color=#2BAD00>9.7%</color>. Attacks that land a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>7</color>s.",
+            "Increases ATK by <color=#2BAD00>9.7%</color>. Landing a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>7</color>s.",
         },
         {
           WeaponID: 14001,
           Level: 4,
           AbilityName: "Oversized Barrel",
           AbilityDes:
-            "Increases ATK by <color=#2BAD00>10.8%</color>. Attacks that land a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>6.5</color>s.",
+            "Increases ATK by <color=#2BAD00>10.8%</color>. Landing a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>6.5</color>s.",
         },
         {
           WeaponID: 14001,
           Level: 5,
           AbilityName: "Oversized Barrel",
           AbilityDes:
-            "Increases ATK by <color=#2BAD00>12%</color>. Attacks that land a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>6</color>s.",
+            "Increases ATK by <color=#2BAD00>12%</color>. Landing a critical hit on an enemy will inflict an additional 200% of ATK as DMG. This effect can trigger once every <color=#2BAD00>6</color>s.",
         },
       ],
       Name: "Cannon Rotor",
@@ -2496,14 +2734,14 @@ Increases the equipper's ATK by <color=#2BAD00>12.8%</color>, increases the equi
           Level: 1,
           AbilityName: "Disordered Current",
           AbilityDes:
-            "Accumulating Anomaly Buildup increases the equipper's Anomaly Mastery by <color=#2BAD00>25</color> for 10s. This effect can trigger once every 20s.",
+            "Accumulating Anomaly Buildup increases the equipper's Anomaly Mastery by <color=#2BAD00>25</color> for 10s. This effect can trigger once every 20s. ",
         },
         {
           WeaponID: 12010,
           Level: 2,
           AbilityName: "Disordered Current",
           AbilityDes:
-            "Accumulating Anomaly Buildup increases the equipper's Anomaly Mastery by <color=#2BAD00>28</color> for 10s. This effect can trigger once every 20s.",
+            "Accumulating Anomaly Buildup increases the equipper's Anomaly Mastery by <color=#2BAD00>28</color> for 10s. This effect can trigger once every 20s. ",
         },
         {
           WeaponID: 12010,
@@ -2524,7 +2762,7 @@ Increases the equipper's ATK by <color=#2BAD00>12.8%</color>, increases the equi
           Level: 5,
           AbilityName: "Disordered Current",
           AbilityDes:
-            "Accumulating Anomaly Buildup increases the equipper's Anomaly Mastery by <color=#2BAD00>40</color> for 10s. This effect can trigger once every 20s.",
+            "Accumulating Anomaly Buildup increases the equipper's Anomaly Mastery by <color=#2BAD00>40</color> for 10s. This effect can trigger once every 20s. ",
         },
       ],
       Name: "[Magnetic Storm] Alpha",
@@ -2951,12 +3189,5 @@ Increases the equipper's ATK by <color=#2BAD00>12.8%</color>, increases the equi
   ],
   r = { ascension: e, professions: o, engines: a, leveling: t };
 
-fs = require('fs');
-fs.writeFileSync('./zzz.gg.weapons.json', JSON.stringify(r, null, 2), 'utf-8')
-// export {
-//   e as ascension,
-//   r as default,
-//   a as engines,
-//   t as leveling,
-//   o as professions,
-// };
+fs = require("fs");
+fs.writeFileSync("./zzz.gg.weapons.json", JSON.stringify(r, null, 2), "utf-8");

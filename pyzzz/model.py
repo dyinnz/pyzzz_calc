@@ -242,18 +242,26 @@ class DiscGroup:
 class SkillLevels:
     core: int = 6  # NaN=0, A=1, F=6
     basic: int = 11
-    dodge: int = 11
-    special: int = 11
-    chain: int = 11
     assit: int = 11
+    dodge: int = 11  # dash + dodge
+    special: int = 11
+    chain: int = 11  # chain + final
 
     def __post_init__(self):
         self.core = min(6, self.core)
         self.basic = min(16, self.basic)
         self.dodge = min(16, self.dodge)
+        self.assit = min(16, self.assit)
         self.special = min(16, self.special)
         self.chain = min(16, self.chain)
-        self.assit = min(16, self.assit)
+
+    @property
+    def dash(self):
+        return self.dodge
+
+    @property
+    def final(self):
+        return self.chain
 
 
 @dataclass

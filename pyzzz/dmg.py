@@ -218,7 +218,7 @@ class DMG:
         elif stat.kind == StatKind.DMG_RATIO:
             self.dmg_ratio.add(number)
         elif stat.kind == StatKind.RES_RATIO:
-            self.resistance.add(number)
+            self.resistance.add(-number)
         elif stat.kind == StatKind.STUN_DMG_RATIO:
             self.daze.add(number)
 
