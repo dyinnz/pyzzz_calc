@@ -49,6 +49,7 @@ class Soukaku(Agent):
         self.ey3 = self._skill["特殊技：集合啦！-收旗攻击"]
 
         self.dogde = self._skill["闪避反击：别抢零食-"]
+        self.dash = self._skill["冲刺攻击：对半分（霜染刃旗）-"]
         self.chain = self._skill["连携技：鹅鸡斩-"]
         self.final = self._skill["终结技：大份鹅鸡斩-"]
 
@@ -94,25 +95,33 @@ class Soukaku(Agent):
 
     def Dodge(self):
         value = self.dogde["dmg"] + self.dogde["dmg_grow"] * (
-            self.skill_levels.special - 1
+            self.skill_levels.dodge - 1
         )
         return Attack(AttackKind.Dodge, Attribute.Ice, value)
 
+    def Dash(self):
+        value = self.dash["dmg"] + self.dash["dmg_grow"] * (
+            self.skill_levels.dodge - 1
+        )
+        return Attack(AttackKind.Dash, Attribute.Ice, value)
+
     def Chain(self):
         value = self.chain["dmg"] + self.chain["dmg_grow"] * (
-            self.skill_levels.special - 1
+            self.skill_levels.chain - 1
         )
         return Attack(AttackKind.Chain, Attribute.Ice, value)
 
     def Final(self):
         value = self.final["dmg"] + self.final["dmg_grow"] * (
-            self.skill_levels.special - 1
+            self.skill_levels.chain - 1
         )
         return Attack(AttackKind.Final, Attribute.Ice, value)
 
     def core_skill(self):
         m = [0, 12.5, 15, 17, 18, 19, 20][self.skill_levels.core] / 100 * 2
-        value = self.static.static_atk() * m
+        value = (
+            self.core_skill_atk if self.core_skill_atk else self.static.static_atk() * m
+        )
         value = min(1000, value)
         return Buff(
             StatValue(value, StatKind.ATK_FLAT),

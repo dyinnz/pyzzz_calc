@@ -35,6 +35,10 @@ class Weapon:
             self.load_zzz_gg_data(name)
             self.fill_data()
 
+    @property
+    def level(self):
+        return self._level
+
     def buffs(self, _: bool = True) -> list[Buff]:
         return []
 

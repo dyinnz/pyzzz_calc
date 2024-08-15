@@ -250,6 +250,7 @@ class DMG:
                 self.apply_disc(disc)
 
     def apply_build_static(self, b: Build):
+        self.defense.set_enemy_level(b.enemy_level)
         self.apply_agent_data(b.agent.base)
         self.apply_weapon_data(b.weapon.data)
         self.apply_discs(b.discs)
@@ -282,6 +283,26 @@ class DMG:
             + f"* {self.daze}        \t# daze\n"
             + f"= {self.calc()}"
         )
+
+
+@dataclass
+class ComboResult:
+    total: float = 0.0
+    dmgs: list[DMG] = field(default_factory=list)
+    comment: str = ""
+
+    def __repr__(self):
+        s = "\n".join([d.one_line() for d in self.dmgs])
+        s += f"\nIn Total : {self.total}; by {self.comment}"
+        return s
+
+
+def print_combo_results(results: list[ComboResult]):
+    base = results[0].total
+
+    for r in results:
+        ratio = (r.total / base - 1) * 100
+        print(f"{r} ; delta ratio: {ratio:.3f}%\n")
 
 
 class Combo:
@@ -326,172 +347,74 @@ class Combo:
             value += dmg.calc().value()
         return value
 
-    def delta(self):
-        print(self.build)
-
+    def delta_analyze(self) -> list[ComboResult]:
+        result = []
         base = self.calc()
-        print(self)
-        print(f"base line {self.attacks} : {base}")
+        result.append(ComboResult(base, copy.deepcopy(self.dmgs), "Baseline"))
 
-        def impl(extra):
-            build = copy.copy(self.build).replace_extra(extra)
-            build.calc_static_agent()
-            build.collect_buffs()
+        def update_build(build, comment=""):
             new = self.calc(build, self.context)
-            print(self)
-            print(f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by {extra}\n")
+            result.append(ComboResult(new, copy.deepcopy(self.dmgs), comment))
 
-        impl([StatValue(9, StatKind.PEN_FLAT)])
-        impl([StatValue(19, StatKind.ATK_FLAT)])
-        impl([StatValue(0.03, StatKind.ATK_RATIO)])
-        impl([StatValue(0.03, StatKind.DMG_RATIO)])
-        impl([StatValue(0.024, StatKind.CRIT_RATIO)])
-        impl([StatValue(-0.024, StatKind.CRIT_RATIO)])
-        impl([StatValue(0.048, StatKind.CRIT_MULTI)])
-        impl([StatValue(0.024, StatKind.PEN_RATIO)])
+        def update_stat(extra):
+            build = copy.copy(self.build).replace_extra(extra)
+            new = self.calc(build, self.context)
+            result.append(ComboResult(new, copy.deepcopy(self.dmgs), str(extra)))
 
-        disc4 = self.build.discs.at(4).primary
-        if disc4.kind == StatKind.CRIT_RATIO:
-            impl(
+        update_stat([StatValue(9, StatKind.PEN_FLAT)])
+        update_stat([StatValue(19, StatKind.ATK_FLAT)])
+        update_stat([StatValue(0.03, StatKind.ATK_RATIO)])
+        update_stat([StatValue(0.03, StatKind.DMG_RATIO)])
+        update_stat([StatValue(0.024, StatKind.CRIT_RATIO)])
+        update_stat([StatValue(0.048, StatKind.CRIT_MULTI)])
+        update_stat([StatValue(0.024, StatKind.PEN_RATIO)])
+
+        disc4_stat = self.build.discs.at(4).primary
+        if disc4_stat.kind == StatKind.CRIT_RATIO:
+            update_stat(
                 [
                     StatValue(-0.24, StatKind.CRIT_RATIO),
                     StatValue(+0.48, StatKind.CRIT_MULTI),
                 ]
             )
-        elif disc4.kind == StatKind.CRIT_MULTI:
-            impl(
+        elif disc4_stat.kind == StatKind.CRIT_MULTI:
+            update_stat(
                 [
                     StatValue(+0.24, StatKind.CRIT_RATIO),
                     StatValue(-0.48, StatKind.CRIT_MULTI),
                 ]
             )
+        disc5_stat_neg = self.build.discs.at(5).primary.negative()
+        update_stat([disc5_stat_neg, StatValue(0.3, StatKind.ATK_RATIO)])
+        update_stat([disc5_stat_neg, StatValue(0.3, StatKind.DMG_RATIO)])
+        update_stat([disc5_stat_neg, StatValue(0.24, StatKind.PEN_RATIO)])
 
-        disc5 = self.build.discs.at(5).primary
-        if disc5.kind == StatKind.ATK_RATIO:
-            impl(
-                [
-                    StatValue(-0.3, StatKind.ATK_RATIO),
-                    StatValue(0.3, StatKind.DMG_RATIO),
-                ]
+        if self.build.agent.level < 60:
+            build = copy.deepcopy(self.build).update_agent_stats(level=60)
+            update_build(build, "agent level -> 60")
+        if self.build.weapon.level < 60:
+            build = copy.deepcopy(self.build).update_weapon_level(level=60)
+            update_build(build, "weapon level -> 60")
+        if self.build.agent.skill_levels.core < 6:
+            skill_levels = replace(
+                self.build.agent.skill_levels,
+                core=self.build.agent.skill_levels.core + 1,
             )
-            impl(
-                [
-                    # self.build.discs.suit2_stats[0].negative(),
-                    StatValue(-0.3, StatKind.ATK_RATIO),
-                    StatValue(0.24, StatKind.PEN_RATIO),
-                ]
+            build = copy.deepcopy(self.build).update_agent_stats(
+                skill_levels=skill_levels
             )
-        elif disc5.kind == StatKind.DMG_RATIO:
-            impl(
-                [
-                    StatValue(-0.3, StatKind.DMG_RATIO),
-                    StatValue(0.3, StatKind.ATK_RATIO),
-                ]
+            update_build(build, "core skill +1")
+        if self.build.agent.skill_levels.basic < 16:
+            skill_levels = replace(
+                self.build.agent.skill_levels,
+                basic=self.build.agent.skill_levels.basic + 1,
             )
-            impl(
-                [
-                    # self.build.discs.suit2_stats[0].negative(),
-                    StatValue(-0.3, StatKind.DMG_RATIO),
-                    StatValue(0.24, StatKind.PEN_RATIO),
-                ]
+            build = copy.deepcopy(self.build).update_agent_stats(
+                skill_levels=skill_levels
             )
-        elif disc5.kind == StatKind.PEN_RATIO:
-            impl(
-                [
-                    StatValue(+0.3, StatKind.DMG_RATIO),
-                    StatValue(-0.24, StatKind.PEN_RATIO),
-                ]
-            )
-            impl(
-                [
-                    StatValue(+0.3, StatKind.ATK_RATIO),
-                    StatValue(-0.24, StatKind.PEN_RATIO),
-                ]
-            )
+            update_build(build, "basic atk skill +1")
 
-
-        def level_up(level=60):
-            build = copy.deepcopy(self.build)
-            agent_new = copy.deepcopy(build.agent).set_stats(level)
-            agent_old = copy.deepcopy(build.agent).set_stats(build.agent.level)
-            build.agent.base.level = level
-            build.agent.base = build.agent.base + (agent_new.base - agent_old.base)
-            build.calc_static_agent()
-
-            new = self.calc(build, self.context)
-            print(self)
-            print(
-                f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by agent level {build.agent.level}->{level}\n"
-            )
-
-        if self.build.agent.static.level < 60:
-            level_up(60)
-
-        def weapon60():
-            build = copy.deepcopy(self.build)
-            weapon_new = copy.deepcopy(build.weapon)
-            weapon_new.set_stats(60)
-            weapon_old = copy.deepcopy(build.weapon)
-            weapon_old.set_stats(build.weapon._level)
-
-            build.weapon.data.level = 60
-            build.weapon.data = build.weapon.data + (weapon_new.data - weapon_old.data)
-            build.calc_static_agent()
-
-            new = self.calc(build, self.context)
-            print(self)
-            print(
-                f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by weapon L50->L60\n"
-            )
-
-        if self.build.weapon.data.level < 60:
-            weapon60()
-
-        def core():
-            skills = self.build.agent.skill_levels
-            build = copy.deepcopy(self.build)
-            build.agent.set_stats(skill_levels=replace(skills, core=skills.core + 1))
-            build.calc_static_agent()
-            build.collect_buffs()
-
-            new = self.calc(build, self.context)
-            print(self)
-            print(
-                f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by core {skills.core}->{skills.core+1}\n"
-            )
-
-        core()
-
-        def basic():
-            skills = self.build.agent.skill_levels
-            build = copy.deepcopy(self.build)
-            build.agent.set_stats(skill_levels=replace(skills, basic=skills.basic + 1))
-            new = self.calc(build, self.context)
-            print(self)
-            print(
-                f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by basic {skills.basic}->{skills.basic+1}\n"
-            )
-
-        basic()
-
-        # def deep_sea():
-        #     build = copy.deepcopy(self.build).replace_weapon(
-        #         weapons.create_weapon("DeepSeaVisitor")
-        #     )
-        #     build.replace_extra([
-        #             StatValue(-0.24, StatKind.CRIT_RATIO),
-        #             StatValue(+0.48, StatKind.CRIT_MULTI),
-        #             self.build.discs.suit2_stats[0].negative(),
-        #             StatValue(-0.3, StatKind.ATK_RATIO),
-        #             StatValue(0.32, StatKind.PEN_RATIO),
-        #         ])
-        #     print(build)
-        #     new = self.calc(build, self.context)
-        #     print(self)
-        #     print(
-        #         f"delta ratio : {(new / base - 1) * 100.0 :.3f}% , by weapon deep sea\n"
-        #     )
-        # deep_sea()
+        return result
 
     def __str__(self):
         v = 0.0

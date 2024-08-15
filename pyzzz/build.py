@@ -27,6 +27,7 @@ class SummaryData:
     disc5: StatKind = StatKind.DMG_RATIO
     disc6: StatKind = StatKind.ATK_RATIO
 
+    enemy_level: int = 60
     team: dict[str, dict[str, str]] = field(default_factory=dict)
 
 
@@ -42,6 +43,8 @@ class FullData:
     weapon_rep: int = 1
 
     discs: DiscGroup = field(default_factory=DiscGroup)
+
+    enemy_level: int = 60
     team: dict[str, dict[str, str]] = field(default_factory=dict)
 
 
@@ -52,6 +55,7 @@ class Build:
         self.agent = Agent()
         self.weapon = Weapon()
         self.discs = DiscGroup()
+        self.enemy_level = 60
         self.team: list[Agent] = []
         self.buffs: dict[str, Buff] = {}
         self.extra: list[StatValue] = []
@@ -69,15 +73,9 @@ class Build:
 
     def collect_buffs(self):
         self.buffs = {}
-        self.discs.suit2_stats = []
+        self.discs.suit2_stats = [get_suit2_stat(k) for k in self.discs.suit2]
 
-        for k in self.discs.suit2:
-            stat = get_suit2_stat(k)
-            if stat:
-                self.discs.suit2_stats.append(stat)
-
-        buf = get_suit4_buff(self.discs.suit4)
-        if buf:
+        if buf := get_suit4_buff(self.discs.suit4):
             self.add_buff(buf)
 
         for b in self.weapon.buffs():
@@ -116,6 +114,7 @@ class Build:
         b.agent.set_weapon(b.weapon.data)
         b.agent.calc_static(b.discs)
 
+        b.enemy_level = summary.enemy_level
         team = [b.agent]
         for name, extra in summary.team.items():
             agent = agents.create_agent(name, **extra)
@@ -144,6 +143,7 @@ class Build:
         b.agent.set_weapon(b.weapon.data)
         b.agent.calc_static(b.discs)
 
+        b.enemy_level = full.enemy_level
         team = [b.agent]
         for name, extra in full.team.items():
             agent = agents.create_agent(name, **extra)
@@ -155,23 +155,41 @@ class Build:
 
     def replace_extra(self, extra):
         self.extra = extra
+        self.calc_static_agent()
         return self
 
     def replace_weapon(self, weapon):
         if self.summary:
             raise Exception("cannot replace weapon under summary mode")
         self.weapon = weapon
+        self.calc_static_agent()
         self.collect_buffs()
         return self
 
-    def replace_disc(self, disc: Disc):
+    def replace_disc(self, discs: list[Disc]):
         if self.summary:
             raise Exception("cannot replace disc under summary mode")
-        self.discs.set(disc)
+        if not discs:
+            return
+        for d in discs:
+            self.discs.set(d)
+        self.calc_static_agent()
         self.collect_buffs()
+        return self
+
+    def update_agent_stats(self, level=None, skill_levels=None):
+        self.agent.set_stats(level=level, skill_levels=skill_levels)
+        self.calc_static_agent()
+        self.collect_buffs()  # core passive buff
+        return self
+
+    def update_weapon_level(self, level):
+        self.weapon.set_stats(level=level)
+        self.calc_static_agent()
         return self
 
     def __str__(self):
+        self.calc_static_agent()
         s = (
             f"Build:\n"
             + f"{self.agent.static}\n"

@@ -249,11 +249,11 @@ class SkillLevels:
 
     def __post_init__(self):
         self.core = min(6, self.core)
-        self.basic = min(15, self.basic)
-        self.dodge = min(15, self.dodge)
-        self.special = min(15, self.special)
-        self.chain = min(15, self.chain)
-        self.assit = min(15, self.assit)
+        self.basic = min(16, self.basic)
+        self.dodge = min(16, self.dodge)
+        self.special = min(16, self.special)
+        self.chain = min(16, self.chain)
+        self.assit = min(16, self.assit)
 
 
 @dataclass
@@ -318,6 +318,9 @@ class AgentData:
     pen_flat: float = 0.0
     dmg_ratio: float = 0.0
 
+    def __bool__(self):
+        return self.level > 0
+
     def static_atk(self):
         return math.floor(
             (self.atk_base + self.atk_weapon) * (1.0 + self.atk_ratio) + self.atk_flat
@@ -356,7 +359,7 @@ class AgentData:
 
     def __sub__(self, rhs):
         return AgentData(
-            0,
+            self.level - rhs.level,
             self.atk_base - rhs.atk_base,
             self.atk_weapon - rhs.atk_weapon,
             self.atk_flat - rhs.atk_flat,
@@ -376,7 +379,7 @@ class AgentData:
 
     def __add__(self, rhs):
         return AgentData(
-            self.level,
+            self.level + rhs.level,
             self.atk_base + rhs.atk_base,
             self.atk_weapon + rhs.atk_weapon,
             self.atk_flat + rhs.atk_flat,

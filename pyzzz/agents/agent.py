@@ -35,13 +35,29 @@ class Agent:
         self._repetition = repetition
 
         # final stats board
-        self.base = AgentData()  # init + growth + weapon base
-        self.static = AgentData()  # base + weapon primary + discs
+        self._base = AgentData()  # init + growth + weapon base
+        self._static = AgentData()  # base + weapon primary + discs
         self._weapon = WeaponData(0, 0, StatValue.create_empty())
 
         if name:
             self.load_zzz_gg_data(name)
-            self.fill_data()
+            self.fill_base()
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def camp(self):
+        return self._camp
+
+    @property
+    def profession(self):
+        return self._profession
+
+    @property
+    def attribute(self):
+        return self._attribute
 
     @property
     def level(self):
@@ -55,12 +71,25 @@ class Agent:
     def skill_levels(self):
         return self._skill_levels
 
-    def fill_data(self):
-        self.base = copy.deepcopy(self._growth.init)
-        self.base.level = self.level
-        self.base.hp += math.floor(self._growth.hp_growth * (self.level - 1))
-        self.base.defense += math.floor(self._growth.defense_growth * (self.level - 1))
-        self.base.atk_base += math.floor(self._growth.atk_growth * (self.level - 1))
+    @property
+    def base(self):
+        return self._base
+
+    @property
+    def static(self):
+        if not self._static:
+            raise Exception("logical error : static stats shall be re-calc")
+        return self._static
+
+    # after user inputs changed, this method shall be called
+    def fill_base(self):
+        self._base = copy.deepcopy(self._growth.init)
+        self._base.level = self.level
+        self._base.hp += math.floor(self._growth.hp_growth * (self.level - 1))
+        self._base.defense += math.floor(self._growth.defense_growth * (self.level - 1))
+        self._base.atk_base += math.floor(self._growth.atk_growth * (self.level - 1))
+        # remember set weapon atk again
+        self._base.atk_weapon = self._weapon.atk
 
         if not self._ascensions:
             raise Exception("expected ascension data")
@@ -75,33 +104,39 @@ class Agent:
             self._ascensions[asc_rank], self._passives[self.skill_levels.core]
         )
         for stat in stats:
-            self.base.apply_stat(stat)
-        self.static = self.base
+            self._base.apply_stat(stat)
+        self._static = AgentData()  # clear static
+
+    def apply_base_changes(self, changes: AgentData):
+        self._base = self._base + changes
+        self._static = AgentData()  # clear static
+        return self
 
     def set_weapon(self, weapon: WeaponData):
         self._weapon = weapon
-        self.base.atk_weapon = weapon.atk
+        self._base.atk_weapon = weapon.atk
+        self._static = AgentData()  # clear static
         return self
 
     def calc_static(self, discs: DiscGroup, extra: list[StatValue] | None = None):
-        self.static = copy.deepcopy(self.base)
-        self.static.apply_stat(self._weapon.primary)
+        self._static = copy.deepcopy(self._base)
+        self._static.apply_stat(self._weapon.primary)
         for s in discs.suit2_stats:
-            self.static.apply_stat(s)
+            self._static.apply_stat(s)
         for d in discs.discs:
-            self.static.apply_stat(d.primary)
+            self._static.apply_stat(d.primary)
             for s in d.secondaries:
-                self.static.apply_stat(s)
+                self._static.apply_stat(s)
         if extra:
             for s in extra:
-                self.static.apply_stat(s)
+                self._static.apply_stat(s)
         return self
 
     @staticmethod
     def _with_filled(func):
         def _with_filled_wrapper(self, *args, **kwargs):
             res = func(self, *args, **kwargs)
-            self.fill_data()
+            self.fill_base()
             return res
 
         return _with_filled_wrapper
@@ -120,7 +155,7 @@ class Agent:
         return []
 
     def __str__(self):
-        return f"{self._name} - {self._camp}/{self._profession}/{self._attribute}\n{self._growth}\n{self._ascensions}\n{self._passives}\n{self.static}"
+        return f"{self._name} - {self._camp}/{self._profession}/{self._attribute}\n{self._growth}\n{self._ascensions}\n{self._passives}\n{self._static}"
 
     def load_cn_data(self, cn_name):
         # self.data: AgentData = dataset.load_agents_basic()[cn_name]
