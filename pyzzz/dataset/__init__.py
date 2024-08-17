@@ -17,7 +17,7 @@ def get_percent(s):
 def load_agents_basic():
     agents = {}
 
-    with open(directory + "/agents_basic.csv") as file:
+    with open(directory + "/agents_basic.csv", encoding="utf-8") as file:
         spamreader = csv.reader(file, delimiter="\t")
         for row in spamreader:
             name = row[0]
@@ -48,7 +48,7 @@ def load_agents_basic():
 def load_skills():
     skills = {}
 
-    with open(directory + "/skills.csv") as file:
+    with open(directory + "/skills.csv", encoding="utf-8") as file:
         spamreader = csv.reader(file, delimiter="\t")
         header = True
         for row in spamreader:
@@ -83,7 +83,7 @@ def load_skills():
 def load_weapons():
     weapons = {}
 
-    with open(directory + "/weapons.csv") as file:
+    with open(directory + "/weapons.csv", encoding="utf-8") as file:
         spamreader = csv.reader(file, delimiter="\t")
 
         for row in spamreader:
@@ -106,7 +106,7 @@ def load_weapons():
 def load_zzz_gg_agents_json():
     import json
 
-    with open(directory + "/zzz.gg.agents.json") as file:
+    with open(directory + "/zzz.gg.agents.json", encoding="utf-8") as file:
         return json.load(file)
 
 
@@ -182,7 +182,7 @@ def load_zzz_gg_agents():
 def load_zzz_gg_weapons_json():
     import json
 
-    with open(directory + "/zzz.gg.weapons.json") as file:
+    with open(directory + "/zzz.gg.weapons.json", encoding="utf-8") as file:
         return json.load(file)
 
 
