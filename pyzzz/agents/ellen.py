@@ -36,31 +36,33 @@ class Ellen(Agent):
 
     def A1(self):
         value = self.a1["dmg"] + self.a1["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ice, value)
+        return Attack(AttackKind.Basic, Attribute.Ice, value, self.a1["anomaly"])
 
     def A2(self):
         value = self.a2["dmg"] + self.a2["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ice, value)
+        return Attack(AttackKind.Basic, Attribute.Ice, value, self.a2["anomaly"])
 
     def A3(self):
         value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ice, value)
+        return Attack(AttackKind.Basic, Attribute.Ice, value, self.a3["anomaly"])
 
     def EX1(self):
         value = self.ex1["dmg"] + self.ex1["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.SpecialEx, Attribute.Ice, value)
+        return Attack(AttackKind.SpecialEx, Attribute.Ice, value, self.ex1["anomaly"])
 
     def EX2(self):
         value = self.ex2["dmg"] + self.ex2["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.SpecialEx, Attribute.Ice, value)
+        return Attack(AttackKind.SpecialEx, Attribute.Ice, value, self.ex2["anomaly"])
 
     def Chain(self):
-        value = self.chain["dmg"] + self.chain["dmg_grow"] * (self.skill_levels.chain - 1)
-        return Attack(AttackKind.Chain, Attribute.Ice, value)
+        value = self.chain["dmg"] + self.chain["dmg_grow"] * (
+            self.skill_levels.chain - 1
+        )
+        return Attack(AttackKind.Chain, Attribute.Ice, value, self.chain["anomaly"])
 
     def Final(self):
         value = self.f["dmg"] + self.f["dmg_grow"] * (self.skill_levels.chain - 1)
-        return Attack(AttackKind.Final, Attribute.Ice, value)
+        return Attack(AttackKind.Final, Attribute.Ice, value, self.f["anomaly"])
 
     def core_skill(self):
         multi = [0.50, 0.583, 0.66, 0.75, 0.8333, 0.916, 1]

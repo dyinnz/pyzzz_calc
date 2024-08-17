@@ -20,8 +20,8 @@ class StatKind(StrEnum):
     PEN_RATIO = auto()
     PEN_FLAT = auto()
 
-    ATTR_MASTER = auto()
-    ANOMALY = auto()
+    ANOMALY_MASTER = auto()
+    ANOMALY_PROFICIENCY = auto()
     IMPACT = auto()
     ENERGY_REGEN = auto()
 
@@ -95,6 +95,7 @@ class Attribute(StrEnum):
 
 class AttackKind(StrEnum):
     All = auto()
+    Anomaly = auto()
     Basic = auto()
     Dash = auto()
     Dodge = auto()  # 闪避反击
@@ -110,6 +111,7 @@ class Attack:
     kind: AttackKind = AttackKind.All
     attribute: Attribute = Attribute.All
     multi: float = 1.0
+    anomaly: float = 0.0
 
 
 @dataclass
@@ -318,8 +320,8 @@ class AgentData:
     hp: float = field(default=0.0, repr=False)
     defense: float = field(default=0.0, repr=False)
     impact: float = 0.0
-    attribte_master: float = 0.0
-    anomaiy_proficiency: float = 0.0
+    anomaly_master: float = 0.0
+    anomaly_proficiency: float = 0.0
     energy_regen: float = field(default=0.0, repr=False)
 
     pen_ratio: float = 0.0
@@ -362,6 +364,8 @@ class AgentData:
             self.impact += stat.value
         elif stat.kind == StatKind.ENERGY_REGEN:
             self.energy_regen += stat.value
+        elif stat.kind == StatKind.ANOMALY_PROFICIENCY:
+            self.anomaly_proficiency += stat.value
         else:
             raise Exception(f"not supported stat kind {stat.kind} for agent data")
 
@@ -377,8 +381,8 @@ class AgentData:
             self.hp - rhs.hp,
             self.defense - rhs.defense,
             self.impact - rhs.impact,
-            self.anomaiy_proficiency - rhs.anomaiy_proficiency,
-            self.attribte_master - rhs.attribte_master,
+            self.anomaly_proficiency - rhs.anomaiy_proficiency,
+            self.anomaly_master - rhs.attribte_master,
             self.energy_regen - rhs.energy_regen,
             self.pen_ratio - rhs.pen_ratio,
             self.pen_flat - rhs.pen_flat,
@@ -397,8 +401,8 @@ class AgentData:
             self.hp + rhs.hp,
             self.defense + rhs.defense,
             self.impact + rhs.impact,
-            self.anomaiy_proficiency + rhs.anomaiy_proficiency,
-            self.attribte_master + rhs.attribte_master,
+            self.anomaly_proficiency + rhs.anomaiy_proficiency,
+            self.anomaly_master + rhs.attribte_master,
             self.energy_regen + rhs.energy_regen,
             self.pen_ratio + rhs.pen_ratio,
             self.pen_flat + rhs.pen_flat,

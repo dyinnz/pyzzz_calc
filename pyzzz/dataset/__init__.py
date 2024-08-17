@@ -31,10 +31,10 @@ def load_agents_basic():
             agent.crit_ratio = get_percent(row[4])
             agent.crit_multi = get_percent(row[5])
             agent.impact = float(row[6])
-            agent.attribte_master = float(row[7])
+            agent.anomaly_master = float(row[7])
             # anergy limit
             agent.energy_regen = float(row[9])
-            agent.anomaiy_proficiency = float(row[10])
+            agent.anomaly_proficiency = float(row[10])
             agent.hp = float(row[11])
             agent.atk = float(row[12])
             agent.defense = float(row[13])
@@ -68,7 +68,7 @@ def load_skills():
             item["impact_grow"] = get_percent(row[6])
             item["energy"] = get_percent(row[7])
             item["noise"] = float(row[8])
-            item["anomaiy"] = float(row[9])
+            item["anomaly"] = float(row[9])
             if len(row) > 10:
                 item["distance"] = row[10]
             else:
@@ -234,8 +234,8 @@ ZZZ_GG_STAT_PASSIVE = {
     "CRIT Rate": StatKind.CRIT_RATIO,
     "CRIT DMG": StatKind.CRIT_MULTI,
     "Energy Regen": StatKind.ENERGY_REGEN,
-    "Anomaly Mastery": StatKind.ATTR_MASTER,
-    "Anomaly Proficiency": StatKind.ANOMALY,
+    "Anomaly Mastery": StatKind.ANOMALY_MASTER,
+    "Anomaly Proficiency": StatKind.ANOMALY_PROFICIENCY,
     "PEN Ratio": StatKind.PEN_RATIO,
 }
 

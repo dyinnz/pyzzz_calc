@@ -20,6 +20,7 @@ def test_combo():
     attacks = AttackList([Ellen.EX1, Ellen.A3])
     b = build_test.full_ellen()
     b.collect_buffs()
+    print(b)
     combo = Combo(attacks, b)
     res = combo.delta_analyze()
     print_combo_results(res)
@@ -35,9 +36,10 @@ def test_combo2():
     from pyzzz.agents.soukaku import Soukaku
 
     # attacks = AttackList([Soukaku.A1, Soukaku.A2, Soukaku.A3])
-    attacks = AttackList([Soukaku.Dash, Soukaku.A3])
-    # attacks = AttackList([Soukaku.Chain])
+    # attacks = AttackList([Soukaku.Dash, Soukaku.A3])
+    attacks = AttackList([Soukaku.Chain])
     b = build_test.full_soukaku()
+    b.update_agent_stats(skill_levels=SkillLevels(4, 15, 15, 15, 15, 15))
     b.collect_buffs()
     print(b)
     combo = Combo(attacks, b)
@@ -57,4 +59,5 @@ def test_combo3():
 
 
 if __name__ == "__main__":
-    test_combo2()
+    test_combo()
+    # test_combo2()

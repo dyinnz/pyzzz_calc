@@ -177,9 +177,9 @@ class Agent:
         self._growth.init.defense = agent["Def"]
         self._growth.defense_growth = agent["DefenceGrowth"] / 1e4
         self._growth.init.impact = agent["BreakStun"]
-        self._growth.init.attribte_master = agent["ElementMystery"]
+        self._growth.init.anomaly_master = agent["ElementMystery"]
         self._growth.init.energy_regen = agent["SpRecover"]
-        self._growth.init.anomaiy_proficiency = agent["ElementAbnormalPower"]
+        self._growth.init.anomaly_proficiency = agent["ElementAbnormalPower"]
 
         ascension = db["ascensions"][name]
         for _, asc in ascension.items():

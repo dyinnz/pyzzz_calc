@@ -55,67 +55,65 @@ class Soukaku(Agent):
 
     def A1(self):
         value = self.a1["dmg"] + self.a1["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ice, value)
+        return Attack(AttackKind.Basic, Attribute.Ice, value, self.a1["anomaly"])
 
     def A2(self):
         value = self.a2["dmg"] + self.a2["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ice, value)
+        return Attack(AttackKind.Basic, Attribute.Ice, value, self.a2["anomaly"])
 
     def A3(self):
         value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ice, value)
+        return Attack(AttackKind.Basic, Attribute.Ice, value, self.a3["anomaly"])
 
     def E1(self):
         value = self.e1["dmg"] + self.e1["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.Special, Attribute.Ice, value)
+        return Attack(AttackKind.Special, Attribute.Ice, value, self.e1["anomaly"])
 
     def E2(self):
         value = self.e2["dmg"] + self.e2["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.Special, Attribute.Ice, value)
+        return Attack(AttackKind.Special, Attribute.Ice, value, self.e2["anomaly"])
 
     def EX1(self):
         value = self.ex1["dmg"] + self.ex1["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.SpecialEx, Attribute.Ice, value)
+        return Attack(AttackKind.SpecialEx, Attribute.Ice, value, self.ex1["anomaly"])
 
     def EX2(self):
         value = self.ex2["dmg"] + self.ex2["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.SpecialEx, Attribute.Ice, value)
+        return Attack(AttackKind.SpecialEx, Attribute.Ice, value, self.ex2["anomaly"])
 
     def EY1(self):
         value = self.ey1["dmg"] + self.ey1["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.Special, Attribute.Ice, value)
+        return Attack(AttackKind.Special, Attribute.Ice, value, self.ey1["anomaly"])
 
     def EY2(self):
         value = self.ey1["dmg"] + self.ey2["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.Special, Attribute.Ice, value)
+        return Attack(AttackKind.Special, Attribute.Ice, value, self.ey2["anomaly"])
 
     def EY3(self):
         value = self.ey3["dmg"] + self.ey3["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.Special, Attribute.Ice, value)
+        return Attack(AttackKind.Special, Attribute.Ice, value, self.ey3["anomaly"])
 
     def Dodge(self):
         value = self.dogde["dmg"] + self.dogde["dmg_grow"] * (
             self.skill_levels.dodge - 1
         )
-        return Attack(AttackKind.Dodge, Attribute.Ice, value)
+        return Attack(AttackKind.Dodge, Attribute.Ice, value, self.dogde["anomaly"])
 
     def Dash(self):
-        value = self.dash["dmg"] + self.dash["dmg_grow"] * (
-            self.skill_levels.dodge - 1
-        )
-        return Attack(AttackKind.Dash, Attribute.Ice, value)
+        value = self.dash["dmg"] + self.dash["dmg_grow"] * (self.skill_levels.dodge - 1)
+        return Attack(AttackKind.Dash, Attribute.Ice, value, self.dash["anomaly"])
 
     def Chain(self):
         value = self.chain["dmg"] + self.chain["dmg_grow"] * (
             self.skill_levels.chain - 1
         )
-        return Attack(AttackKind.Chain, Attribute.Ice, value)
+        return Attack(AttackKind.Chain, Attribute.Ice, value, self.chain["anomaly"])
 
     def Final(self):
         value = self.final["dmg"] + self.final["dmg_grow"] * (
             self.skill_levels.chain - 1
         )
-        return Attack(AttackKind.Final, Attribute.Ice, value)
+        return Attack(AttackKind.Final, Attribute.Ice, value, self.final["anomaly"])
 
     def core_skill(self):
         m = [0, 12.5, 15, 17, 18, 19, 20][self.skill_levels.core] / 100 * 2

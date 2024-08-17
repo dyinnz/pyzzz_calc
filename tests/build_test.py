@@ -29,7 +29,7 @@ def full_ellen():
     f = FullData()
     f.agent_name = "Ellen"
     f.agent_level = 60
-    f.skill_levels = SkillLevels(5, 10, 10, 10, 10, 10)
+    f.skill_levels = SkillLevels(6, 10, 10, 10, 10, 10)
     f.weapon_name = "CannonRotor"
     f.weapon_level = 60
     f.discs.set(
@@ -63,6 +63,7 @@ def full_ellen():
             [
                 StatValue(0.096, StatKind.CRIT_MULTI),
                 StatValue(0.048, StatKind.CRIT_RATIO),
+                StatValue(27, StatKind.ANOMALY_PROFICIENCY),
             ],
         )
     )
@@ -71,17 +72,17 @@ def full_ellen():
             4,
             DiscKind.Polar_Metal,
             StatValue(0.48, StatKind.CRIT_MULTI),
-            # [
-            #     StatValue(0.03, StatKind.ATK_RATIO),
-            #     StatValue(18, StatKind.PEN_FLAT),
-            #     StatValue(0.048, StatKind.CRIT_RATIO),
-            #     StatValue(57, StatKind.ATK_FLAT),
-            # ],
             [
-                StatValue(0.12, StatKind.ATK_RATIO),
-                StatValue(19, StatKind.PEN_FLAT),
-                StatValue(0.024, StatKind.CRIT_RATIO),
+                StatValue(0.03, StatKind.ATK_RATIO),
+                StatValue(18, StatKind.PEN_FLAT),
+                StatValue(0.048, StatKind.CRIT_RATIO),
+                StatValue(57, StatKind.ATK_FLAT),
             ],
+            # [
+            #     StatValue(0.12, StatKind.ATK_RATIO),
+            #     StatValue(19, StatKind.PEN_FLAT),
+            #     StatValue(0.024, StatKind.CRIT_RATIO),
+            # ],
         )
     )
     f.discs.set(

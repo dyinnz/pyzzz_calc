@@ -1,3 +1,5 @@
+import copy
+
 from pyzzz import agents, weapons
 from pyzzz.agents.agent import Agent
 from pyzzz.buff import Buff
@@ -154,8 +156,9 @@ class Build:
         return b
 
     def replace_extra(self, extra):
-        self.extra = extra
+        self.extra = copy.deepcopy(extra)
         self.calc_static_agent()
+        self.collect_buffs()
         return self
 
     def replace_weapon(self, weapon):
