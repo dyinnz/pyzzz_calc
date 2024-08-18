@@ -80,29 +80,6 @@ def load_skills():
 
 
 @lru_cache
-def load_weapons():
-    weapons = {}
-
-    with open(directory + "/weapons.csv", encoding="utf-8") as file:
-        spamreader = csv.reader(file, delimiter="\t")
-
-        for row in spamreader:
-            if not row:
-                continue
-            name = row[0]
-
-            weapon = {}
-            weapon["name"] = name
-            weapon["rank"] = row[1]
-            weapon["atk_0"] = row[2]
-            weapon["atk"] = row[3]
-            weapon["primary"] = StatValue.from_cn(row[4], row[6])
-            weapons[name] = weapon
-
-    return weapons
-
-
-@lru_cache
 def load_zzz_gg_agents_json():
     import json
 

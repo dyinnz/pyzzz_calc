@@ -131,12 +131,13 @@ class DefenseMultiplier:
         self.pen_ratio = LazyAdd([])
         self.pen_flat = LazyAdd([0.0])
 
-    def set_agent_level(self, level):
+    def set_agent(self, level):
         self._agent_level = level
         self.agent = Number(self.defense_func(self._agent_level))
 
-    def set_enemy_level(self, level):
+    def set_enemy(self, level, base):
         self._enemy_level = level
+        self._enemy_base = base
         self.enemy = Number(
             self.defense_func(self._enemy_level) * self._enemy_base / 50
         )
@@ -241,6 +242,8 @@ class DMG:
         self.anomaly_level = AnomalyLevelMultiplier()
         self.anomaly_acc = 0.0
 
+        self.extras: list[ExtraMultiplier] = []
+
     def calc_anomaly(self):
         v = (
             self.atk.calc()
@@ -248,11 +251,15 @@ class DMG:
             * self.resistance.calc()
             * self.defense.calc()
             * self.daze.calc()
-            # anomaly 
+            # anomaly
             * self.aa.calc()
             * self.ap.calc()
             * self.anomaly_level.calc()
         ).value()
+
+        for extra in self.extras:
+            v *= extra.calc()
+
         return v
 
     def calc(self):
@@ -299,7 +306,7 @@ class DMG:
 
     def apply_agent_data(self, agent: AgentData):
         self.atk.agent = Number(agent.atk_base, "Agent basic ATK")
-        self.defense.set_agent_level(agent.level)
+        self.defense.set_agent(agent.level)
         self.critical.ratio.add(Number(agent.crit_ratio, "Agent basic CRIT_RATIO"))
         self.critical.multi.add(Number(agent.crit_multi, "Agent basic CRIT_MULTI"))
 
@@ -329,7 +336,7 @@ class DMG:
                 self.apply_disc(disc)
 
     def apply_build_static(self, b: Build):
-        self.defense.set_enemy_level(b.enemy_level)
+        self.defense.set_enemy(b.enemy_level, b.enemy_base)
         self.aa.attribute = b.agent.attribute
         self.apply_agent_data(b.agent.base)
         self.apply_weapon_data(b.weapon.data)
@@ -392,6 +399,14 @@ class ComboResult:
     dmgs: list[DMG] = field(default_factory=list)
     comment: str = ""
     anomaly_total: float = 0.0
+    anomaly_detail: str = ""
+
+    def __init__(self, total, dmgs: list[DMG], comment="", anomaly=False):
+        self.total = total
+        self.dmgs = dmgs
+        self.comment = comment
+        if anomaly:
+            self.anomaly_total, self.anomaly_detail = calc_anomaly(self.dmgs)
 
     def show_normal(self):
         s = "\n".join([d.show_normal() for d in self.dmgs])
@@ -399,9 +414,11 @@ class ComboResult:
         return s
 
     def show_anomaly(self):
-        self.anomaly_total, detail = calc_anomaly(self.dmgs)
+        if not self.anomaly_total:
+            self.anomaly_total, self.anomaly_detail = calc_anomaly(self.dmgs)
+
         s = "\n".join([d.show_anomaly() for d in self.dmgs])
-        s += f"\nAcc calc: {detail}"
+        s += f"\nAcc calc: {self.anomaly_detail}"
         s += f"\nIn Total (anomaly) : {self.anomaly_total:.1f}; by {self.comment}"
         return s
 
@@ -489,7 +506,7 @@ class Combo:
                     StatValue(-0.48, StatKind.CRIT_MULTI),
                 ]
             )
-        disc5_stat_neg = self.build.discs.at(5).primary.negative()
+        disc5_stat_neg = -self.build.discs.at(5).primary
         update_stat([disc5_stat_neg, StatValue(0.3, StatKind.ATK_RATIO)])
         update_stat([disc5_stat_neg, StatValue(0.3, StatKind.DMG_RATIO)])
         update_stat([disc5_stat_neg, StatValue(0.24, StatKind.PEN_RATIO)])
@@ -545,5 +562,3 @@ def print_combo_results(results: list[ComboResult], print_anomaly=False):
             ratio = (r.anomaly_total / anomaly_base - 1) * 100
             s += f"; delta ratio: {ratio:.3f}%\n"
             print(s)
-
-

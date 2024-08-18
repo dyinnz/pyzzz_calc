@@ -1,5 +1,5 @@
 from pyzzz.agents.agent import Agent
-from pyzzz.buff import Buff
+from pyzzz.buff import Buff, DynamicBuff
 from pyzzz.model import (
     AgentData,
     Attack,
@@ -116,13 +116,18 @@ class Soukaku(Agent):
         return Attack(AttackKind.Final, Attribute.Ice, value, self.final["anomaly"])
 
     def core_skill(self):
-        m = [0, 12.5, 15, 17, 18, 19, 20][self.skill_levels.core] / 100 * 2
-        value = (
-            self.core_skill_atk if self.core_skill_atk else self.static.static_atk() * m
-        )
-        value = min(1000, value)
-        return Buff(
-            StatValue(value, StatKind.ATK_FLAT),
+        def create():
+            m = [0, 12.5, 15, 17, 18, 19, 20][self.skill_levels.core] / 100 * 2
+            value = (
+                self.core_skill_atk
+                if self.core_skill_atk
+                else self.static.static_atk() * m
+            )
+            value = min(1000, value)
+            return StatValue(value, StatKind.ATK_FLAT)
+
+        return DynamicBuff(
+            create,
             source="Soukaku core skill atk dynamic flat",
         )
 

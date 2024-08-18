@@ -154,6 +154,9 @@ class Agent:
     def buffs(self, _: bool = True) -> list[Buff]:
         return []
 
+    def extra_multiplier(self):
+        return 
+
     def __str__(self):
         return f"{self._name} - {self._camp}/{self._profession}/{self._attribute}\n{self._growth}\n{self._ascensions}\n{self._passives}\n{self._static}"
 
@@ -205,7 +208,9 @@ class Agent:
                 elif k == "Energy Regen":
                     result.append(StatValue(v, StatKind.ENERGY_REGEN))
                 elif k == "Anomaly Mastery":
-                    result.append(StatValue(v, StatKind.ANOMALY))
+                    result.append(StatValue(v, StatKind.ANOMALY_MASTER))
+                elif k == "Anomaly Proficiency":
+                    result.append(StatValue(v, StatKind.ANOMALY_PROFICIENCY))
                 elif k == "PEN Ratio":
                     result.append(StatValue(v, StatKind.PEN_RATIO))
                 else:

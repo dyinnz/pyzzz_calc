@@ -1,7 +1,8 @@
 import math
+from typing import Sequence
 
 from pyzzz import dataset
-from pyzzz.buff import Buff
+from pyzzz.buff import BuffBase, DynamicBuff
 from pyzzz.model import *
 
 CN2EN = {
@@ -29,7 +30,7 @@ class Weapon:
 
         self.data: WeaponData = WeaponData(level, 0, StatValue.create_empty())
 
-        self._buffs: list[Buff] = []
+        self._buffs: Sequence[BuffBase] = []
 
         if name:
             self.load_zzz_gg_data(name)
@@ -39,7 +40,7 @@ class Weapon:
     def level(self):
         return self._level
 
-    def buffs(self, _: bool = True) -> list[Buff]:
+    def buffs(self, _: bool = True) -> Sequence[BuffBase]:
         return []
 
     def fill_data(self):
@@ -91,8 +92,13 @@ class CannonRotor(Weapon):
         Weapon.__init__(self, CannonRotor.NAME, level, is_ascension, repetition)
 
     def buffs(self, _: bool = True):
-        value = [0, 0.075, 0.086, 0.097, 0.108, 0.120][self._repetition]
-        return [Buff(StatValue(value, StatKind.ATK_RATIO), source="CannonRotor buff")]
+        def create():
+            return StatValue(
+                [0, 0.075, 0.086, 0.097, 0.108, 0.120][self._repetition],
+                StatKind.ATK_RATIO,
+            )
+
+        return [DynamicBuff(create, source="CannonRotor buff")]
 
 
 class StarlightEngine(Weapon):
@@ -103,10 +109,15 @@ class StarlightEngine(Weapon):
         self._cov = cov
 
     def buffs(self, _: bool = True):
-        value = [0, 0.12, 0.138, 0.156, 0.174, 0.192][self._repetition]
+        def create():
+            return StatValue(
+                [0, 0.12, 0.138, 0.156, 0.174, 0.192][self._repetition],
+                StatKind.ATK_RATIO,
+            )
+
         return [
-            Buff(
-                StatValue(value, StatKind.ATK_RATIO),
+            DynamicBuff(
+                create,
                 cov=self._cov,
                 source="CannonRotor buff",
             )
@@ -121,18 +132,27 @@ class BashfulDemon(Weapon):
         self._cov = cov
 
     def buffs(self, _: bool = True):
-        v1 = [0, 0.15, 0.175, 0.20, 0.22, 0.24][self._repetition]
-        v2 = [0, 0.02, 0.023, 0.026, 0.029, 0.032][self._repetition]
+        def create1():
+            return StatValue(
+                [0, 0.15, 0.175, 0.20, 0.22, 0.24][self._repetition], StatKind.DMG_RATIO
+            )
+
+        def create2():
+            return StatValue(
+                [0, 0.02, 0.023, 0.026, 0.029, 0.032][self._repetition],
+                StatKind.ATK_RATIO,
+            )
+
         return [
-            Buff(
-                StatValue(v1, StatKind.DMG_RATIO),
+            DynamicBuff(
+                create1,
                 cov=self._cov,
-                source="BashfulDemon buff",
+                source="BashfulDemon buff 1",
             ),
-            Buff(
-                StatValue(v2, StatKind.ATK_RATIO),
+            DynamicBuff(
+                create2,
                 cov=self._cov,
-                source="BashfulDemon buff",
+                source="BashfulDemon buff 2",
             ),
         ]
 
@@ -155,22 +175,28 @@ class DeepSeaVisitor(Weapon):
         self._cov = cov
 
     def buffs(self, _: bool = True):
-        ice = [0, 0.25, 0.315, 0.38, 0.445, 0.50][self._repetition]
-        c1 = [0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition]
-        c2 = [0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition]
         return [
-            Buff(
-                StatValue(ice, StatKind.DMG_RATIO),
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.25, 0.315, 0.38, 0.445, 0.50][self._repetition],
+                    StatKind.DMG_RATIO,
+                ),
                 cov=self._cov,
                 source=f"{self._name} ice dmg buff",
             ),
-            Buff(
-                StatValue(c1, StatKind.CRIT_RATIO),
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition],
+                    StatKind.CRIT_RATIO,
+                ),
                 cov=self._cov,
                 source=f"{self._name} ice crit ratio buff 1",
             ),
-            Buff(
-                StatValue(c2, StatKind.CRIT_RATIO),
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition],
+                    StatKind.CRIT_RATIO,
+                ),
                 cov=self._cov,
                 source=f"{self._name} ice crit ratio buff 2",
             ),

@@ -1,5 +1,5 @@
 from pyzzz.agents.agent import Agent
-from pyzzz.buff import Buff
+from pyzzz.buff import Buff, DynamicBuff
 from pyzzz.model import (
     AgentData,
     Attack,
@@ -65,11 +65,14 @@ class Ellen(Agent):
         return Attack(AttackKind.Final, Attribute.Ice, value, self.f["anomaly"])
 
     def core_skill(self):
-        multi = [0.50, 0.583, 0.66, 0.75, 0.8333, 0.916, 1]
-        return Buff(
-            StatValue(multi[self.skill_levels.core], StatKind.CRIT_MULTI),
+        def create():
+            multi = [0.50, 0.583, 0.66, 0.75, 0.8333, 0.916, 1]
+            return StatValue(multi[self.skill_levels.core], StatKind.CRIT_MULTI)
+
+        return DynamicBuff(
+            create,
             condition=ContextData(atk_kind=AttackKind.Basic),
-            source="Ellen core skill",
+            source="Ellen core skill criti multi",
         )
 
     def extra_skill(self):

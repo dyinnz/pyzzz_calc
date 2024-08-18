@@ -1,3 +1,4 @@
+import abc
 import math
 from dataclasses import dataclass, field
 from enum import StrEnum, auto
@@ -58,30 +59,8 @@ class StatValue:
             raise Exception(f"not same kind {self.kind} - {rhs.kind}")
         return StatValue(self.value + rhs.value, self.kind)
 
-    def negative(self):
+    def __neg__(self):
         return StatValue(-self.value, self.kind)
-
-    @staticmethod
-    def from_cn(name, value):
-        if name in ("攻击力", "生命", "防御") and value[-1] == "%":
-            name += "%"
-        v = util.parse_float(value)
-        kind = {
-            "攻击力%": StatKind.ATK_RATIO,
-            "攻击力": StatKind.ATK_FLAT,
-            "暴击率": StatKind.CRIT_RATIO,
-            "暴击伤害": StatKind.CRIT_RATIO,
-            "生命值%": StatKind.HP_RATIO,
-            "生命值": StatKind.HP_FLAT,
-            "防御力%": StatKind.DEF_RATIO,
-            "防御力": StatKind.DEF_FLAT,
-            "穿透率": StatKind.PEN_RATIO,
-            "穿透值": StatKind.PEN_FLAT,
-            "异常精通": StatKind.ANOMALY,
-            "冲击力": StatKind.IMPACT,
-            "能量自动回复": StatKind.ENERGY_REGEN,
-        }[name]
-        return StatValue(v, kind)
 
 
 class Attribute(StrEnum):
@@ -328,9 +307,6 @@ class AgentData:
     pen_flat: float = 0.0
     dmg_ratio: float = 0.0
 
-    def __bool__(self):
-        return self.level > 0
-
     def static_atk(self):
         return math.floor(
             (self.atk_base + self.atk_weapon) * (1.0 + self.atk_ratio) + self.atk_flat
@@ -364,6 +340,8 @@ class AgentData:
             self.impact += stat.value
         elif stat.kind == StatKind.ENERGY_REGEN:
             self.energy_regen += stat.value
+        elif stat.kind == StatKind.ANOMALY_MASTER:
+            self.anomaly_master += stat.value
         elif stat.kind == StatKind.ANOMALY_PROFICIENCY:
             self.anomaly_proficiency += stat.value
         else:
@@ -466,3 +444,10 @@ class ContextData:
         if rhs.daze and not self.daze:
             return False
         return True
+
+
+class ExtraMultiplier:
+
+    @abc.abstractmethod
+    def calc() -> float:
+        pass

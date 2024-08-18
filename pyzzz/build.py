@@ -30,6 +30,7 @@ class SummaryData:
     disc6: StatKind = StatKind.ATK_RATIO
 
     enemy_level: int = 60
+    enemy_base: int = 60
     team: dict[str, dict[str, str]] = field(default_factory=dict)
 
 
@@ -47,6 +48,7 @@ class FullData:
     discs: DiscGroup = field(default_factory=DiscGroup)
 
     enemy_level: int = 60
+    enemy_base: int = 60
     team: dict[str, dict[str, str]] = field(default_factory=dict)
 
 
@@ -58,6 +60,7 @@ class Build:
         self.weapon = Weapon()
         self.discs = DiscGroup()
         self.enemy_level = 60
+        self.enemy_base = 60
         self.team: list[Agent] = []
         self.buffs: dict[str, Buff] = {}
         self.extra: list[StatValue] = []
@@ -117,6 +120,7 @@ class Build:
         b.agent.calc_static(b.discs)
 
         b.enemy_level = summary.enemy_level
+        b.enemy_base = summary.enemy_base
         team = [b.agent]
         for name, extra in summary.team.items():
             agent = agents.create_agent(name, **extra)
@@ -146,6 +150,7 @@ class Build:
         b.agent.calc_static(b.discs)
 
         b.enemy_level = full.enemy_level
+        b.enemy_base = full.enemy_base
         team = [b.agent]
         for name, extra in full.team.items():
             agent = agents.create_agent(name, **extra)
@@ -158,7 +163,7 @@ class Build:
     def replace_extra(self, extra):
         self.extra = copy.deepcopy(extra)
         self.calc_static_agent()
-        self.collect_buffs()
+        self.collect_buffs()  # XXX: remove me
         return self
 
     def replace_weapon(self, weapon):
@@ -166,7 +171,7 @@ class Build:
             raise Exception("cannot replace weapon under summary mode")
         self.weapon = weapon
         self.calc_static_agent()
-        self.collect_buffs()
+        self.collect_buffs()  # XXX: remove me
         return self
 
     def replace_disc(self, discs: list[Disc]):
@@ -177,7 +182,7 @@ class Build:
         for d in discs:
             self.discs.set(d)
         self.calc_static_agent()
-        self.collect_buffs()
+        self.collect_buffs()  # XXX: remove me
         return self
 
     def update_agent_stats(self, level=None, skill_levels=None):
