@@ -13,7 +13,9 @@ from pyzzz.model import (
 
 
 class Lycaon(Agent):
-    def __init__(self, level=60, skill_levels: SkillLevels | None = None, repetition=0):
+    def __init__(
+        self, level=60, skill_levels: SkillLevels | None = None, repetition=0, **kw
+    ):
         name = "Lycaon"
         Agent.__init__(
             self,
@@ -21,6 +23,7 @@ class Lycaon(Agent):
             level=level,
             skill_levels=skill_levels,
             repetition=repetition,
+            **kw,
         )
 
         self.cn_name = "莱卡恩"

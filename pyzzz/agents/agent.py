@@ -1,6 +1,7 @@
 import copy
 import itertools
 import math
+from typing import Sequence
 
 from pyzzz import dataset
 from pyzzz.buff import Buff
@@ -15,6 +16,7 @@ class Agent:
         is_ascension=False,
         skill_levels: SkillLevels | None = None,
         repetition=0,
+        **kw,
     ):
         # from dataset
         self._camp = ""
@@ -99,7 +101,7 @@ class Agent:
         asc_rank = (self.level - 1) // 10 + int(
             self.level % 10 == 0 and self.is_ascension
         )
-
+        asc_rank = min(asc_rank, 5)
         stats = itertools.chain(
             self._ascensions[asc_rank], self._passives[self.skill_levels.core]
         )
@@ -151,17 +153,16 @@ class Agent:
             self._skill_levels = skill_levels
         return self
 
-    def buffs(self, _: bool = True) -> list[Buff]:
+    def buffs(self, context: ContextData | None = None) -> Sequence[Buff]:
         return []
 
-    def extra_multiplier(self):
-        return 
+    def extra_multiplier(self) -> Sequence[ExtraMultiplier]:
+        return []
 
     def __str__(self):
         return f"{self._name} - {self._camp}/{self._profession}/{self._attribute}\n{self._growth}\n{self._ascensions}\n{self._passives}\n{self._static}"
 
     def load_cn_data(self, cn_name):
-        # self.data: AgentData = dataset.load_agents_basic()[cn_name]
         self._skill = dataset.load_skills()[cn_name]
 
     def load_zzz_gg_data(self, name: str):

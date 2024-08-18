@@ -18,7 +18,8 @@ class Soukaku(Agent):
         level=60,
         skill_levels: SkillLevels | None = None,
         core_skill_atk=None,
-        repetition=5,
+        repetition=6,
+        **kw,
     ):
         name = "Soukaku"
         Agent.__init__(
@@ -27,6 +28,7 @@ class Soukaku(Agent):
             level=level,
             skill_levels=skill_levels,
             repetition=repetition,
+            **kw,
         )
 
         self.cn_name = "苍角"
@@ -148,14 +150,22 @@ class Soukaku(Agent):
     def rep6(self):
         return Buff(
             StatValue(0.45, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.Ice, atk_kind=AttackKind.Basic),
+            condition=[
+                ContextData(
+                    agent=self.name, atk_attr=Attribute.Ice, atk_kind=AttackKind.Basic
+                ),
+                ContextData(
+                    agent=self.name, atk_attr=Attribute.Ice, atk_kind=AttackKind.Dash
+                ),
+            ],
             source="Soukaku rep6 ice dmg ratio",
         )
 
-    def buffs(self, _: bool = True):
+    def buffs(self, context: ContextData | None = None):
         res = [self.core_skill(), self.extra_skill()]
         if self._repetition >= 4:
             res.append(self.rep4())
+        # if context and context.agent == self.name and self._repetition >= 6:
         if self._repetition >= 6:
             res.append(self.rep6())
         return res

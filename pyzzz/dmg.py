@@ -3,7 +3,7 @@ import copy
 import math
 from dataclasses import replace
 from functools import reduce
-from typing import Optional, Union
+from typing import Optional, Sequence, Union
 
 from pyzzz import build, weapons
 from pyzzz.build import Build
@@ -226,14 +226,15 @@ class AnomalyLevelMultiplier:
 
 class DMG:
     def __init__(self):
+        # common
         self.atk = ATK()
         self.dmg_ratio = DMGMultiplier()
         self.resistance = ResistanceMutiplier()
         self.defense = DefenseMultiplier()
-        self.critical = CriticalMultiplier()
         self.daze = DazeMultiplier()
 
         # attack
+        self.critical = CriticalMultiplier()
         self.skill = SkillMultiplier()
 
         # anomaly
@@ -242,15 +243,31 @@ class DMG:
         self.anomaly_level = AnomalyLevelMultiplier()
         self.anomaly_acc = 0.0
 
-        self.extras: list[ExtraMultiplier] = []
+        # extra multiplier
+        self.context = ContextData()
+        self.extras: Sequence[ExtraMultiplier] = []
 
-    def calc_anomaly(self):
-        v = (
+    def calc_common(self):
+        return (
             self.atk.calc()
             * self.dmg_ratio.calc()
             * self.resistance.calc()
             * self.defense.calc()
             * self.daze.calc()
+        )
+
+    def calc_normal(self):
+        v = (self.calc_common() * self.critical.calc() * self.skill.calc()).value()
+
+        for extra in self.extras:
+            if extra.active(False, self.context):
+                v *= extra.calc()
+
+        return v
+
+    def calc_anomaly(self):
+        v = (
+            self.calc_common()
             # anomaly
             * self.aa.calc()
             * self.ap.calc()
@@ -258,22 +275,29 @@ class DMG:
         ).value()
 
         for extra in self.extras:
-            v *= extra.calc()
+            if extra.active(True, self.context):
+                v *= extra.calc()
 
         return v
 
-    def calc(self):
-        v = (
-            self.atk.calc()
-            * self.dmg_ratio.calc()
-            * self.resistance.calc()
-            * self.defense.calc()
-            * self.daze.calc()
-            # normal
-            * self.critical.calc()
-            * self.skill.calc()
-        ).value()
-        return v
+    def show_common(self):
+        return f"{self.atk} * {self.dmg_ratio} * {self.resistance} * {self.defense} * {self.daze}"
+
+    def show_normal(self):
+        s = f"{self.show_common()} * {self.critical}* {self.skill}"
+        for extra in self.extras:
+            if extra.active(True, self.context):
+                s += f" * {extra.show()}"
+        s += f" = {self.calc_normal():.1f}\t# acc={self.anomaly_acc}"
+        return s
+
+    def show_anomaly(self):
+        s = f"{self.show_common()} * {self.aa} * {self.ap} * {self.anomaly_level}"
+        for extra in self.extras:
+            if extra.active(False, self.context):
+                s += f" * {extra.show()}"
+        s += f" = {self.calc_anomaly():.1f}"
+        return s
 
     def apply_stat(self, stat: StatValue, source="", dynamic=False):
         number = Number(stat.value, source)
@@ -303,6 +327,8 @@ class DMG:
             self.daze.add(number)
         elif stat.kind == StatKind.ANOMALY_PROFICIENCY:
             self.ap.add(number)
+        elif stat.kind == StatKind.SKILL_MULTI:
+            self.skill.add(number)
 
     def apply_agent_data(self, agent: AgentData):
         self.atk.agent = Number(agent.atk_base, "Agent basic ATK")
@@ -338,6 +364,7 @@ class DMG:
     def apply_build_static(self, b: Build):
         self.defense.set_enemy(b.enemy_level, b.enemy_base)
         self.aa.attribute = b.agent.attribute
+        self.extras = b.agent.extra_multiplier()
         self.apply_agent_data(b.agent.base)
         self.apply_weapon_data(b.weapon.data)
         self.apply_discs(b.discs)
@@ -345,6 +372,7 @@ class DMG:
             self.apply_stat(stat)
 
     def apply_build_dynamic(self, b: Build, context: ContextData):
+        self.context = context
         if context.daze:
             self.daze.add(Number(0.5, "Basic daze ratio"))
         for buff in b.buffs.values():
@@ -356,18 +384,6 @@ class DMG:
         self.apply_build_static(b)
         self.apply_build_dynamic(b, context)
 
-    def show_normal(self):
-        return (
-            f"{self.atk} * {self.dmg_ratio} * {self.resistance} * {self.defense} * {self.daze}"
-            + f" * {self.aa} * {self.ap} * {self.anomaly_level} = {self.calc()}"
-        )
-
-    def show_anomaly(self):
-        return (
-            f"{self.atk} * {self.dmg_ratio} * {self.resistance} * {self.defense} * {self.daze}"
-            + f" * {self.critical}* {self.skill} = {self.calc_anomaly()} # acc={self.anomaly_acc}"
-        )
-
     def __str__(self):
         return (
             f"{self.atk}             \t# base\n"
@@ -377,7 +393,7 @@ class DMG:
             + f"* {self.critical}    \t# critical\n"
             + f"* {self.daze}        \t# daze\n"
             + f"* {self.skill}       \t# skill\n"
-            + f"= {self.calc()}"
+            + f"= {self.calc_normal()}"
         )
 
 
@@ -388,8 +404,8 @@ def calc_anomaly(dmgs):
     s = "0.0"
     for value, acc in anomaly_dmgs:
         result += value * acc / total
-        s += f" + {value} * {acc:.1f}/{total:.1f}"
-    s += f" = {result:.1f}"
+        s += f" + {value:.2f} * {acc:.2f}/{total:.2f}"
+    s += f" = {result:.2f}"
     return result, s
 
 
@@ -401,12 +417,10 @@ class ComboResult:
     anomaly_total: float = 0.0
     anomaly_detail: str = ""
 
-    def __init__(self, total, dmgs: list[DMG], comment="", anomaly=False):
-        self.total = total
-        self.dmgs = dmgs
-        self.comment = comment
-        if anomaly:
+    def calc_anomaly(self):
+        if not self.anomaly_total:
             self.anomaly_total, self.anomaly_detail = calc_anomaly(self.dmgs)
+        return self.anomaly_total, self.anomaly_detail
 
     def show_normal(self):
         s = "\n".join([d.show_normal() for d in self.dmgs])
@@ -414,8 +428,7 @@ class ComboResult:
         return s
 
     def show_anomaly(self):
-        if not self.anomaly_total:
-            self.anomaly_total, self.anomaly_detail = calc_anomaly(self.dmgs)
+        self.anomaly_total, self.anomaly_detail = self.calc_anomaly()
 
         s = "\n".join([d.show_anomaly() for d in self.dmgs])
         s += f"\nAcc calc: {self.anomaly_detail}"
@@ -437,14 +450,13 @@ class Combo:
         self.build = build
         self.context = context
         self.dmgs = []
-        self.anomaly_dmgs = []
-        self.final_anomaly_dmg = 0.0
 
     def calc(self, build=None, context=None):
         if not build:
             build = self.build
         if not context:
             context = self.context
+        context.agent = build.agent.name
 
         base_dmg = DMG()
         base_dmg.apply_build_static(build)
@@ -465,7 +477,7 @@ class Combo:
 
         value = 0.0
         for dmg in self.dmgs:
-            value += dmg.calc()
+            value += dmg.calc_normal()
         return value
 
     def delta_analyze(self) -> list[ComboResult]:
@@ -551,8 +563,7 @@ class Combo:
 
 def print_combo_results(results: list[ComboResult], print_anomaly=False):
     base = results[0].total
-    results[0].show_anomaly()
-    anomaly_base = results[0].anomaly_total
+    anomaly_base, _ = results[0].calc_anomaly()
 
     for r in results:
         ratio = (r.total / base - 1) * 100

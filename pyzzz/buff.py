@@ -28,7 +28,7 @@ class BuffBase:
             for cond in self.condition:
                 if context.contains(cond):
                     return True
-                return False
+            return False
         return True
 
     def __str__(self):

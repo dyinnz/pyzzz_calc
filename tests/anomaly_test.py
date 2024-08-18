@@ -2,6 +2,7 @@ from pyzzz.dmg import *
 from pyzzz.model import *
 from tests import build_test
 
+
 def test_combo():
     from pyzzz.agents.ellen import Ellen
 
@@ -15,4 +16,17 @@ def test_combo():
     print_combo_results(res, True)
 
 
-test_combo()
+def test_grace():
+    from pyzzz.agents.grace import Grace
+
+    attacks = AttackList([Grace.EX])
+    b = build_test.full_grace()
+    b.enemy_base = 54
+    b.collect_buffs()
+    combo = Combo(attacks, b)
+    res = combo.delta_analyze()
+    print_combo_results(res, True)
+
+
+# test_combo()
+test_grace()

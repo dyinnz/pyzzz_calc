@@ -30,6 +30,8 @@ class StatKind(StrEnum):
     RES_RATIO = auto()
     STUN_DMG_RATIO = auto()
 
+    SKILL_MULTI = auto()
+
 
 @dataclass
 class StatValue:
@@ -418,6 +420,8 @@ class WeaponGrowth:
 
 @dataclass
 class ContextData:
+    agent: str = ""  # empty str means that wound apply to all the agents
+
     # agent -> moster
     atk_attr: Attribute | None = None
     atk_kind: AttackKind | None = None
@@ -427,6 +431,8 @@ class ContextData:
     daze: bool = False
 
     def contains(self, rhs):
+        if rhs.agent and self.agent and self.agent != rhs.agent:
+            return False
         if (
             rhs.atk_attr
             and self.atk_attr != Attribute.All
@@ -449,5 +455,13 @@ class ContextData:
 class ExtraMultiplier:
 
     @abc.abstractmethod
-    def calc() -> float:
+    def calc(self) -> float:
+        pass
+
+    @abc.abstractmethod
+    def active(self, anomaly: bool, context: ContextData) -> bool:
+        pass
+
+    @abc.abstractmethod
+    def show(self) -> str:
         pass

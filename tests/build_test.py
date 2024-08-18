@@ -145,7 +145,7 @@ def full_soukaku():
     f.discs.set(
         Disc(
             3,
-            DiscKind.Polar_Metal,
+            DiscKind.Woodpecker_Electro,
             StatValue.create_empty(),
             [
                 StatValue(0.048, StatKind.CRIT_MULTI),
@@ -156,7 +156,7 @@ def full_soukaku():
     f.discs.set(
         Disc(
             4,
-            DiscKind.Polar_Metal,
+            DiscKind.Woodpecker_Electro,
             StatValue(0.24, StatKind.CRIT_RATIO),
             [
                 StatValue(38, StatKind.ATK_FLAT),
@@ -281,6 +281,17 @@ def full_lycaon():
     return Build.from_full(f)
 
 
+def full_grace():
+    f = FullData()
+    f.agent_name = "Grace"
+    f.agent_level = 30
+    f.agent_asc = True
+    f.agent_rep = 0
+    f.skill_levels = SkillLevels(0, 1, 1, 1, 1, 1)
+    f.weapon_name = ""
+    return Build.from_full(f);
+
 if __name__ == '__main__':
-    res = full_ellen()
+    # res = full_ellen()
+    res = full_grace()
     print(res)

@@ -13,7 +13,9 @@ from pyzzz.model import (
 
 
 class Ellen(Agent):
-    def __init__(self, level=60, skill_levels: SkillLevels | None = None, repetition=0):
+    def __init__(
+        self, level=60, skill_levels: SkillLevels | None = None, repetition=0, **kw
+    ):
         name = "Ellen"
         Agent.__init__(
             self,
@@ -21,6 +23,7 @@ class Ellen(Agent):
             level=level,
             skill_levels=skill_levels,
             repetition=repetition,
+            **kw,
         )
 
         self.cn_name = "艾莲"
@@ -80,5 +83,5 @@ class Ellen(Agent):
             StatValue(0.3, StatKind.DMG_RATIO), source="Ellen extra skill ice ratio"
         )
 
-    def buffs(self, _: bool = True):
+    def buffs(self, context: ContextData | None = None):
         return [self.core_skill(), self.extra_skill()]

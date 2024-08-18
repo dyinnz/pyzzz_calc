@@ -12,6 +12,7 @@ from pyzzz.weapons import Weapon
 class SummaryData:
     agent_name: str = ""
     agent_level: int = 60
+    agent_asc: bool = False
     agent_rep: int = 0
     skill_levels: SkillLevels = field(default_factory=SkillLevels)
 
@@ -38,6 +39,7 @@ class SummaryData:
 class FullData:
     agent_name: str = ""
     agent_level: int = 60
+    agent_asc: bool = False
     agent_rep: int = 0
     skill_levels: SkillLevels = field(default_factory=SkillLevels)
 
@@ -94,11 +96,17 @@ class Build:
     def from_summary(summary: SummaryData):
         b = Build()
         b.summary = True
-        b.agent = agents.create_agent(
-            summary.agent_name,
+
+        kw = dict(
             level=summary.agent_level,
             skill_levels=summary.skill_levels,
             repetition=summary.agent_rep,
+        )
+        if summary.agent_asc:
+            kw["is_ascension"] = summary.agent_asc
+        b.agent = agents.create_agent(
+            summary.agent_name,
+            **kw,
         )
         b.weapon = weapons.create_weapon(
             summary.weapon_name,
@@ -134,11 +142,16 @@ class Build:
     @staticmethod
     def from_full(full: FullData):
         b = Build()
-        b.agent = agents.create_agent(
-            full.agent_name,
+        kw = dict(
             level=full.agent_level,
             skill_levels=full.skill_levels,
             repetition=full.agent_rep,
+        )
+        if full.agent_asc:
+            kw["is_ascension"] = full.agent_asc
+        b.agent = agents.create_agent(
+            full.agent_name,
+            **kw,
         )
         b.weapon = weapons.create_weapon(
             full.weapon_name, level=full.weapon_level, repetition=full.weapon_rep
