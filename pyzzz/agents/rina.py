@@ -90,9 +90,9 @@ class Rina(Agent):
 
     def core_skill(self):
         def create():
-            m = [6, 7.5, 9, 10.2, 10.8, 11.4, 12][self.skill_levels.core]
+            m = [0.06, 0.075, 0.09, 0.102, 0.108, 0.114, 0.12][self.skill_levels.core]
             value = self.static.pen_ratio * 0.25 + m
-            value = min(30, value)
+            value = min(0.3, value)
             return StatValue(value, StatKind.PEN_RATIO)
 
         return DynamicBuff(
@@ -109,9 +109,9 @@ class Rina(Agent):
 
     def rep1(self):
         def create():
-            m = [6, 7.5, 9, 10.2, 10.8, 11.4, 12][self.skill_levels.core]
+            m = [0.06, 0.075, 0.09, 0.102, 0.108, 0.114, 0.12][self.skill_levels.core]
             value = self.static.pen_ratio * 0.25 + m
-            value = min(30, value)*0.3
+            value = min(0.3, value)*0.3
             return StatValue(value, StatKind.PEN_RATIO)
 
         return DynamicBuff(
