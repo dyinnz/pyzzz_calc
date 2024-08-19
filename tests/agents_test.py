@@ -29,3 +29,6 @@ if __name__ == "__main__":
 
     agent = agents.Zhuyuan()
     print(agent)
+
+    agent = agents.Nicole()
+    print(agent)
