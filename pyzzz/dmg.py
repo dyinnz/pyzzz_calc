@@ -130,6 +130,7 @@ class DefenseMultiplier:
 
         self.pen_ratio = LazyAdd([])
         self.pen_flat = LazyAdd([0.0])
+        self.def_res = LazyAdd([])
 
     def set_agent(self, level):
         self._agent_level = level
@@ -144,7 +145,7 @@ class DefenseMultiplier:
 
     def calc(self):
         return self.agent / (
-            self.agent + self.enemy * (Number(1.0) - self.pen_ratio) - self.pen_flat
+            self.agent + self.enemy * (Number(1.0) - self.def_res) * (Number(1.0) - self.pen_ratio) - self.pen_flat
         )
 
     def __str__(self):
