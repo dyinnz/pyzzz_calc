@@ -17,3 +17,15 @@ if __name__ == "__main__":
 
     agent = agents.Lycaon()
     print(agent)
+
+    agent = agents.Rina()
+    print(agent)
+
+    agent = agents.Nekomata()
+    print(agent)
+
+    agent = agents.Soldier11()
+    print(agent)
+
+    agent = agents.Zhuyuan()
+    print(agent)
