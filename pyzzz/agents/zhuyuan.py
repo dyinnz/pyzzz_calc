@@ -134,7 +134,7 @@ class Zhuyuan(Agent):
 
     def rep6(self):
         return Buff(
-            StatValue(2.2, StatKind.SKILL_MULTI),
+            StatValue(8.8, StatKind.SKILL_MULTI),
             condition=ContextData(atk_attr=Attribute.Ether, atk_kind=AttackKind.SpecialEx),
             source="Zhuyuan rep6 skill",
         )
