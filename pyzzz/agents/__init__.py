@@ -7,6 +7,7 @@ from pyzzz.agents.rina import Rina
 from pyzzz.agents.nekomata import Nekomata
 from pyzzz.agents.soldier11 import Soldier11
 from pyzzz.agents.zhuyuan import Zhuyuan
+from pyzzz.agents.nicole import Nicole
 
 
 def create_agent(name: str, **kw):
@@ -19,6 +20,7 @@ def create_agent(name: str, **kw):
         "Nekomata" : Nekomata,
         "Soldier11": Soldier11,
         "Zhuyuan": Zhuyuan,
+        "Nicole": Nicole
     }[
         name
     ](**kw)
