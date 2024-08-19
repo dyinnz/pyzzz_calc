@@ -74,13 +74,13 @@ class Soldier11(Agent):
 
     def Dash(self):
         value = self.dash["dmg"] + self.dash["dmg_grow"] * (
-            self.skill_levels.dogde - 1
+            self.skill_levels.dodge - 1
         )
         return Attack(AttackKind.Dash, Attribute.Fire, value)
     
     def Dodge(self):
         value = self.dogde["dmg"] + self.dogde["dmg_grow"] * (
-            self.skill_levels.dogde - 1
+            self.skill_levels.dodge - 1
         )
         return Attack(AttackKind.Dodge, Attribute.Fire, value)
 
@@ -135,11 +135,12 @@ class Soldier11(Agent):
                        ContextData(atk_attr=Attribute.Fire, atk_kind=AttackKind.Dash)],
             source="Soldier11 rep6 Fire res ratio",
         )
-
-    def buffs(self, _: bool = True):
+    
+    def buffs(self, context: ContextData | None = None):
         res = [self.core_skill(), self.extra_skill()]
         if self._repetition >= 2:
             res.append(self.rep2())
+        # if context and context.agent == self.name and self._repetition >= 6:
         if self._repetition >= 6:
             res.append(self.rep6())
         return res
