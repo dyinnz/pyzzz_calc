@@ -20,6 +20,7 @@ class StatKind(StrEnum):
     DEF_FLAT = auto()
     PEN_RATIO = auto()
     PEN_FLAT = auto()
+    DEF_RES = auto()
 
     ANOMALY_MASTER = auto()
     ANOMALY_PROFICIENCY = auto()
