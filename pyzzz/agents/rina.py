@@ -72,7 +72,7 @@ class Rina(Agent):
 
     def Dodge(self):
         value = self.dogde["dmg"] + self.dogde["dmg_grow"] * (
-            self.skill_levels.dogde - 1
+            self.skill_levels.dodge - 1
         )
         return Attack(AttackKind.Dodge, Attribute.Electric, value)
 
@@ -90,10 +90,10 @@ class Rina(Agent):
 
     def core_skill(self):
         def create():
-            m = [6, 7.5, 9, 10.2, 10.8, 11.4, 12]
-            value = self.static.pen_ratio() * 0.25 + m
+            m = [6, 7.5, 9, 10.2, 10.8, 11.4, 12][self.skill_levels.core]
+            value = self.static.pen_ratio * 0.25 + m
             value = min(30, value)
-            return StatValue(value[self.skill_levels.core], StatKind.PEN_RATIO)
+            return StatValue(value, StatKind.PEN_RATIO)
 
         return DynamicBuff(
             create,
@@ -109,10 +109,10 @@ class Rina(Agent):
 
     def rep1(self):
         def create():
-            m = [6, 7.5, 9, 10.2, 10.8, 11.4, 12]
-            value = self.static.pen_ratio() * 0.25 + m
+            m = [6, 7.5, 9, 10.2, 10.8, 11.4, 12][self.skill_levels.core]
+            value = self.static.pen_ratio * 0.25 + m
             value = min(30, value)*0.3
-            return StatValue(value[self.skill_levels.core], StatKind.PEN_RATIO)
+            return StatValue(value, StatKind.PEN_RATIO)
 
         return DynamicBuff(
             create,
@@ -134,12 +134,13 @@ class Rina(Agent):
             source="Rina rep6 Electric dmg ratio",
         )
 
-    def buffs(self, _: bool = True):
+    def buffs(self, context: ContextData | None = None):
         res = [self.core_skill(), self.extra_skill()]
         if self._repetition >= 1:
             res.append(self.rep1())
         if self._repetition >= 2:
             res.append(self.rep2())
+        # if context and context.agent == self.name and self._repetition >= 6:
         if self._repetition >= 6:
             res.append(self.rep6())
         return res
