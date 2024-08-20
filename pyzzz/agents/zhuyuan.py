@@ -19,7 +19,7 @@ class Zhuyuan(Agent):
         core_skill_atk=None,
         repetition=0,
     ):
-        name = "Zhuyuan"
+        name = "Zhu Yuan"
         Agent.__init__(
             self,
             name=name,
