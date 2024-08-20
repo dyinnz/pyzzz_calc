@@ -38,11 +38,11 @@ class Nekomata(Agent):
         self.a3 = self._skill["普通攻击：猫猫爪刺-三段"]
         self.a4 = self._skill["普通攻击：猫猫爪刺-四段"]
         self.a5 = self._skill["普通攻击：猫猫爪刺-五段"]
-        self.a6 = self._skill["普通攻击：赤色之刃"]
+        self.a6 = self._skill["普通攻击：赤色之刃-"]
 
-        self.e1 = self._skill["特殊技：奇袭"]
+        self.e1 = self._skill["特殊技：奇袭-"]
 
-        self.ex1 = self._skill["强化特殊技：超~凶奇袭"]
+        self.ex1 = self._skill["强化特殊技：超~凶奇袭！-"]
 
         self.dogde = self._skill["闪避反击：虚影双刺-"]
         self.chain = self._skill["连携技：刃爪挥击-"]
