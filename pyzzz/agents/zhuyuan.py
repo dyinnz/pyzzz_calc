@@ -33,9 +33,10 @@ class Zhuyuan(Agent):
 
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
 
-        self.a1 = self._skill["普通攻击：请勿抵抗(以太)-一段"]
-        self.a2 = self._skill["普通攻击：请勿抵抗(以太)-二段"]
-        self.a3 = self._skill["普通攻击：请勿抵抗(以太)-三段"]
+        self.a1 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
+        self.a2 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
+        self.a3 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
+
 
         self.e1 = self._skill["特殊技：鹿弹射击-"]
 
