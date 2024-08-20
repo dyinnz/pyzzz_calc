@@ -19,7 +19,7 @@ class Soldier11(Agent):
         core_skill_atk=None,
         repetition=0,
     ):
-        name = "Soldier11"
+        name = "Soldier 11"
         Agent.__init__(
             self,
             name=name,
@@ -28,7 +28,7 @@ class Soldier11(Agent):
             repetition=repetition,
         )
 
-        self.cn_name = "11号"
+        self.cn_name = "「11号」"
         self.load_cn_data(self.cn_name)
 
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
@@ -38,9 +38,9 @@ class Soldier11(Agent):
         self.a3 = self._skill["普通攻击：火力镇压-三段"]
         self.a4 = self._skill["普通攻击：火力镇压-四段"]
 
-        self.e1 = self._skill["特殊技：烈火"]
+        self.e1 = self._skill["特殊技：烈火-"]
 
-        self.ex1 = self._skill["强化特殊技：盛燃烈火"]
+        self.ex1 = self._skill["强化特殊技：盛燃烈火-"]
 
         self.dash = self._skill["冲刺攻击：火力镇压-"]
         self.dogde = self._skill["闪避反击：逆火-"]
