@@ -20,7 +20,7 @@ def create_agent(name: str, **kw):
         "Rina": Rina,
         "Nekomata" : Nekomata,
         "Soldier11": Soldier11,
-        "Zhuyuan": Zhuyuan,
+        "Zhu Yuan": Zhuyuan,
         "Nicole": Nicole，
         "Qingyi": Qingyi
     }[
