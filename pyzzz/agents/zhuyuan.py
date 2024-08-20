@@ -37,9 +37,9 @@ class Zhuyuan(Agent):
         self.a2 = self._skill["普通攻击：请勿抵抗(以太)-二段"]
         self.a3 = self._skill["普通攻击：请勿抵抗(以太)-三段"]
 
-        self.e1 = self._skill["特殊技：鹿弹射击"]
+        self.e1 = self._skill["特殊技：鹿弹射击-"]
 
-        self.ex1 = self._skill["强化特殊技：全弹连射"]
+        self.ex1 = self._skill["强化特殊技：全弹连射-"]
 
         self.dash = self._skill["闪避反击：火力震爆-"]
         self.dogde = self._skill["闪避反击：火力震爆-"]
