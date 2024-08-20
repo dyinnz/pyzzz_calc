@@ -271,7 +271,8 @@ class Camp(StrEnum):
     Belobog_Heavy_Industries = auto()
     Section_6 = auto()
     Sons_of_Calydon = auto()
-    Public_Security = auto()
+    Public_Security = auto() 
+    Criminal_Investigation_Special_Response_Team = auto()
 
     @staticmethod
     def from_full_name(name: str):
@@ -283,6 +284,7 @@ class Camp(StrEnum):
             "Obol Squad": Camp.Obol_Squad,
             "Sons of Calydon": Camp.Sons_of_Calydon,
             "Victoria Housekeeping Co.": Camp.Victoria_Housekeeping,
+            "Criminal Investigation Special Response Team": Camp.Criminal_Investigation_Special_Response_Team,
         }[name]
 
 
