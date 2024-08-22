@@ -1,4 +1,4 @@
-from pyzzz.agents.agent import Agent
+from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.buff import Buff, DynamicBuff
 from pyzzz.model import (
     AgentData,
@@ -10,8 +10,9 @@ from pyzzz.model import (
     StatKind,
     StatValue,
 )
+from pyzzz.hit import Hit, Attack
 
-class Qingyi(Agent):
+class Qingyi(AgentWithData):
     def __init__(
         self,
         level=60,
@@ -20,7 +21,7 @@ class Qingyi(Agent):
         repetition=0,
     ):
         name = "Qingyi"
-        Agent.__init__(
+        AgentWithData.__init__(
             self,
             name=name,
             level=level,
@@ -28,8 +29,8 @@ class Qingyi(Agent):
             repetition=repetition,
         )
 
-        self.cn_name = "青衣"
-        self.load_cn_data(self.cn_name)
+        self._cn_name = "青衣"
+        self.load_cn_data(self._cn_name)
 
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
 

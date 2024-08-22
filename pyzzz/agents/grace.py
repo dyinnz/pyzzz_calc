@@ -1,7 +1,7 @@
-from pyzzz.agents.agent import Agent
-from pyzzz.buff import Buff, DynamicBuff
+from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.model import *
 
+from pyzzz.hit import Hit, Attack
 
 class GraceExtraMultiplier(ExtraMultiplier):
 
@@ -15,14 +15,13 @@ class GraceExtraMultiplier(ExtraMultiplier):
         return "(1 + 0.36)"
 
 
-class Grace(Agent):
+class Grace(AgentWithData):
 
     def __init__(
         self, level=60, skill_levels: SkillLevels | None = None, repetition=0, **kw
     ):
         name = "Grace"
-        Agent.__init__(
-            self,
+        super().__init__(
             name=name,
             level=level,
             skill_levels=skill_levels,
@@ -30,8 +29,8 @@ class Grace(Agent):
             **kw
         )
 
-        self.cn_name = "格莉丝"
-        self.load_cn_data(self.cn_name)
+        self._cn_name = "格莉丝"
+        self.load_cn_data(self._cn_name)
 
         self.a1 = self._skill["普通攻击：高压射钉-一段"]
         self.a2 = self._skill["普通攻击：高压射钉-二段"]

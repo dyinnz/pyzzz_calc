@@ -1,7 +1,6 @@
-from pyzzz.agents.agent import Agent
+from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.buff import Buff, DynamicBuff
 from pyzzz.model import (
-    AgentData,
     Attack,
     AttackKind,
     Attribute,
@@ -11,8 +10,9 @@ from pyzzz.model import (
     StatValue,
 )
 
+from pyzzz.hit import Hit, Attack
 
-class Soukaku(Agent):
+class Soukaku(AgentWithData):
     def __init__(
         self,
         level=60,
@@ -22,7 +22,7 @@ class Soukaku(Agent):
         **kw,
     ):
         name = "Soukaku"
-        Agent.__init__(
+        AgentWithData.__init__(
             self,
             name=name,
             level=level,
@@ -31,8 +31,8 @@ class Soukaku(Agent):
             **kw,
         )
 
-        self.cn_name = "苍角"
-        self.load_cn_data(self.cn_name)
+        self._cn_name = "苍角"
+        self.load_cn_data(self._cn_name)
 
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
 
@@ -117,6 +117,13 @@ class Soukaku(Agent):
         )
         return Attack(AttackKind.Final, Attribute.Ice, value, self.final["anomaly"])
 
+    def final_buff(self):
+        return Buff(
+            StatValue(0.15, StatKind.CRIT_RATIO),
+            condition=ContextData(atk_kind=AttackKind.Final, agent=self.name),
+            source=f"{self.name} final buff +15% critical ratio",
+        )
+
     def core_skill(self):
         def create():
             m = [0, 12.5, 15, 17, 18, 19, 20][self.skill_levels.core] / 100 * 2
@@ -158,11 +165,12 @@ class Soukaku(Agent):
                     agent=self.name, atk_attr=Attribute.Ice, atk_kind=AttackKind.Dash
                 ),
             ],
+            for_team=False,
             source="Soukaku rep6 ice dmg ratio",
         )
 
     def buffs(self, context: ContextData | None = None):
-        res = [self.core_skill(), self.extra_skill()]
+        res = [self.core_skill(), self.extra_skill(), self.final_buff()]
         if self._repetition >= 4:
             res.append(self.rep4())
         # if context and context.agent == self.name and self._repetition >= 6:

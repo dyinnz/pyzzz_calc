@@ -1,7 +1,7 @@
 import abc
-from typing import Callable, Optional
+from typing import Callable
 
-from pyzzz.model import AttackKind, ContextData, StatKind, StatValue
+from pyzzz.model import ContextData, StatValue
 
 
 class BuffBase:
@@ -10,10 +10,12 @@ class BuffBase:
         source: str = "",
         cov: float = 1.0,
         condition: ContextData | list[ContextData] | None = None,
+        for_team: bool = True,
     ):
         self.source = source
         self.cov = cov
         self.condition: list[ContextData] = []
+        self.for_team = for_team
         if isinstance(condition, list):
             self.condition.extend(condition)
         elif isinstance(condition, ContextData):
@@ -33,13 +35,12 @@ class BuffBase:
 
     def __str__(self):
         if self.cov < 1.0:
-            return f"{self.produce(None)} * {self.cov} from '{self.source}'"
+            return f"{self.produce(None)} with cov={self.cov} from '{self.source}'"
         else:
             return f"{self.produce(None)} from '{self.source}'"
 
 
 class Buff(BuffBase):
-
     def __init__(self, stat: StatValue, **kw):
         BuffBase.__init__(self, **kw)
         self.stat = stat

@@ -3,6 +3,7 @@ from typing import Sequence
 from pyzzz import dataset
 from pyzzz.model import *
 from pyzzz.agent import Agent
+from pyzzz.hit import Hit, Attack
 
 
 class AgentWithData(Agent):

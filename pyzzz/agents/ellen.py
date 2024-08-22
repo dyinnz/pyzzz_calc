@@ -1,8 +1,6 @@
-from pyzzz.agents.agent import Agent
+from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.buff import Buff, DynamicBuff
 from pyzzz.model import (
-    AgentData,
-    Attack,
     AttackKind,
     Attribute,
     ContextData,
@@ -11,14 +9,15 @@ from pyzzz.model import (
     StatValue,
 )
 
+from pyzzz.hit import Hit, Attack
 
-class Ellen(Agent):
+
+class Ellen(AgentWithData):
     def __init__(
         self, level=60, skill_levels: SkillLevels | None = None, repetition=0, **kw
     ):
         name = "Ellen"
-        Agent.__init__(
-            self,
+        super().__init__(
             name=name,
             level=level,
             skill_levels=skill_levels,
@@ -26,8 +25,8 @@ class Ellen(Agent):
             **kw,
         )
 
-        self.cn_name = "艾莲"
-        self.load_cn_data(self.cn_name)
+        self._cn_name = "艾莲"
+        self.load_cn_data(self._cn_name)
 
         self.a1 = self._skill["普通攻击：急冻修剪法-一段"]
         self.a2 = self._skill["普通攻击：急冻修剪法-二段"]

@@ -1,7 +1,6 @@
-from pyzzz.agents.agent import Agent
+from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.buff import Buff, DynamicBuff
 from pyzzz.model import (
-    AgentData,
     Attack,
     AttackKind,
     Attribute,
@@ -10,8 +9,10 @@ from pyzzz.model import (
     StatKind,
     StatValue,
 )
+from pyzzz.hit import Attack
 
-class Soldier11(Agent):
+
+class Soldier11(AgentWithData):
     def __init__(
         self,
         level=60,
@@ -20,7 +21,7 @@ class Soldier11(Agent):
         repetition=0,
     ):
         name = "Soldier 11"
-        Agent.__init__(
+        AgentWithData.__init__(
             self,
             name=name,
             level=level,
@@ -28,7 +29,7 @@ class Soldier11(Agent):
             repetition=repetition,
         )
 
-        self.cn_name = "「11号」"
+        self._cn_name = "「11号」"
         self.load_cn_data(self.cn_name)
 
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
@@ -59,7 +60,7 @@ class Soldier11(Agent):
     def A3(self):
         value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Fire, value)
-    
+
     def A4(self):
         value = self.a4["dmg"] + self.a4["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Fire, value)
@@ -73,11 +74,9 @@ class Soldier11(Agent):
         return Attack(AttackKind.SpecialEx, Attribute.Fire, value)
 
     def Dash(self):
-        value = self.dash["dmg"] + self.dash["dmg_grow"] * (
-            self.skill_levels.dodge - 1
-        )
+        value = self.dash["dmg"] + self.dash["dmg_grow"] * (self.skill_levels.dodge - 1)
         return Attack(AttackKind.Dash, Attribute.Fire, value)
-    
+
     def Dodge(self):
         value = self.dogde["dmg"] + self.dogde["dmg_grow"] * (
             self.skill_levels.dodge - 1
@@ -106,36 +105,41 @@ class Soldier11(Agent):
             source="Soldier11 core skill dmg ratio",
         )
 
-
     def extra_skill(self):
-        return( Buff(
-            StatValue(0.1, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.Fire),
-            source="Soldier11 extra skill dmg ratio",
-        ),
+        return (
             Buff(
-            StatValue(0.225, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.Fire),
-            source="Soldier11 extra skill daze fire dmg ratio",
-        ))
-    
+                StatValue(0.1, StatKind.DMG_RATIO),
+                condition=ContextData(atk_attr=Attribute.Fire),
+                source="Soldier11 extra skill dmg ratio",
+            ),
+            Buff(
+                StatValue(0.225, StatKind.DMG_RATIO),
+                condition=ContextData(atk_attr=Attribute.Fire),
+                source="Soldier11 extra skill daze fire dmg ratio",
+            ),
+        )
+
     def rep2(self):
         return Buff(
             StatValue(0.36, StatKind.DMG_RATIO),
-            condition=[ContextData(atk_kind=AttackKind.Basic),
-                       ContextData(atk_kind=AttackKind.Dash),
-                       ContextData(atk_kind=AttackKind.Dodge)],
+            condition=[
+                ContextData(atk_kind=AttackKind.Basic),
+                ContextData(atk_kind=AttackKind.Dash),
+                ContextData(atk_kind=AttackKind.Dodge),
+            ],
             source="Soldier11 ep2 Physical res ratio",
         )
 
     def rep6(self):
         return Buff(
             StatValue(-0.25, StatKind.RES_RATIO),
-            condition=[ContextData(atk_attr=Attribute.Fire, atk_kind=AttackKind.Basic),
-                       ContextData(atk_attr=Attribute.Fire, atk_kind=AttackKind.Dash)],
+            condition=[
+                ContextData(atk_attr=Attribute.Fire, atk_kind=AttackKind.Basic),
+                ContextData(atk_attr=Attribute.Fire, atk_kind=AttackKind.Dash),
+            ],
             source="Soldier11 rep6 Fire res ratio",
         )
-    
+
     def buffs(self, context: ContextData | None = None):
         res = [self.core_skill(), self.extra_skill()]
         if self._repetition >= 2:

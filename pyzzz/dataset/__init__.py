@@ -14,37 +14,6 @@ def get_percent(s):
 
 
 @lru_cache
-def load_agents_basic():
-    agents = {}
-
-    with open(directory + "/agents_basic.csv", encoding="utf-8") as file:
-        spamreader = csv.reader(file, delimiter="\t")
-        for row in spamreader:
-            name = row[0]
-
-            agent = AgentData()
-            # agent.name = row[0]
-            agent.level = 60
-            # agent.hp = float(row[1])
-            # agent.atk = float(row[2])
-            # agent.defense = float(row[3])
-            agent.crit_ratio = get_percent(row[4])
-            agent.crit_multi = get_percent(row[5])
-            agent.impact = float(row[6])
-            agent.anomaly_master = float(row[7])
-            # anergy limit
-            agent.energy_regen = float(row[9])
-            agent.anomaly_proficiency = float(row[10])
-            agent.hp = float(row[11])
-            agent.atk = float(row[12])
-            agent.defense = float(row[13])
-
-            agents[name] = agent
-
-    return agents
-
-
-@lru_cache
 def load_skills():
     skills = {}
 
@@ -165,7 +134,6 @@ def load_zzz_gg_weapons_json():
 
 @lru_cache
 def load_zzz_gg_weapons():
-
     json = load_zzz_gg_weapons_json()
 
     professions_by_id = {item["ID"]: item["Name"] for item in json["professions"]}

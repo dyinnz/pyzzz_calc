@@ -1,9 +1,7 @@
-import math
-from typing import Sequence
-
 from pyzzz import dataset
-from pyzzz.buff import BuffBase, DynamicBuff
-from pyzzz.model import *
+from pyzzz.buff import DynamicBuff
+from pyzzz.model import Profession, StatKind, StatValue, ContextData
+from pyzzz.weapon import Weapon
 
 CN2EN = {
     "加农转子": "CannonRotor",
@@ -13,61 +11,19 @@ CN2EN = {
 EN2CN = {v: k for k, v in CN2EN.items()}
 
 
-class Weapon:
-    def __init__(self, name="", level=60, is_ascension=False, repetition=1):
-        self._name = name
-
-        # from dataset
-        self._profession: Profession = Profession.All
-        self._init: WeaponData = WeaponData(0, 0, StatValue.create_empty())
-        self._growths: list[WeaponGrowth] = []
-        self._ascensions: list[WeaponGrowth] = []
-
-        # from input
-        self._level = level
-        self._is_ascension = is_ascension
-        self._repetition = repetition
-
-        self.data: WeaponData = WeaponData(level, 0, StatValue.create_empty())
-
-        self._buffs: Sequence[BuffBase] = []
-
+class WeaponWithData(Weapon):
+    def __init__(
+        self,
+        name: str = "",
+        level: int = 60,
+        is_ascension: bool = False,
+        repetition: int = 1,
+    ):
+        super().__init__(name, level, is_ascension, repetition)
         if name:
-            self.load_zzz_gg_data(name)
-            self.fill_data()
+            self._load_zzz_gg_data(name)
 
-    @property
-    def level(self):
-        return self._level
-
-    def buffs(self, context: ContextData | None = None) -> Sequence[BuffBase]:
-        return []
-
-    def fill_data(self):
-        self.data.level = self._level
-        rank = (self._level - 1) // 10 + int(
-            self._level % 10 == 0 and self._is_ascension
-        )
-        asc = self._ascensions[rank]
-        self.data.atk = math.floor(
-            self._init.atk * (1 + asc.atk_rate + self._growths[self._level].atk_rate)
-        )
-        self.data.primary.value = self._init.primary.value * (1 + asc.primary_rate)
-        self.data.primary.kind = self._init.primary.kind
-
-    def set_stats(self, level=None, is_ascension=None, repetition=None):
-        if level is not None:
-            self._level = level
-        if is_ascension is not None:
-            self._is_ascension = is_ascension
-        if repetition is not None:
-            self._repetition = repetition
-        self.fill_data()
-
-    def __str__(self):
-        return f"{self._name} - {self._profession}\n{self._ascensions}\ninit: {self._init} - current: {self.data}"
-
-    def load_zzz_gg_data(self, name: str):
+    def _load_zzz_gg_data(self, name: str):
         db = dataset.load_zzz_gg_weapons()
 
         weapon = db["weapons"][name]
@@ -76,20 +32,22 @@ class Weapon:
         self._ascensions = db["ascensions"][model]
         self._growths = db["levelings"][model]
 
-        self._init.atk = weapon["BaseProperty"]["Value"]
-        self._init.primary.value = weapon["RandProperty"]["Value"]
-        self._init.primary.kind = dataset.ZZZ_GG_STAT_PRIMARY[
+        self._init_atk_base = weapon["BaseProperty"]["Value"]
+        self._init_advanced_stat.value = weapon["RandProperty"]["Value"]
+        self._init_advanced_stat.kind = dataset.ZZZ_GG_STAT_PRIMARY[
             weapon["RandProperty"]["Name"]
         ]
         if "%" in weapon["RandProperty"]["ShowForm"]:
-            self._init.primary.value /= 1e4
+            self._init_advanced_stat.value /= 1e4
+
+        self._fill_data()
 
 
-class CannonRotor(Weapon):
+class CannonRotor(WeaponWithData):
     NAME = "CannonRotor"
 
     def __init__(self, level=60, is_ascension=False, repetition=1):
-        Weapon.__init__(self, CannonRotor.NAME, level, is_ascension, repetition)
+        super().__init__(CannonRotor.NAME, level, is_ascension, repetition)
 
     def buffs(self, context: ContextData | None = None):
         def create():
@@ -101,11 +59,11 @@ class CannonRotor(Weapon):
         return [DynamicBuff(create, source="CannonRotor buff")]
 
 
-class StarlightEngine(Weapon):
+class StarlightEngine(WeaponWithData):
     NAME = "StarlightEngine"
 
     def __init__(self, cov=1.0, level=60, is_ascension=False, repetition=1):
-        Weapon.__init__(self, StarlightEngine.NAME, level, is_ascension, repetition)
+        super().__init__(StarlightEngine.NAME, level, is_ascension, repetition)
         self._cov = cov
 
     def buffs(self, context: ContextData | None = None):
@@ -124,11 +82,11 @@ class StarlightEngine(Weapon):
         ]
 
 
-class BashfulDemon(Weapon):
+class BashfulDemon(WeaponWithData):
     NAME = "BashfulDemon"
 
     def __init__(self, cov=1.0, level=60, is_ascension=False, repetition=1):
-        Weapon.__init__(self, BashfulDemon.NAME, level, is_ascension, repetition)
+        super().__init__(BashfulDemon.NAME, level, is_ascension, repetition)
         self._cov = cov
 
     def buffs(self, context: ContextData | None = None):
@@ -157,7 +115,7 @@ class BashfulDemon(Weapon):
         ]
 
 
-class PreciousFossilizedCore(Weapon):
+class PreciousFossilizedCore(WeaponWithData):
     NAME = "PreciousFossilizedCore"
 
     def __init__(self, cov=1.0, level=60, is_ascension=False, repetition=1):
@@ -167,11 +125,11 @@ class PreciousFossilizedCore(Weapon):
         self._cov = cov
 
 
-class DeepSeaVisitor(Weapon):
+class DeepSeaVisitor(WeaponWithData):
     NAME = "DeepSeaVisitor"
 
     def __init__(self, cov=1.0, level=60, is_ascension=False, repetition=1):
-        Weapon.__init__(self, DeepSeaVisitor.NAME, level, is_ascension, repetition)
+        super().__init__(DeepSeaVisitor.NAME, level, is_ascension, repetition)
         self._cov = cov
 
     def buffs(self, context: ContextData | None = None):
@@ -203,12 +161,25 @@ class DeepSeaVisitor(Weapon):
         ]
 
 
+class RainforestGourmet(WeaponWithData):
+    NAME = "RainforestGourmet"
+
+    def __init__(self, cov=1.0, level=60, is_ascension=False, repetition=1):
+        super().__init__(RainforestGourmet.NAME, level, is_ascension, repetition)
+        self._cov = cov
+
+
 def create_weapon(name: str, **kw):
-    return {
+    name = name.replace(" ", "")
+    mappings = {
         "CannonRotor": CannonRotor,
         "StarlightEngine": StarlightEngine,
         "BashfulDemon": BashfulDemon,
         "DeepSeaVisitor": DeepSeaVisitor,
         "PreciousFossilizedCore": PreciousFossilizedCore,
-        "": Weapon
-    }[name](**kw)
+        "RainforestGourmet": RainforestGourmet,
+    }
+    if name in mappings:
+        return mappings[name](**kw)
+    elif name:
+        return Weapon(name, **kw)

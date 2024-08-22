@@ -1,0 +1,215 @@
+from functools import reduce
+import math
+
+from pyzzz.model import Attribute
+
+
+class Number:
+    def __init__(self, v, source=""):
+        if isinstance(v, Number):
+            self.v = v.value()
+            self.source = v.source
+        else:
+            self.v = v
+            self.source = ""
+        if source:
+            self.source = source
+
+    def __add__(self, rhs):
+        return Number(self.v + rhs.value())
+
+    def __mul__(self, rhs):
+        return Number(self.v * rhs.value())
+
+    def __sub__(self, rhs):
+        return Number(self.v - rhs.value())
+
+    def __truediv__(self, rhs):
+        return Number(self.v / rhs.value())
+
+    def __neg__(self):
+        return Number(-self.v)
+
+    def value(self):
+        return self.v
+
+    def __str__(self):
+        return f"{self.v:.3f}".rstrip("0").rstrip(".")
+
+
+class LazyAdd:
+    def __init__(self, numbers, source=""):
+        self.numbers = [Number(n) for n in numbers]
+        self.source = source
+
+    def add(self, n: float | Number):
+        self.numbers.append(Number(n))
+
+    def set(self, n: float | Number):
+        self.numbers = [Number(n)]
+
+    def value(self):
+        return reduce(lambda x, y: x + y, self.numbers, Number(0.0)).value()
+
+    def __str__(self):
+        if not self.numbers:
+            return "0"
+        s = "+".join([str(n) for n in self.numbers])
+        if len(self.numbers) > 1:
+            s = "(" + s + ")"
+        return s
+
+
+class ListMultiplier(LazyAdd):
+    def __init__(self, numbers=None):
+        if numbers is None:
+            numbers = [1.0]
+        LazyAdd.__init__(self, numbers)
+
+    def calc(self):
+        return self
+
+
+# 1.1
+class ATKMultiplier:
+    def __init__(self):
+        self.agent = Number(0.0)
+        self.weapon = Number(0.0)
+        self.static_ratio = LazyAdd([1.0])
+        self.static_flat = LazyAdd([])
+        self.dynamic_ratio = LazyAdd([1.0])
+        self.dynamic_flat = LazyAdd([])
+
+    def calc(self):
+        return (
+            (self.agent + self.weapon) * self.static_ratio + self.static_flat
+        ) * self.dynamic_ratio + self.dynamic_flat
+
+    def __str__(self):
+        return f"( ( ({self.agent} + {self.weapon}) * {self.static_ratio} + {self.static_flat} ) * {self.dynamic_ratio} + {self.dynamic_flat} )"
+
+
+# 1.2
+SkillMultiplier = ListMultiplier
+
+# 2
+DMGMultiplier = ListMultiplier
+
+# 3
+ResistanceMutiplier = ListMultiplier
+
+
+# 4
+class DefenseMultiplier:
+    @staticmethod
+    def defense_func(level):
+        if level > 60:
+            level = 60
+        return math.floor(0.1551 * level * level + 3.141 * level + 47.2049)
+
+    def __init__(self, **kw):
+        self._agent_level = kw.get("agent_level", 60)
+        self._enemy_level = kw.get("enemy_level", 70)
+        self._enemy_base = kw.get("enemy_base", 54)
+
+        self.agent = Number(self.defense_func(self._agent_level))
+        self.enemy = Number(
+            self.defense_func(self._enemy_level) * self._enemy_base / 50
+        )
+
+        self.pen_ratio = LazyAdd([])
+        self.pen_flat = LazyAdd([0.0])
+        self.def_res = LazyAdd([])
+
+    def set_agent(self, level):
+        self._agent_level = level
+        self.agent = Number(self.defense_func(self._agent_level))
+
+    def set_enemy(self, level, base):
+        self._enemy_level = level
+        self._enemy_base = base
+        self.enemy = Number(
+            self.defense_func(self._enemy_level) * self._enemy_base / 50
+        )
+
+    def calc(self):
+        return self.agent / (
+            self.agent
+            + self.enemy * (Number(1.0) - self.def_res) * (Number(1.0) - self.pen_ratio)
+            - self.pen_flat
+        )
+
+    def __str__(self):
+        pen = Number(1.0) - self.pen_ratio
+        return f"( {self.agent} / ({self.agent} + {self.enemy} * {pen} - {self.pen_flat}) )"
+
+
+# 5
+class CriticalMultiplier:
+    def __init__(self):
+        self.ratio = LazyAdd([])
+        self.multi = LazyAdd([])
+
+    def calc(self):
+        ratio = self.ratio.value()
+        if ratio > 1.0:
+            ratio = 1.0
+        return Number(1.0) + Number(ratio * self.multi.value())
+
+    def __str__(self):
+        ratio = self.ratio.value()
+        if ratio > 1.0:
+            return f"(1.0 + 1.0 * {self.multi})"
+        else:
+            return f"(1.0 + {self.ratio} * {self.multi})"
+
+
+# 7
+DazeMultiplier = ListMultiplier
+
+
+# ap
+class AnomalyProficiencyMultiplier(LazyAdd):
+    def __init__(self):
+        LazyAdd.__init__(self, [0.0])
+
+    def calc(self):
+        return Number(self.value() / 100.0)
+
+    def __str__(self):
+        return f"({super().__str__()} / 100.0)"
+
+
+class AnomalyAttributeMultiplier:
+    def __init__(self):
+        self.attribute = Attribute.All
+        pass
+
+    def calc(self):
+        v = 0.0
+        if self.attribute == Attribute.Fire:
+            v = 0.5 * 20
+        elif self.attribute == Attribute.Electric:
+            v = 1.25 * 10
+        elif self.attribute == Attribute.Ether:
+            v = 0.625 * 20
+        elif self.attribute == Attribute.Ice:
+            v = 5
+        elif self.attribute == Attribute.Physical:
+            v = 7.13
+        return Number(v)
+
+    def __str__(self):
+        return f"{self.calc()}"
+
+
+class AnomalyLevelMultiplier:
+    def __init__(self):
+        self.level = 60
+        pass
+
+    def calc(self):
+        return Number(round(1 + 1 / 59 * (self.level - 1), 4))
+
+    def __str__(self):
+        return f"{self.calc()}"

@@ -1,7 +1,6 @@
-from pyzzz.agents.agent import Agent
+from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.buff import Buff
 from pyzzz.model import (
-    AgentData,
     Attack,
     AttackKind,
     Attribute,
@@ -12,12 +11,13 @@ from pyzzz.model import (
 )
 
 
-class Lycaon(Agent):
+from pyzzz.hit import Hit, Attack
+class Lycaon(AgentWithData):
     def __init__(
         self, level=60, skill_levels: SkillLevels | None = None, repetition=0, **kw
     ):
         name = "Lycaon"
-        Agent.__init__(
+        AgentWithData.__init__(
             self,
             name=name,
             level=level,
@@ -26,8 +26,8 @@ class Lycaon(Agent):
             **kw,
         )
 
-        self.cn_name = "莱卡恩"
-        self.load_cn_data(self.cn_name)
+        self._cn_name = "莱卡恩"
+        self.load_cn_data(self._cn_name)
 
         self.chain = self._skill["连携技：遵命-"]
 
@@ -41,6 +41,7 @@ class Lycaon(Agent):
         return Buff(
             StatValue(-0.25, StatKind.RES_RATIO),
             condition=ContextData(atk_attr=Attribute.Ice),
+            for_team=True,
             source=f"{self._name} core skill Ice DMG RES",
         )
 
@@ -48,6 +49,7 @@ class Lycaon(Agent):
         return Buff(
             StatValue(0.35, StatKind.STUN_DMG_RATIO),
             condition=ContextData(daze=True),
+            for_team=True,
             source=f"{self._name} extra skill Stun DMG Multiplier",
         )
 

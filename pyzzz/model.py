@@ -3,8 +3,6 @@ import math
 from dataclasses import dataclass, field
 from enum import StrEnum, auto
 
-from pyzzz import util
-
 
 class StatKind(StrEnum):
     STAT_EMPTY = auto()
@@ -130,7 +128,6 @@ class DiscKind(StrEnum):
 
 
 def get_suit2_stat(kind: DiscKind) -> StatValue:
-
     mapping = {
         DiscKind.Fanged_Metal: StatValue(0.10, StatKind.DMG_RATIO),
         DiscKind.Polar_Metal: StatValue(0.10, StatKind.DMG_RATIO),
@@ -140,6 +137,7 @@ def get_suit2_stat(kind: DiscKind) -> StatValue:
         DiscKind.Hormone_Punk: StatValue(0.10, StatKind.ATK_RATIO),
         DiscKind.Puffer_Electro: StatValue(0.08, StatKind.PEN_RATIO),
         DiscKind.Woodpecker_Electro: StatValue(0.08, StatKind.CRIT_RATIO),
+        DiscKind.Freedom_Blues: StatValue(30, StatKind.ANOMALY_PROFICIENCY),
     }
 
     return mapping.get(kind, StatValue.create_empty())
@@ -153,7 +151,7 @@ class Disc:
     secondaries: list[StatValue] = field(default_factory=list)
 
     def empty(self):
-        return self.primary.value == 0 and len(self.secondaries) == 0
+        return self.primary.value == 0 and self.kind == DiscKind.Empty
 
 
 @dataclass
@@ -161,12 +159,12 @@ class DiscGroup:
     @staticmethod
     def _default_discs():
         return [
-            Disc(1, DiscKind.Empty, StatValue(0.0, StatKind.HP_FLAT)),
-            Disc(2, DiscKind.Empty, StatValue(0.0, StatKind.ATK_FLAT)),
-            Disc(3, DiscKind.Empty, StatValue(0.0, StatKind.DEF_FLAT)),
-            Disc(4, DiscKind.Empty, StatValue(0.0, StatKind.CRIT_MULTI)),
-            Disc(5, DiscKind.Empty, StatValue(0.0, StatKind.ATK_RATIO)),
-            Disc(6, DiscKind.Empty, StatValue(0.0, StatKind.ATK_RATIO)),
+            Disc(1, DiscKind.Empty, StatValue(2200, StatKind.HP_FLAT)),
+            Disc(2, DiscKind.Empty, StatValue(316, StatKind.ATK_FLAT)),
+            Disc(3, DiscKind.Empty, StatValue(184, StatKind.DEF_FLAT)),
+            Disc(4, DiscKind.Empty, StatValue(24, StatKind.CRIT_RATIO)),
+            Disc(5, DiscKind.Empty, StatValue(30, StatKind.DMG_RATIO)),
+            Disc(6, DiscKind.Empty, StatValue(30, StatKind.ATK_RATIO)),
         ]
 
     discs: list[Disc] = field(default_factory=_default_discs)
@@ -252,6 +250,7 @@ class SkillLevels:
 class SkillMutil:
     base: float = 1.0
     grow: float = 0.0
+    anomaly: float = 0.0
 
 
 class Profession(StrEnum):
@@ -402,20 +401,6 @@ class AgentDataWithGrowth:
 
 
 @dataclass
-class WeaponData:
-    # NOTE: static data, buff not included here
-    level: int
-    atk: float
-    primary: StatValue
-
-    def __sub__(self, rhs):
-        return WeaponData(0, self.atk - rhs.atk, self.primary - rhs.primary)
-
-    def __add__(self, rhs):
-        return WeaponData(self.level, self.atk + rhs.atk, self.primary + rhs.primary)
-
-
-@dataclass
 class WeaponGrowth:
     atk_rate: float = 0.0
     primary_rate: float = 0.0
@@ -456,7 +441,6 @@ class ContextData:
 
 
 class ExtraMultiplier:
-
     @abc.abstractmethod
     def calc(self) -> float:
         pass

@@ -1,4 +1,4 @@
-from pyzzz.agents.agent import Agent
+from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.agents.ellen import Ellen
 from pyzzz.agents.grace import Grace
 from pyzzz.agents.lycaon import Lycaon
@@ -9,6 +9,7 @@ from pyzzz.agents.soldier11 import Soldier11
 from pyzzz.agents.zhuyuan import Zhuyuan
 from pyzzz.agents.nicole import Nicole
 from pyzzz.agents.qingyi import Qingyi
+from pyzzz.agents.jane import Jane
 
 
 def create_agent(name: str, **kw):
@@ -18,11 +19,10 @@ def create_agent(name: str, **kw):
         "Soukaku": Soukaku,
         "Grace": Grace,
         "Rina": Rina,
-        "Nekomata" : Nekomata,
+        "Nekomata": Nekomata,
         "Soldier11": Soldier11,
         "Zhu Yuan": Zhuyuan,
-        "Nicole": Nicole，
-        "Qingyi": Qingyi
-    }[
-        name
-    ](**kw)
+        "Nicole": Nicole,
+        "Qingyi": Qingyi,
+        "Jane": Jane,
+    }[name](**kw)

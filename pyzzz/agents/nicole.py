@@ -1,7 +1,6 @@
-from pyzzz.agents.agent import Agent
+from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.buff import Buff, DynamicBuff
 from pyzzz.model import (
-    AgentData,
     Attack,
     AttackKind,
     Attribute,
@@ -11,7 +10,8 @@ from pyzzz.model import (
     StatValue,
 )
 
-class Nicole(Agent):
+
+class Nicole(AgentWithData):
     def __init__(
         self,
         level=60,
@@ -20,15 +20,14 @@ class Nicole(Agent):
         repetition=0,
     ):
         name = "Nicole"
-        Agent.__init__(
-            self,
+        super().__init__(
             name=name,
             level=level,
             skill_levels=skill_levels,
             repetition=repetition,
         )
 
-        self.cn_name = "妮可"
+        self._cn_name = "妮可"
         self.load_cn_data(self.cn_name)
 
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
@@ -58,11 +57,10 @@ class Nicole(Agent):
         value = self.e2["dmg"] + self.e2["dmg_grow"] * (self.skill_levels.special - 1)
         return Attack(AttackKind.Special, Attribute.Ether, value)
 
-
     def EX1(self):
         value = self.ex1["dmg"] + self.ex1["dmg_grow"] * (self.skill_levels.special - 1)
         return Attack(AttackKind.SpecialEx, Attribute.Ether, value)
-    
+
     def EX2(self):
         value = self.ex2["dmg"] + self.ex2["dmg_grow"] * (self.skill_levels.special - 1)
         return Attack(AttackKind.SpecialEx, Attribute.Ether, value)
@@ -75,7 +73,6 @@ class Nicole(Agent):
         value = self.ex4["dmg"] + self.ex4["dmg_grow"] * (self.skill_levels.special - 1)
         return Attack(AttackKind.SpecialEx, Attribute.Ether, value)
 
-
     def Dodge1(self):
         value = self.dogde1["dmg"] + self.dogde1["dmg_grow"] * (
             self.skill_levels.dodge - 1
@@ -87,7 +84,6 @@ class Nicole(Agent):
             self.skill_levels.dodge - 1
         )
         return Attack(AttackKind.Dodge, Attribute.Ether, value)
-
 
     def Chain1(self):
         value = self.chain1["dmg"] + self.chain1["dmg_grow"] * (
@@ -107,7 +103,6 @@ class Nicole(Agent):
         )
         return Attack(AttackKind.Chain, Attribute.Ether, value)
 
-
     def Final1(self):
         value = self.final1["dmg"] + self.final1["dmg_grow"] * (
             self.skill_levels.chain - 1
@@ -119,7 +114,6 @@ class Nicole(Agent):
             self.skill_levels.chain - 1
         )
         return Attack(AttackKind.Final, Attribute.Ether, value)
-
 
     def core_skill(self):
         def create():
@@ -138,14 +132,12 @@ class Nicole(Agent):
             source="Nicole extra skill Ether dmg ratio",
         )
 
-
     def rep6(self):
         return Buff(
             StatValue(0.15, StatKind.CRIT_RATIO),
             condition=ContextData(atk_attr=Attribute.All, atk_kind=AttackKind.All),
             source="Nicole rep6 crit ratio",
         )
-
 
     def buffs(self, context: ContextData | None = None):
         res = [self.core_skill(), self.extra_skill()]

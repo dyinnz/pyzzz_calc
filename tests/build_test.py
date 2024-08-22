@@ -25,6 +25,7 @@ def summary_ellen():
 
     return Build.from_summary(s)
 
+
 def full_ellen():
     f = FullData()
     f.agent_name = "Ellen"
@@ -112,12 +113,13 @@ def full_ellen():
     f.team = {"Soukaku": dict(core_skill_atk="1000"), "Lycaon": {}}
     return Build.from_full(f)
 
+
 def full_soukaku():
     f = FullData()
     f.agent_name = "Soukaku"
     f.agent_level = 60
     f.agent_rep = 6
-    f.skill_levels = SkillLevels(4, 10, 10, 10, 10, 10)
+    f.skill_levels = SkillLevels(5, 15, 15, 15, 15, 15)
     f.weapon_name = "BashfulDemon"
     f.weapon_level = 60
     f.discs.set(
@@ -137,8 +139,8 @@ def full_soukaku():
             DiscKind.Woodpecker_Electro,
             StatValue(316, StatKind.ATK_FLAT),
             [
-                StatValue(0.048, StatKind.CRIT_MULTI),
-                StatValue(0.09, StatKind.ATK_RATIO),
+                StatValue(0.048, StatKind.CRIT_RATIO),
+                StatValue(0.06, StatKind.ATK_RATIO),
             ],
         )
     )
@@ -148,8 +150,9 @@ def full_soukaku():
             DiscKind.Woodpecker_Electro,
             StatValue.create_empty(),
             [
-                StatValue(0.048, StatKind.CRIT_MULTI),
-                StatValue(0.09, StatKind.ATK_RATIO),
+                StatValue(0.096, StatKind.CRIT_MULTI),
+                StatValue(0.048, StatKind.CRIT_RATIO),
+                StatValue(57, StatKind.ATK_FLAT),
             ],
         )
     )
@@ -159,7 +162,7 @@ def full_soukaku():
             DiscKind.Woodpecker_Electro,
             StatValue(0.24, StatKind.CRIT_RATIO),
             [
-                StatValue(38, StatKind.ATK_FLAT),
+                StatValue(0.192, StatKind.CRIT_MULTI),
             ],
         )
     )
@@ -192,6 +195,7 @@ def full_soukaku():
     )
     f.team = {"Lycaon": {}}
     return Build.from_full(f)
+
 
 def full_lycaon():
     f = FullData()
@@ -289,9 +293,72 @@ def full_grace():
     f.agent_rep = 0
     f.skill_levels = SkillLevels(0, 1, 1, 1, 1, 1)
     f.weapon_name = ""
-    return Build.from_full(f);
+    return Build.from_full(f)
 
-if __name__ == '__main__':
+
+def full_jane():
+    f = FullData()
+    f.agent_name = "Jane"
+    f.agent_level = 60
+    f.skill_levels = SkillLevels(6, 11, 11, 11, 11, 11)
+    f.weapon_name = "RainforestGourmet"
+    f.weapon_level = 60
+
+    f.discs.set(
+        Disc(
+            1,
+            DiscKind.Freedom_Blues,
+            StatValue(0, StatKind.HP_FLAT),
+            [
+                StatValue(90, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(0.3, StatKind.ATK_RATIO),
+                StatValue(558, StatKind.ATK_FLAT),
+                StatValue(0.15, StatKind.ATK_RATIO),
+            ],
+        )
+    )
+    f.discs.set(
+        Disc(
+            2,
+            DiscKind.Freedom_Blues,
+            StatValue(316, StatKind.ATK_FLAT),
+        )
+    )
+    f.discs.set(
+        Disc(
+            3,
+            DiscKind.Fanged_Metal,
+            StatValue(0, StatKind.DEF_FLAT),
+            []
+        )
+    )
+    f.discs.set(
+        Disc(
+            4,
+            DiscKind.Fanged_Metal,
+            StatValue(90, StatKind.ANOMALY_PROFICIENCY),
+        )
+    )
+    f.discs.set(
+        Disc(
+            5,
+            DiscKind.Fanged_Metal,
+            StatValue(0.3, StatKind.DMG_RATIO),
+        )
+    )
+    f.discs.set(
+        Disc(
+            6,
+            DiscKind.Fanged_Metal,
+            StatValue(0.3, StatKind.ATK_RATIO),
+        )
+    )
+
+    return Build.from_full(f)
+
+
+if __name__ == "__main__":
     # res = full_ellen()
-    res = full_grace()
+    # res = full_grace()
+    res = full_jane()
     print(res)

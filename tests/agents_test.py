@@ -3,10 +3,12 @@ from pyzzz.model import *
 
 
 if __name__ == "__main__":
-    agent = agents.Agent("Ellen", level=50, skill_levels=SkillLevels(4, 9, 9, 9, 9, 9))
+    agent = agents.AgentWithData(
+        "Ellen", level=50, skill_levels=SkillLevels(4, 9, 9, 9, 9, 9)
+    )
     print(agent)
 
-    agent = agents.Agent("Ellen", level=60)
+    agent = agents.AgentWithData("Ellen", level=60)
     print(agent)
 
     agent = agents.Ellen()
@@ -31,4 +33,7 @@ if __name__ == "__main__":
     print(agent)
 
     agent = agents.Nicole()
+    print(agent)
+
+    agent = agents.Jane()
     print(agent)
