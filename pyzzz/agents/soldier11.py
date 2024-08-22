@@ -1,10 +1,9 @@
 from pyzzz.agents.agent_with_data import AgentWithData
-from pyzzz.buff import Buff, DynamicBuff
+from pyzzz.buff import StaticBuff, DynamicBuff
 from pyzzz.model import (
-    Attack,
     AttackKind,
     Attribute,
-    ContextData,
+    HitContext,
     SkillLevels,
     StatKind,
     StatValue,
@@ -107,40 +106,40 @@ class Soldier11(AgentWithData):
 
     def extra_skill(self):
         return (
-            Buff(
+            StaticBuff(
                 StatValue(0.1, StatKind.DMG_RATIO),
-                condition=ContextData(atk_attr=Attribute.Fire),
+                condition=HitContext(atk_attr=Attribute.Fire),
                 source="Soldier11 extra skill dmg ratio",
             ),
-            Buff(
+            StaticBuff(
                 StatValue(0.225, StatKind.DMG_RATIO),
-                condition=ContextData(atk_attr=Attribute.Fire),
+                condition=HitContext(atk_attr=Attribute.Fire),
                 source="Soldier11 extra skill daze fire dmg ratio",
             ),
         )
 
     def rep2(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.36, StatKind.DMG_RATIO),
             condition=[
-                ContextData(atk_kind=AttackKind.Basic),
-                ContextData(atk_kind=AttackKind.Dash),
-                ContextData(atk_kind=AttackKind.Dodge),
+                HitContext(atk_kind=AttackKind.Basic),
+                HitContext(atk_kind=AttackKind.Dash),
+                HitContext(atk_kind=AttackKind.Dodge),
             ],
             source="Soldier11 ep2 Physical res ratio",
         )
 
     def rep6(self):
-        return Buff(
+        return StaticBuff(
             StatValue(-0.25, StatKind.RES_RATIO),
             condition=[
-                ContextData(atk_attr=Attribute.Fire, atk_kind=AttackKind.Basic),
-                ContextData(atk_attr=Attribute.Fire, atk_kind=AttackKind.Dash),
+                HitContext(atk_attr=Attribute.Fire, atk_kind=AttackKind.Basic),
+                HitContext(atk_attr=Attribute.Fire, atk_kind=AttackKind.Dash),
             ],
             source="Soldier11 rep6 Fire res ratio",
         )
 
-    def buffs(self, context: ContextData | None = None):
+    def buffs(self):
         res = [self.core_skill(), self.extra_skill()]
         if self._repetition >= 2:
             res.append(self.rep2())

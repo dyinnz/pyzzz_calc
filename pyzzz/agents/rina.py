@@ -1,16 +1,15 @@
 from pyzzz.agents.agent_with_data import AgentWithData
-from pyzzz.buff import Buff, DynamicBuff
+from pyzzz.buff import StaticBuff, DynamicBuff
 from pyzzz.model import (
-    AgentData,
-    Attack,
     AttackKind,
     Attribute,
-    ContextData,
+    HitContext,
     SkillLevels,
     StatKind,
     StatValue,
 )
-from pyzzz.hit import Hit, Attack
+from pyzzz.hit import Attack
+
 
 class Rina(AgentWithData):
     def __init__(
@@ -58,7 +57,7 @@ class Rina(AgentWithData):
     def A3(self):
         value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Electric, value)
-    
+
     def A4(self):
         value = self.a4["dmg"] + self.a4["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Electric, value)
@@ -102,9 +101,9 @@ class Rina(AgentWithData):
         )
 
     def extra_skill(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.1, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.Electric),
+            condition=HitContext(atk_attr=Attribute.Electric),
             source="Rina extra skill Electric dmg ratio",
         )
 
@@ -112,30 +111,29 @@ class Rina(AgentWithData):
         def create():
             m = [0.06, 0.075, 0.09, 0.102, 0.108, 0.114, 0.12][self.skill_levels.core]
             value = self.static.pen_ratio * 0.25 + m
-            value = min(0.3, value)*0.3
+            value = min(0.3, value) * 0.3
             return StatValue(value, StatKind.PEN_RATIO)
 
         return DynamicBuff(
             create,
             source="Rina ep1 pen ratio",
         )
-    
+
     def rep2(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.15, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.All, atk_kind=AttackKind.All),
+            condition=HitContext(atk_attr=Attribute.All, atk_kind=AttackKind.All),
             source="Rina rep2 dmg ratio",
         )
 
-
     def rep6(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.15, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.Electric, atk_kind=AttackKind.All),
+            condition=HitContext(atk_attr=Attribute.Electric, atk_kind=AttackKind.All),
             source="Rina rep6 Electric dmg ratio",
         )
 
-    def buffs(self, context: ContextData | None = None):
+    def buffs(self):
         res = [self.core_skill(), self.extra_skill()]
         if self._repetition >= 1:
             res.append(self.rep1())

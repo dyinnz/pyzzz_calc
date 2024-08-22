@@ -1,16 +1,16 @@
 from pyzzz.agents.agent_with_data import AgentWithData
-from pyzzz.buff import Buff, DynamicBuff
+from pyzzz.buff import StaticBuff, DynamicBuff
 from pyzzz.model import (
-    Attack,
     AttackKind,
     Attribute,
-    ContextData,
+    HitContext,
     SkillLevels,
     StatKind,
     StatValue,
 )
 
-from pyzzz.hit import Hit, Attack
+from pyzzz.hit import Attack
+
 
 class Soukaku(AgentWithData):
     def __init__(
@@ -118,9 +118,9 @@ class Soukaku(AgentWithData):
         return Attack(AttackKind.Final, Attribute.Ice, value, self.final["anomaly"])
 
     def final_buff(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.15, StatKind.CRIT_RATIO),
-            condition=ContextData(atk_kind=AttackKind.Final, agent=self.name),
+            condition=HitContext(atk_kind=AttackKind.Final, agent=self.name),
             source=f"{self.name} final buff +15% critical ratio",
         )
 
@@ -138,42 +138,43 @@ class Soukaku(AgentWithData):
         return DynamicBuff(
             create,
             source="Soukaku core skill atk dynamic flat",
+            for_team=True,
         )
 
     def extra_skill(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.2, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.Ice),
+            condition=HitContext(atk_attr=Attribute.Ice),
             source="Soukaku extra skill ice dmg ratio",
+            for_team=True,
         )
 
     def rep4(self):
-        return Buff(
+        return StaticBuff(
             StatValue(-0.1, StatKind.RES_RATIO),
-            condition=ContextData(atk_attr=Attribute.Ice),
+            condition=HitContext(atk_attr=Attribute.Ice),
             source="Soukaku rep4 ice res ratio",
+            for_team=True,
         )
 
     def rep6(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.45, StatKind.DMG_RATIO),
             condition=[
-                ContextData(
+                HitContext(
                     agent=self.name, atk_attr=Attribute.Ice, atk_kind=AttackKind.Basic
                 ),
-                ContextData(
+                HitContext(
                     agent=self.name, atk_attr=Attribute.Ice, atk_kind=AttackKind.Dash
                 ),
             ],
-            for_team=False,
             source="Soukaku rep6 ice dmg ratio",
         )
 
-    def buffs(self, context: ContextData | None = None):
+    def buffs(self):
         res = [self.core_skill(), self.extra_skill(), self.final_buff()]
         if self._repetition >= 4:
             res.append(self.rep4())
-        # if context and context.agent == self.name and self._repetition >= 6:
         if self._repetition >= 6:
             res.append(self.rep6())
         return res

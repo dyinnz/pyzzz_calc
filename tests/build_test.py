@@ -2,6 +2,7 @@ from pyzzz.build import *
 from pyzzz.model import *
 
 
+"""
 def summary_ellen():
     s = SummaryData()
     s.agent_name = "Ellen"
@@ -24,10 +25,11 @@ def summary_ellen():
     print(json.dumps(asdict(s), indent=2))
 
     return Build.from_summary(s)
+"""
 
 
 def full_ellen():
-    f = FullData()
+    f = FullBuild()
     f.agent_name = "Ellen"
     f.agent_level = 60
     f.skill_levels = SkillLevels(6, 10, 10, 10, 10, 10)
@@ -63,8 +65,8 @@ def full_ellen():
             StatValue.create_empty(),
             [
                 StatValue(0.096, StatKind.CRIT_MULTI),
-                StatValue(0.048, StatKind.CRIT_RATIO),
-                StatValue(27, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(0.072, StatKind.CRIT_RATIO),
+                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
             ],
         )
     )
@@ -110,12 +112,12 @@ def full_ellen():
             ],
         )
     )
-    f.team = {"Soukaku": dict(core_skill_atk="1000"), "Lycaon": {}}
-    return Build.from_full(f)
+    f.team = {"Soukaku": dict(core_skill_atk="500"), "Lycaon": {}}
+    return f
 
 
 def full_soukaku():
-    f = FullData()
+    f = FullBuild()
     f.agent_name = "Soukaku"
     f.agent_level = 60
     f.agent_rep = 6
@@ -194,11 +196,11 @@ def full_soukaku():
         )
     )
     f.team = {"Lycaon": {}}
-    return Build.from_full(f)
+    return f
 
 
 def full_lycaon():
-    f = FullData()
+    f = FullBuild()
     f.agent_name = "Lycaon"
     f.agent_level = 60
     f.agent_rep = 6
@@ -286,23 +288,30 @@ def full_lycaon():
 
 
 def full_grace():
-    f = FullData()
+    f = FullBuild()
     f.agent_name = "Grace"
     f.agent_level = 30
     f.agent_asc = True
     f.agent_rep = 0
     f.skill_levels = SkillLevels(0, 1, 1, 1, 1, 1)
     f.weapon_name = ""
-    return Build.from_full(f)
+    return f
 
 
 def full_jane():
-    f = FullData()
+    f = FullBuild()
     f.agent_name = "Jane"
     f.agent_level = 60
     f.skill_levels = SkillLevels(6, 11, 11, 11, 11, 11)
     f.weapon_name = "RainforestGourmet"
     f.weapon_level = 60
+    f.weapon_rep = 5
+    # f.weapon_name = "FusionCompiler"
+    # f.weapon_level = 60
+    # f.weapon_rep = 1
+    # f.weapon_name = "SharpenedStinger"
+    # f.weapon_level = 60
+    # f.weapon_rep = 1
 
     f.discs.set(
         Disc(
@@ -312,8 +321,6 @@ def full_jane():
             [
                 StatValue(90, StatKind.ANOMALY_PROFICIENCY),
                 StatValue(0.3, StatKind.ATK_RATIO),
-                StatValue(558, StatKind.ATK_FLAT),
-                StatValue(0.15, StatKind.ATK_RATIO),
             ],
         )
     )
@@ -324,14 +331,7 @@ def full_jane():
             StatValue(316, StatKind.ATK_FLAT),
         )
     )
-    f.discs.set(
-        Disc(
-            3,
-            DiscKind.Fanged_Metal,
-            StatValue(0, StatKind.DEF_FLAT),
-            []
-        )
-    )
+    f.discs.set(Disc(3, DiscKind.Fanged_Metal, StatValue(0, StatKind.DEF_FLAT), []))
     f.discs.set(
         Disc(
             4,
@@ -353,8 +353,7 @@ def full_jane():
             StatValue(0.3, StatKind.ATK_RATIO),
         )
     )
-
-    return Build.from_full(f)
+    return f
 
 
 if __name__ == "__main__":

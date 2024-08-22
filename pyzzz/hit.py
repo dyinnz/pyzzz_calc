@@ -1,6 +1,6 @@
 from typing import Sequence
 from pyzzz.model import *
-from pyzzz.buff import BuffBase
+from pyzzz.buff import Buff
 
 
 class Hit:
@@ -40,7 +40,7 @@ class Hit:
     def tags(self):
         return self._tags
 
-    def buffs(self) -> Sequence[BuffBase]:
+    def buffs(self) -> Sequence[Buff]:
         return []
 
 

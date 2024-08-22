@@ -10,13 +10,13 @@ from pyzzz.model import *
 
 
 class HitDMG:
-    def __init__(self):
-        self._hit = Hit()
-        self._agent = Agent()
-        self._enemy = Enemy()
-        self._context = ContextData()
+    def __init__(self, hit: Hit, agent: Agent, enemy: Enemy):
+        self._hit = hit
+        self._agent = agent
+        self._enemy = enemy
+        self._context = HitContext.default()
 
-        self._active_buffs = list[BuffBase]()
+        self._active_buffs = list[Buff]()
 
         # common multiplier
         self.dmg_ratio = DMGMultiplier()
@@ -38,6 +38,7 @@ class HitDMG:
         # extra multiplier
         self.extras: Sequence[ExtraMultiplier] = []
 
+        # cache the result
         self.common_result = 0.0
         self.normal_result = 0.0
         self.anomaly_result = 0.0
@@ -84,6 +85,8 @@ class HitDMG:
             self.defense.pen_ratio.add(number)
         elif stat.kind == StatKind.PEN_FLAT:
             self.defense.pen_flat.add(number)
+        elif stat.kind == StatKind.ENEMY_DEF_RATIO:
+            self.defense.enemy_def_ratio.add(number)
         elif stat.kind == StatKind.DMG_RATIO:
             self.dmg_ratio.add(number)
         elif stat.kind == StatKind.RES_RATIO:
@@ -95,7 +98,7 @@ class HitDMG:
         elif stat.kind == StatKind.SKILL_MULTI:
             self.skill.add(number)
 
-    def fill_buff(self):
+    def apply_buff(self):
         for buf in self._active_buffs:
             stat = buf.produce(self._context)  # TODO:
             self.apply_stat(stat)
@@ -165,6 +168,7 @@ class HitDMG:
 class ComboDMG:
     def __init__(self):
         self.dmgs = list[HitDMG]()
+        self.anomaly_multiplier: list[ExtraMultiplier] = []
         self.comment = ""
 
     def calc_normal(self):
@@ -188,6 +192,8 @@ class ComboDMG:
         result = 0.0
         for value, acc in anomaly_dmgs:
             result += value * acc / total_acc
+        for multi in self.anomaly_multiplier:
+            result *= multi.calc()
         return result
 
     def show_anomaly(self, base=0.0):
@@ -200,6 +206,9 @@ class ComboDMG:
                 for d in self.dmgs
             )
         )
+        for multi in self.anomaly_multiplier:
+            s += f"\n* {multi.show()}"
+
         if base == 0.0:
             s += f"\nAnomaly DMG : {total:.1f}; by {self.comment}\n"
         else:

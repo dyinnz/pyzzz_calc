@@ -1,16 +1,15 @@
 from pyzzz.agents.agent_with_data import AgentWithData
-from pyzzz.buff import Buff, DynamicBuff
+from pyzzz.buff import StaticBuff, DynamicBuff
 from pyzzz.model import (
-    AgentData,
-    Attack,
     AttackKind,
     Attribute,
-    ContextData,
+    HitContext,
     SkillLevels,
     StatKind,
     StatValue,
 )
-from pyzzz.hit import Hit, Attack
+from pyzzz.hit import Attack
+
 
 class Qingyi(AgentWithData):
     def __init__(
@@ -61,19 +60,19 @@ class Qingyi(AgentWithData):
     def A3(self):
         value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Electric, value)
-    
+
     def A4(self):
         value = self.a4["dmg"] + self.a4["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Electric, value)
-    
+
     def A5(self):
         value = self.a5["dmg"] + self.a5["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Electric, value)
-    
+
     def A6(self):
         value = self.a6["dmg"] + self.a6["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Electric, value)
-    
+
     def A7(self):
         value = self.a7["dmg"] + self.a7["dmg_grow"] * (self.skill_levels.basic - 1)
         return Attack(AttackKind.Basic, Attribute.Electric, value)
@@ -116,25 +115,26 @@ class Qingyi(AgentWithData):
         )
 
     def extra_skill(self):
-        m = max((self.static.impact - 120) * 6,0)
-        return Buff(
+        m = max((self.static.impact - 120) * 6, 0)
+        return StaticBuff(
             StatValue(m, StatKind.ATK_FLAT),
             source="Qingyi extra skill atk flat",
         )
 
     def rep1(self):
-        return (Buff(
-            StatValue(-0.15, StatKind.DEF_RES),
-            condition=ContextData(atk_attr=Attribute.Physical),
-            source="Qingyi ep1 def res",
-        ),  
+        return (
             Buff(
-            StatValue(0.2, StatKind.CRIT_RATIO),
-            condition=ContextData(atk_attr=Attribute.Physical),
-            source="Qingyi ep1 crit ratio",
+                StatValue(-0.15, StatKind.ENEMY_DEF_RATIO),
+                condition=HitContext(atk_attr=Attribute.Physical),
+                source="Qingyi ep1 def res",
+            ),
+            StaticBuff(
+                StatValue(0.2, StatKind.CRIT_RATIO),
+                condition=HitContext(atk_attr=Attribute.Physical),
+                source="Qingyi ep1 crit ratio",
+            ),
         )
-        )
-    
+
     def rep2(self):
         def create():
             m0 = [0.02, 0.024, 0.027, 0.03, 0.034, 0.037, 0.04][self.skill_levels.core]
@@ -146,16 +146,14 @@ class Qingyi(AgentWithData):
             source="Qingyi ep2 stun dmg ratio",
         )
 
-
     def rep6(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.2, StatKind.RES_RATIO),
-            condition=ContextData(atk_attr=Attribute.All, atk_kind=AttackKind.All),
+            condition=HitContext(atk_attr=Attribute.All, atk_kind=AttackKind.All),
             source="Qingyi rep6 res ratio",
         )
 
-
-    def buffs(self, context: ContextData | None = None):
+    def buffs(self):
         res = [self.core_skill(), self.extra_skill()]
         if self._repetition >= 1:
             res.append(self.rep1())

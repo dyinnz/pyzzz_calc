@@ -1,17 +1,18 @@
 from pyzzz.agents.agent_with_data import AgentWithData
-from pyzzz.buff import Buff
+from pyzzz.buff import StaticBuff
 from pyzzz.model import (
-    Attack,
     AttackKind,
     Attribute,
-    ContextData,
+    HitContext,
     SkillLevels,
     StatKind,
     StatValue,
 )
 
 
-from pyzzz.hit import Hit, Attack
+from pyzzz.hit import Attack
+
+
 class Lycaon(AgentWithData):
     def __init__(
         self, level=60, skill_levels: SkillLevels | None = None, repetition=0, **kw
@@ -38,17 +39,17 @@ class Lycaon(AgentWithData):
         return Attack(AttackKind.Chain, Attribute.Ice, value)
 
     def core_skill(self):
-        return Buff(
+        return StaticBuff(
             StatValue(-0.25, StatKind.RES_RATIO),
-            condition=ContextData(atk_attr=Attribute.Ice),
+            condition=HitContext(atk_attr=Attribute.Ice),
             for_team=True,
             source=f"{self._name} core skill Ice DMG RES",
         )
 
     def extra_skill(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.35, StatKind.STUN_DMG_RATIO),
-            condition=ContextData(daze=True),
+            condition=HitContext(daze=True),
             for_team=True,
             source=f"{self._name} extra skill Stun DMG Multiplier",
         )

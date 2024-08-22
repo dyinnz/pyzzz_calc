@@ -1,9 +1,9 @@
 from pyzzz.agents.agent_with_data import AgentWithData
-from pyzzz.buff import Buff, DynamicBuff
+from pyzzz.buff import StaticBuff, DynamicBuff
 from pyzzz.model import (
     AttackKind,
     Attribute,
-    ContextData,
+    HitContext,
     SkillLevels,
     StatKind,
     StatValue,
@@ -73,14 +73,14 @@ class Ellen(AgentWithData):
 
         return DynamicBuff(
             create,
-            condition=ContextData(atk_kind=AttackKind.Basic),
+            condition=HitContext(atk_kind=AttackKind.Basic),
             source="Ellen core skill criti multi",
         )
 
     def extra_skill(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.3, StatKind.DMG_RATIO), source="Ellen extra skill ice ratio"
         )
 
-    def buffs(self, context: ContextData | None = None):
+    def buffs(self):
         return [self.core_skill(), self.extra_skill()]

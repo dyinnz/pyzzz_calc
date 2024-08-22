@@ -3,7 +3,6 @@ from typing import Sequence
 from pyzzz import dataset
 from pyzzz.model import *
 from pyzzz.agent import Agent
-from pyzzz.hit import Hit, Attack
 
 
 class AgentWithData(Agent):
@@ -33,12 +32,11 @@ class AgentWithData(Agent):
         self._profession = Profession(agent["ProfessionName"].lower())
         self._attribute = Attribute(agent["ElementTypeName"].lower())
 
-        self._growth.init.level = self.level
-        self._growth.init.hp = agent["HpMax"]
+        self._growth.init.hp_base = agent["HpMax"]
         self._growth.hp_growth = agent["HPGrowth"] / 1e4
         self._growth.init.atk_base = agent["Atk"]
         self._growth.atk_growth = agent["AttackGrowth"] / 1e4
-        self._growth.init.defense = agent["Def"]
+        self._growth.init.def_base = agent["Def"]
         self._growth.defense_growth = agent["DefenceGrowth"] / 1e4
         self._growth.init.impact = agent["BreakStun"]
         self._growth.init.anomaly_master = agent["ElementMystery"]
@@ -49,9 +47,9 @@ class AgentWithData(Agent):
         for _, asc in ascension.items():
             self._ascensions.append(
                 [
-                    StatValue(asc["HpMax"], StatKind.HP_FLAT),
+                    StatValue(asc["HpMax"], StatKind.HP_BASE),
                     StatValue(asc["Atk"], StatKind.ATK_BASE),
-                    StatValue(asc["Def"], StatKind.DEF_FLAT),
+                    StatValue(asc["Def"], StatKind.DEF_BASE),
                 ]
             )
 

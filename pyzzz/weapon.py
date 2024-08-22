@@ -1,6 +1,6 @@
 from typing import Sequence
 
-from pyzzz.buff import BuffBase
+from pyzzz.buff import Buff
 from pyzzz.model import Profession, StatValue, WeaponGrowth
 
 
@@ -86,7 +86,7 @@ class Weapon:
             self._repetition = repetition
         self._fill_data()
 
-    def buffs(self) -> Sequence[BuffBase]:
+    def buffs(self) -> Sequence[Buff]:
         return []
 
     def __str__(self):

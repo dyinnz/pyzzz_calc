@@ -2,7 +2,7 @@ from typing import Sequence
 import copy
 import itertools
 from pyzzz.model import *
-from pyzzz.buff import BuffBase
+from pyzzz.buff import Buff
 from pyzzz.weapon import Weapon
 from pyzzz.discs import get_suit4_buff
 
@@ -114,9 +114,8 @@ class Agent:
 
     def _fill_data(self):
         self._basic = copy.deepcopy(self._growth.init)
-        self._basic.level = self.level
-        self._basic.hp += round(self._growth.hp_growth * (self.level - 1))
-        self._basic.defense += round(self._growth.defense_growth * (self.level - 1))
+        self._basic.hp_base += round(self._growth.hp_growth * (self.level - 1))
+        self._basic.def_base += round(self._growth.defense_growth * (self.level - 1))
         self._basic.atk_base += round(self._growth.atk_growth * (self.level - 1))
 
         if not self._ascensions:
@@ -173,15 +172,18 @@ class Agent:
         else:
             self._calc_static()
 
-    def buffs(self) -> Sequence[BuffBase]:
+    def buffs(self) -> Sequence[Buff]:
         return []
 
-    def all_buffs(self) -> Sequence[BuffBase]:
+    def all_buffs(self) -> Sequence[Buff]:
         res = list(self.buffs())
         res.extend(self.weapon.buffs())
         if buff := get_suit4_buff(self.discs.suit4):
             res.append(buff)
         return res
+
+    def extra_multiplier(self) -> Sequence[ExtraMultiplier]:
+        return []
 
     def debug_str(self):
         return f"{self}\n{self._growth}\n{self._ascensions}\n{self._passives}\n"

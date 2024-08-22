@@ -1,5 +1,5 @@
 from functools import reduce
-import math
+from pyzzz import util
 
 from pyzzz.model import Attribute
 
@@ -101,46 +101,31 @@ ResistanceMutiplier = ListMultiplier
 
 # 4
 class DefenseMultiplier:
-    @staticmethod
-    def defense_func(level):
-        if level > 60:
-            level = 60
-        return math.floor(0.1551 * level * level + 3.141 * level + 47.2049)
-
-    def __init__(self, **kw):
-        self._agent_level = kw.get("agent_level", 60)
-        self._enemy_level = kw.get("enemy_level", 70)
-        self._enemy_base = kw.get("enemy_base", 54)
-
-        self.agent = Number(self.defense_func(self._agent_level))
-        self.enemy = Number(
-            self.defense_func(self._enemy_level) * self._enemy_base / 50
-        )
+    def __init__(self):
+        self.agent = Number(util.calc_defense(60))
+        self.enemy = Number(util.calc_defense(70))
 
         self.pen_ratio = LazyAdd([])
         self.pen_flat = LazyAdd([0.0])
-        self.def_res = LazyAdd([])
+        self.enemy_def_ratio = LazyAdd([])
 
     def set_agent(self, level):
-        self._agent_level = level
-        self.agent = Number(self.defense_func(self._agent_level))
+        self.agent = Number(util.calc_defense(level))
 
     def set_enemy(self, level, base):
-        self._enemy_level = level
-        self._enemy_base = base
-        self.enemy = Number(
-            self.defense_func(self._enemy_level) * self._enemy_base / 50
-        )
+        self.enemy = Number(util.calc_defense(level, base))
 
     def calc(self):
         return self.agent / (
             self.agent
-            + self.enemy * (Number(1.0) - self.def_res) * (Number(1.0) - self.pen_ratio)
+            + self.enemy
+            * (Number(1.0) + self.enemy_def_ratio)
+            * (Number(1.0) - self.pen_ratio)
             - self.pen_flat
         )
 
     def __str__(self):
-        pen = Number(1.0) - self.pen_ratio
+        pen = (Number(1.0) - self.pen_ratio) * (Number(1.0) + self.enemy_def_ratio)
         return f"( {self.agent} / ({self.agent} + {self.enemy} * {pen} - {self.pen_flat}) )"
 
 

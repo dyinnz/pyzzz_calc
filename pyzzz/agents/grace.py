@@ -5,7 +5,7 @@ from pyzzz.hit import Hit, Attack
 
 class GraceExtraMultiplier(ExtraMultiplier):
 
-    def active(self, anomaly: bool, context: ContextData):
+    def active(self, anomaly: bool, context: HitContext):
         return anomaly
 
     def calc(self):

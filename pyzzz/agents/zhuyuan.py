@@ -1,17 +1,17 @@
 from pyzzz.agents.agent_with_data import AgentWithData
-from pyzzz.buff import Buff, DynamicBuff
+from pyzzz.buff import StaticBuff, DynamicBuff
 from pyzzz.model import (
-    AgentData,
-    Attack,
     AttackKind,
     Attribute,
-    ContextData,
+    HitContext,
     SkillLevels,
     StatKind,
     StatValue,
 )
 
-from pyzzz.hit import Hit, Attack
+from pyzzz.hit import Attack
+
+
 class Zhuyuan(AgentWithData):
     def __init__(
         self,
@@ -37,7 +37,6 @@ class Zhuyuan(AgentWithData):
         self.a1 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
         self.a2 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
         self.a3 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
-
 
         self.e1 = self._skill["特殊技：鹿弹射击-"]
 
@@ -67,11 +66,9 @@ class Zhuyuan(AgentWithData):
     def EX1(self):
         value = self.ex1["dmg"] + self.ex1["dmg_grow"] * (self.skill_levels.special - 1)
         return Attack(AttackKind.SpecialEx, Attribute.Ether, value)
-    
+
     def Dash(self):
-        value = self.dash["dmg"] + self.dash["dmg_grow"] * (
-            self.skill_levels.dodge - 1
-        )
+        value = self.dash["dmg"] + self.dash["dmg_grow"] * (self.skill_levels.dodge - 1)
         return Attack(AttackKind.Dash, Attribute.Ether, value)
 
     def Dodge(self):
@@ -79,7 +76,7 @@ class Zhuyuan(AgentWithData):
             self.skill_levels.dodge - 1
         )
         return Attack(AttackKind.Dodge, Attribute.Ether, value)
-    
+
     def Chain(self):
         value = self.chain["dmg"] + self.chain["dmg_grow"] * (
             self.skill_levels.chain - 1
@@ -99,49 +96,52 @@ class Zhuyuan(AgentWithData):
 
         return DynamicBuff(
             create,
-            condition=ContextData(atk_kind=AttackKind.Basic),
-            source="Zhuyuan core skill dmg ratio")
-    
+            condition=HitContext(atk_kind=AttackKind.Basic),
+            source="Zhuyuan core skill dmg ratio",
+        )
+
     def core_skill2(self):
         def create():
             m = [0.20, 0.233, 0.266, 0.30, 0.333, 0.366, 0.40]
             return StatValue(m[self.skill_levels.core], StatKind.DMG_RATIO)
-        
+
         return DynamicBuff(
             create,
-            condition=ContextData(atk_kind=AttackKind.Basic),
-            source="Zhuyuan core daze skill dmg ratio")
-        
+            condition=HitContext(atk_kind=AttackKind.Basic),
+            source="Zhuyuan core daze skill dmg ratio",
+        )
 
     def extra_skill(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.30, StatKind.CRIT_RATIO),
-            condition=ContextData(atk_attr=Attribute.All),
+            condition=HitContext(atk_attr=Attribute.All),
             source="Zhuyuan extra skill crit ratio",
         )
 
     def rep2(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.50, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.Ether),
+            condition=HitContext(atk_attr=Attribute.Ether),
             source="Zhuyuan ep2 Ether dmg ratio",
         )
-    
+
     def rep4(self):
-        return Buff(
+        return StaticBuff(
             StatValue(-0.25, StatKind.RES_RATIO),
-            condition=ContextData(atk_attr=Attribute.Ether),
+            condition=HitContext(atk_attr=Attribute.Ether),
             source="Zhuyuan ep4 Ether res ratio",
         )
 
     def rep6(self):
-        return Buff(
+        return StaticBuff(
             StatValue(8.8, StatKind.SKILL_MULTI),
-            condition=ContextData(atk_attr=Attribute.Ether, atk_kind=AttackKind.SpecialEx),
+            condition=HitContext(
+                atk_attr=Attribute.Ether, atk_kind=AttackKind.SpecialEx
+            ),
             source="Zhuyuan rep6 skill",
         )
 
-    def buffs(self, context: ContextData | None = None):
+    def buffs(self):
         res = [self.core_skill1(), self.core_skill2(), self.extra_skill()]
         if self._repetition >= 2:
             res.append(self.rep2())
@@ -151,4 +151,3 @@ class Zhuyuan(AgentWithData):
         if self._repetition >= 6:
             res.append(self.rep6())
         return res
-

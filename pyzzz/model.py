@@ -12,22 +12,27 @@ class StatKind(StrEnum):
     ATK_FLAT = auto()
     CRIT_RATIO = auto()
     CRIT_MULTI = auto()
+    HP_BASE = auto()
     HP_RATIO = auto()
     HP_FLAT = auto()
+    DEF_BASE = auto()
     DEF_RATIO = auto()
     DEF_FLAT = auto()
     PEN_RATIO = auto()
     PEN_FLAT = auto()
-    DEF_RES = auto()
 
     ANOMALY_MASTER = auto()
     ANOMALY_PROFICIENCY = auto()
     IMPACT = auto()
+    IMPACT_RATIO = auto()
     ENERGY_REGEN = auto()
 
     DMG_RATIO = auto()  # TODO: support different DMG
+
+    # on enemy
     RES_RATIO = auto()
     STUN_DMG_RATIO = auto()
+    ENEMY_DEF_RATIO = auto()
 
     SKILL_MULTI = auto()
 
@@ -84,25 +89,6 @@ class AttackKind(StrEnum):
     SpecialEx = auto()
     Chain = auto()
     Final = auto()
-
-
-@dataclass
-class Attack:
-    kind: AttackKind = AttackKind.All
-    attribute: Attribute = Attribute.All
-    multi: float = 1.0
-    anomaly: float = 0.0
-
-
-@dataclass
-class AttackList:
-    attacks: list
-
-    def __iter__(self):
-        return self.attacks.__iter__()
-
-    def __next__(self):
-        return self.__next__()
 
 
 class DiscKind(StrEnum):
@@ -270,7 +256,7 @@ class Camp(StrEnum):
     Belobog_Heavy_Industries = auto()
     Section_6 = auto()
     Sons_of_Calydon = auto()
-    Public_Security = auto() 
+    Public_Security = auto()
     Criminal_Investigation_Special_Response_Team = auto()
 
     @staticmethod
@@ -290,8 +276,6 @@ class Camp(StrEnum):
 @dataclass
 class AgentData:
     # NOTE: static data, buff not included here
-    level: int = 0
-
     atk_base: float = 0.0
     atk_weapon: float = 0.0
     atk_flat: float = 0.0
@@ -300,9 +284,16 @@ class AgentData:
     crit_multi: float = 0.50
 
     # not important
-    hp: float = field(default=0.0, repr=False)
-    defense: float = field(default=0.0, repr=False)
+    hp_base: float = field(default=0.0, repr=False)
+    hp_flat: float = field(default=0.0, repr=False)
+    hp_ratio: float = field(default=0.0, repr=False)
+
+    def_base: float = field(default=0.0, repr=False)
+    def_flat: float = field(default=0.0, repr=False)
+    def_ratio: float = field(default=0.0, repr=False)
+
     impact: float = 0.0
+    impact_ratio: float = field(default=0.0, repr=False)
     anomaly_master: float = 0.0
     anomaly_proficiency: float = 0.0
     energy_regen: float = field(default=0.0, repr=False)
@@ -325,6 +316,19 @@ class AgentData:
             self.atk_ratio += stat.value
         elif stat.kind == StatKind.ATK_FLAT:
             self.atk_flat += stat.value
+        elif stat.kind == StatKind.HP_BASE:
+            self.hp_base += stat.value
+        elif stat.kind == StatKind.HP_RATIO:
+            self.hp_ratio += stat.value
+        elif stat.kind == StatKind.HP_FLAT:
+            self.hp_flat += stat.value
+        elif stat.kind == StatKind.DEF_BASE:
+            self.def_base += stat.value
+        elif stat.kind == StatKind.DEF_RATIO:
+            self.def_ratio += stat.value
+        elif stat.kind == StatKind.DEF_FLAT:
+            self.def_flat += stat.value
+
         elif stat.kind == StatKind.CRIT_RATIO:
             self.crit_ratio += stat.value
         elif stat.kind == StatKind.CRIT_MULTI:
@@ -336,12 +340,10 @@ class AgentData:
         elif stat.kind == StatKind.DMG_RATIO:
             self.dmg_ratio += stat.value
 
-        elif stat.kind == StatKind.HP_FLAT:
-            self.hp += stat.value
-        elif stat.kind == StatKind.DEF_FLAT:
-            self.defense += stat.value
         elif stat.kind == StatKind.IMPACT:
             self.impact += stat.value
+        elif stat.kind == StatKind.IMPACT_RATIO:
+            self.impact_ratio += stat.value
         elif stat.kind == StatKind.ENERGY_REGEN:
             self.energy_regen += stat.value
         elif stat.kind == StatKind.ANOMALY_MASTER:
@@ -353,16 +355,20 @@ class AgentData:
 
     def __sub__(self, rhs):
         return AgentData(
-            self.level - rhs.level,
             self.atk_base - rhs.atk_base,
             self.atk_weapon - rhs.atk_weapon,
             self.atk_flat - rhs.atk_flat,
             self.atk_ratio - rhs.atk_ratio,
             self.crit_ratio - rhs.crit_ratio,
             self.crit_multi - rhs.crit_multi,
-            self.hp - rhs.hp,
-            self.defense - rhs.defense,
+            self.hp_base - rhs.hp_base,
+            self.hp_ratio - rhs.hp_ratio,
+            self.hp_flat - rhs.hp_flat,
+            self.def_base - rhs.def_base,
+            self.def_ratio - rhs.def_ratio,
+            self.def_flat - rhs.def_flat,
             self.impact - rhs.impact,
+            self.impact_ratio - rhs.impact_ratio,
             self.anomaly_proficiency - rhs.anomaiy_proficiency,
             self.anomaly_master - rhs.attribte_master,
             self.energy_regen - rhs.energy_regen,
@@ -373,16 +379,20 @@ class AgentData:
 
     def __add__(self, rhs):
         return AgentData(
-            self.level + rhs.level,
             self.atk_base + rhs.atk_base,
             self.atk_weapon + rhs.atk_weapon,
             self.atk_flat + rhs.atk_flat,
             self.atk_ratio + rhs.atk_ratio,
             self.crit_ratio + rhs.crit_ratio,
             self.crit_multi + rhs.crit_multi,
-            self.hp + rhs.hp,
-            self.defense + rhs.defense,
+            self.hp_base + rhs.hp_base,
+            self.hp_ratio + rhs.hp_ratio,
+            self.hp_flat + rhs.hp_flat,
+            self.def_base + rhs.def_base,
+            self.def_ratio + rhs.def_ratio,
+            self.def_flat + rhs.def_flat,
             self.impact + rhs.impact,
+            self.impact_ratio + rhs.impact_ratio,
             self.anomaly_proficiency + rhs.anomaiy_proficiency,
             self.anomaly_master + rhs.attribte_master,
             self.energy_regen + rhs.energy_regen,
@@ -407,35 +417,34 @@ class WeaponGrowth:
 
 
 @dataclass
-class ContextData:
+class HitContext:
     agent: str = ""  # empty str means that wound apply to all the agents
+    tags: set[str] = field(default_factory=set)
 
     # agent -> moster
     atk_attr: Attribute | None = None
     atk_kind: AttackKind | None = None
-    assault: bool = False
+    assault: bool | None = None
 
     # moster
-    daze: bool = False
+    daze: bool | None = None
+
+    @staticmethod
+    def default():
+        return HitContext("", set(), None, None, False, False)
 
     def contains(self, rhs):
-        if rhs.agent and self.agent and self.agent != rhs.agent:
+        if rhs.agent and self.agent != rhs.agent:
             return False
-        if (
-            rhs.atk_attr
-            and self.atk_attr != Attribute.All
-            and self.atk_attr != rhs.atk_attr
-        ):
+        if rhs.tags and not self.tags.issuperset(rhs.tags):
             return False
-        if (
-            rhs.atk_kind
-            and self.atk_kind != AttackKind.All
-            and self.atk_kind != rhs.atk_kind
-        ):
+        if rhs.atk_attr and self.atk_attr != rhs.atk_attr:
             return False
-        if rhs.assault and not self.assault:
+        if rhs.atk_kind and self.atk_kind != rhs.atk_kind:
             return False
-        if rhs.daze and not self.daze:
+        if rhs.assault is not None and self.assault != rhs.assault:
+            return False
+        if rhs.daze is not None and self.daze != rhs.daze:
             return False
         return True
 
@@ -446,7 +455,7 @@ class ExtraMultiplier:
         pass
 
     @abc.abstractmethod
-    def active(self, anomaly: bool, context: ContextData) -> bool:
+    def active(self, anomaly: bool, context: HitContext) -> bool:
         pass
 
     @abc.abstractmethod

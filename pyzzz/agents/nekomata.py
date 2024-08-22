@@ -1,11 +1,9 @@
 from pyzzz.agents.agent_with_data import AgentWithData
-from pyzzz.buff import Buff, DynamicBuff
+from pyzzz.buff import StaticBuff, DynamicBuff
 from pyzzz.model import (
-    AgentData,
-    Attack,
     AttackKind,
     Attribute,
-    ContextData,
+    HitContext,
     SkillLevels,
     StatKind,
     StatValue,
@@ -110,35 +108,35 @@ class Nekomata(AgentWithData):
         )
 
     def extra_skill(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.35, StatKind.DMG_RATIO),
-            condition=ContextData(atk_attr=Attribute.All, atk_kind=AttackKind.SpecialEx),
+            condition=HitContext(atk_attr=Attribute.All, atk_kind=AttackKind.SpecialEx),
             source="Nekomata extra skill SpecialEx dmg ratio",
         )
 
     def rep1(self):
-        return Buff(
+        return StaticBuff(
             StatValue(-0.16, StatKind.RES_RATIO),
-            condition=ContextData(atk_attr=Attribute.Physical),
+            condition=HitContext(atk_attr=Attribute.Physical),
             source="Nekomata ep1 res ratio",
         )
     def rep4(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.14, StatKind.CRIT_RATIO),
-            condition=ContextData(atk_attr=Attribute.All),
+            condition=HitContext(atk_attr=Attribute.All),
             source="Nekomata ep4 crit ratio",
         )
 
 
     def rep6(self):
-        return Buff(
+        return StaticBuff(
             StatValue(0.54, StatKind.CRIT_MULTI),
-            condition=ContextData(atk_attr=Attribute.All, atk_kind=AttackKind.All),
+            condition=HitContext(atk_attr=Attribute.All, atk_kind=AttackKind.All),
             source="Nekomata rep6 crit multi",
         )
 
 
-    def buffs(self, context: ContextData | None = None):
+    def buffs(self):
         res = [self.core_skill(), self.extra_skill()]
         if self._repetition >= 1:
             res.append(self.rep1())
