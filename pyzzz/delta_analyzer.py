@@ -1,4 +1,5 @@
 from pyzzz.env import Env
+import dataclasses
 
 from pyzzz.dmg import ComboDMG
 from pyzzz.model import *
@@ -54,6 +55,7 @@ class DeltaAnalyzer:
         update([disc5_stat_neg, StatValue(0.3, StatKind.ATK_RATIO)])
         update([disc5_stat_neg, StatValue(0.3, StatKind.DMG_RATIO)])
         update([disc5_stat_neg, StatValue(0.24, StatKind.PEN_RATIO)])
+        # update([disc5_stat_neg, StatValue(-0.08, StatKind.CRIT_RATIO), StatValue(0.32, StatKind.PEN_RATIO)])
 
         if agent0.level < 60:
             env = self._env.clone()
@@ -71,14 +73,14 @@ class DeltaAnalyzer:
                 agent0.skill_levels, core=agent0.skill_levels.core + 1
             )
             env.agent(0).set_stats(skill_levels=skill_levels)
-            r.append(env.calc_combo(self._combo, "Core Skill -> 60"))
+            r.append(env.calc_combo(self._combo, "Core Skill +1"))
 
-        if agent0.skill_levels.basic < 6:
+        if agent0.skill_levels.basic < 16:
             env = self._env.clone()
             skill_levels = dataclasses.replace(
                 agent0.skill_levels, basic=agent0.skill_levels.basic + 1
             )
             env.agent(0).set_stats(skill_levels=skill_levels)
-            r.append(env.calc_combo(self._combo, "Basic Skill -> 60"))
+            r.append(env.calc_combo(self._combo, "Basic Skill +1"))
 
         return r

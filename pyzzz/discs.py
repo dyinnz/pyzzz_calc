@@ -20,7 +20,7 @@ def get_suit4_buff(kind: DiscKind):
         ),
         DiscKind.Swing_Jazz: StaticBuff(
             StatValue(0.15, StatKind.DMG_RATIO),
-            condition=HitContext(daze=True),
+            # condition=HitContext(daze=True),
             source="Swing_Jazz suit4 DMG +15%",
             for_team=True,
         ),

@@ -120,7 +120,11 @@ class Soukaku(AgentWithData):
     def final_buff(self):
         return StaticBuff(
             StatValue(0.15, StatKind.CRIT_RATIO),
-            condition=HitContext(atk_kind=AttackKind.Final, agent=self.name),
+            condition=[
+                HitContext(atk_kind=AttackKind.Final, agent=self.name),
+                HitContext(atk_kind=AttackKind.Basic, agent=self.name),
+                HitContext(atk_kind=AttackKind.Dash, agent=self.name),
+            ],
             source=f"{self.name} final buff +15% critical ratio",
         )
 
@@ -129,7 +133,7 @@ class Soukaku(AgentWithData):
             m = [0, 12.5, 15, 17, 18, 19, 20][self.skill_levels.core] / 100 * 2
             value = (
                 self.core_skill_atk
-                if self.core_skill_atk
+                if self.core_skill_atk is not None
                 else self.static.static_atk() * m
             )
             value = min(1000, value)

@@ -1,6 +1,6 @@
 from pyzzz import dataset
 from pyzzz.buff import DynamicBuff
-from pyzzz.model import Profession, StatKind, StatValue
+from pyzzz.model import Profession, StatKind, StatValue, HitContext, AttackKind
 from pyzzz.weapon import Weapon
 
 CN2EN = {
@@ -213,6 +213,78 @@ class SharpenedStinger(WeaponWithData):
         ]
 
 
+class ElectroLipGloss(WeaponWithData):
+    NAME = "Electro-LipGloss"
+
+    def __init__(self, level=60, is_ascension=False, repetition=1):
+        super().__init__(ElectroLipGloss.NAME, level, is_ascension, repetition)
+
+    def buffs(self):
+        return [
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.10][self._repetition],
+                    StatKind.ATK_RATIO,
+                ),
+                source=f"{self._name} atk ratio buff",
+            ),
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.15][self._repetition],
+                    StatKind.DMG_RATIO,
+                ),
+                source=f"{self._name} dmg ratio buff",
+            ),
+        ]
+
+
+class TheBrimstone(WeaponWithData):
+    NAME = "TheBrimstone"
+
+    def __init__(self, level=60, is_ascension=False, repetition=1):
+        super().__init__(TheBrimstone.NAME, level, is_ascension, repetition)
+
+    def buffs(self):
+        return [
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.035][self._repetition],
+                    StatKind.ATK_RATIO,
+                ),
+                cov=4.0,
+                source=f"{self._name} atk ratio buff",
+            ),
+        ]
+
+
+class GildedBlossom(WeaponWithData):
+    NAME = "GildedBlossom"
+
+    def __init__(self, level=60, is_ascension=False, repetition=1):
+        super().__init__(GildedBlossom.NAME, level, is_ascension, repetition)
+
+    def buffs(self):
+        return [
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.06, 0.069, 0.078, 0.087, 0.096][self._repetition],
+                    StatKind.ATK_RATIO,
+                ),
+                cov=1.0,
+                source=f"{self._name} atk ratio buff",
+            ),
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.15, 0.172, 0.195, 0.218, 0.24][self._repetition],
+                    StatKind.DMG_RATIO,
+                ),
+                condition=HitContext(atk_kind=AttackKind.SpecialEx),
+                cov=1.0,
+                source=f"{self._name} special ex dmg buff",
+            ),
+        ]
+
+
 def create_weapon(name: str, **kw):
     name = name.replace(" ", "")
     mappings = {
@@ -224,6 +296,9 @@ def create_weapon(name: str, **kw):
         "RainforestGourmet": RainforestGourmet,
         "FusionCompiler": FusionCompiler,
         "SharpenedStinger": SharpenedStinger,
+        "Electro-LipGloss": ElectroLipGloss,
+        "TheBrimstone": TheBrimstone,
+        "GildedBlossom": GildedBlossom,
     }
     if name in mappings:
         return mappings[name](**kw)

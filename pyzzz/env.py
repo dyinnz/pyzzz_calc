@@ -19,6 +19,8 @@ class Env:
         self._buffs: list[dict[str, Buff]] = [{}, {}, {}]
         self._team_buffs: dict[str, Buff] = {}
 
+        self._disable_buffs: set[str] = set()
+
     def agent(self, i: int) -> Agent:
         return self._agents[i]
 
@@ -40,6 +42,7 @@ class Env:
     def clone(self) -> "Env":
         env = Env()
         env._agents = copy.deepcopy(self._agents)
+        env._disable_buffs = copy.deepcopy(self._disable_buffs)
         return env
 
     def reset_static(self):
@@ -56,6 +59,9 @@ class Env:
     def debug_str(self):
         pass
 
+    def disable(self, buf: str):
+        self._disable_buffs.add(buf)
+
     def calc_combo(self, combo: list, comment="") -> ComboDMG:
         self.reset_static()
 
@@ -67,9 +73,11 @@ class Env:
             dmg.fill_data()
             # TODO: refactor me
             for b in self._buffs[0].values():
-                dmg._active_buffs.append(b)
+                if b.source not in self._disable_buffs:
+                    dmg._active_buffs.append(b)
             for b in self._team_buffs.values():
-                dmg._active_buffs.append(b)
+                if b.source not in self._disable_buffs:
+                    dmg._active_buffs.append(b)
             dmg.apply_buff()
             result.dmgs.append(dmg)
 
