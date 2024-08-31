@@ -12,7 +12,7 @@ from pyzzz.agents.qingyi import Qingyi
 from pyzzz.agents.jane import Jane
 
 
-def create_agent(name: str, **kw):
+def get_agents_mapping():
     return {
         "Ellen": Ellen,
         "Lycaon": Lycaon,
@@ -25,4 +25,20 @@ def create_agent(name: str, **kw):
         "Nicole": Nicole,
         "Qingyi": Qingyi,
         "Jane": Jane,
-    }[name](**kw)
+    }
+
+
+def create_agent(name: str, **kw):
+    return get_agents_mapping()[name](**kw)
+
+
+def list_agents():
+    res = []
+    map = get_agents_mapping()
+    for t in map.values():
+        agent = t()
+        res.append(
+            {"name": agent.name, "cn_name": agent.cn_name, "attribute": agent.attribute}
+        )
+    res.sort(key=lambda x: (x['attribute'], x['name']))
+    return res

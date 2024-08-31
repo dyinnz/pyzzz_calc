@@ -83,7 +83,7 @@ def full_ellen():
             ],
             # [
             #     StatValue(0.12, StatKind.ATK_RATIO),
-            #     StatValue(19, StatKind.PEN_FLAT),
+            #     StatValue(19, StatKind.ATK_FLAT),
             #     StatValue(0.024, StatKind.CRIT_RATIO),
             # ],
         )
@@ -444,7 +444,7 @@ def full_jane():
 
 
 if __name__ == "__main__":
-    res = full_ellen()
+    # res = full_ellen()
     # res = full_grace()
-    # res = full_jane()
+    res = full_jane()
     print(res)

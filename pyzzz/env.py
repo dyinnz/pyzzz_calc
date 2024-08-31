@@ -9,6 +9,8 @@ from pyzzz.buff import Buff
 from pyzzz.model import *
 from pyzzz.multiplier import *
 
+from typing import Sequence
+
 
 class Env:
     def __init__(self):
@@ -62,13 +64,14 @@ class Env:
     def disable(self, buf: str):
         self._disable_buffs.add(buf)
 
-    def calc_combo(self, combo: list, comment="") -> ComboDMG:
+    def calc_combo(self, combo: Sequence, comment="") -> ComboDMG:
         self.reset_static()
 
         result = ComboDMG()
 
         for hit in combo:
             dmg = HitDMG(hit(self.agent(0)), self.agent(0), self._enemy)
+            dmg.name = hit.__qualname__
             dmg.fill_context()
             dmg.fill_data()
             # TODO: refactor me
@@ -135,5 +138,39 @@ class Env:
             i += 1
 
         env._enemy = Enemy(level=data.enemy_level, defense_base=data.enemy_base)
+
+        return env
+
+    @staticmethod
+    def from_agent_build(data: AgentBuild):
+        weapon = weapons.create_weapon(
+            data.weapon_name, level=data.weapon_level, repetition=data.weapon_rep
+        )
+
+        discs = data.discs
+        discs.generate_suits()
+        kw = dict(
+            level=data.agent_level,
+            skill_levels=data.skills,
+            repetition=data.agent_rep,
+        )
+        agent = agents.create_agent(
+            data.agent_name,
+            **kw,
+        )
+        agent.set_equipment(weapon, discs)
+        return agent
+
+    @staticmethod
+    def from_input(data: CalcInput):
+        env = Env()
+
+        if data.agent1.agent_name:
+            env.set_agent(0, Env.from_agent_build(data.agent1))
+        if data.agent2.agent_name:
+            env.set_agent(1, Env.from_agent_build(data.agent2))
+        if data.agent3.agent_name:
+            env.set_agent(2, Env.from_agent_build(data.agent3))
+        env._enemy = Enemy(level=data.enemy.level, defense_base=data.enemy.base)
 
         return env

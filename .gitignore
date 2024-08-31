@@ -4,3 +4,5 @@ pyenv/
 *venv/
 play/
 zzz.gg*
+.DS_store
+dist/

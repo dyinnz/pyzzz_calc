@@ -84,14 +84,20 @@ def test_jane():
     # combo = [Jane.Dodge1, Jane.Dodge2, Jane.Dodge3]
     env = Env.from_full(build_test.full_jane())
     print(env)
+    
+    hits = env.calc_combo(combo)
+    print(hits.dmgs[0].name)
 
-    delta = DeltaAnalyzer(env, combo)
-    result = delta.quick()
-    normal_base = result[0].calc_normal()
-    anomaly_base = result[0].calc_anomaly()
-    for r in result:
-        print(r.show_normal(normal_base))
-        print(r.show_anomaly(anomaly_base))
+    print(env.agent(0).__class__.__dict__)
+
+
+    # delta = DeltaAnalyzer(env, combo)
+    # result = delta.quick()
+    # normal_base = result[0].calc_normal()
+    # anomaly_base = result[0].calc_anomaly()
+    # for r in result:
+    #     print(r.show_normal(normal_base))
+    #     print(r.show_anomaly(anomaly_base))
 
 
 if __name__ == "__main__":

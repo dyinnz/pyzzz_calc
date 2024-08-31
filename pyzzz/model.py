@@ -2,10 +2,11 @@ import abc
 import math
 from dataclasses import dataclass, field
 from enum import StrEnum, auto
+from pydantic import BaseModel
 
 
 class StatKind(StrEnum):
-    STAT_EMPTY = auto()
+    EMPTY = auto()
 
     ATK_BASE = auto()
     ATK_RATIO = auto()
@@ -44,10 +45,10 @@ class StatValue:
 
     @staticmethod
     def create_empty():
-        return StatValue(0, StatKind.STAT_EMPTY)
+        return StatValue(0, StatKind.EMPTY)
 
     def __bool__(self):
-        return self.kind != StatKind.STAT_EMPTY
+        return self.kind != StatKind.EMPTY
 
     def __repr__(self):
         if abs(self.value) > 1.0 or self.value == 0.0:
@@ -308,7 +309,7 @@ class AgentData:
         )
 
     def apply_stat(self, stat: StatValue):
-        if stat.kind == StatKind.STAT_EMPTY:
+        if stat.kind == StatKind.EMPTY:
             pass
         elif stat.kind == StatKind.ATK_BASE:
             self.atk_base += stat.value
@@ -447,6 +448,30 @@ class HitContext:
         if rhs.daze is not None and self.daze != rhs.daze:
             return False
         return True
+
+
+class EnemyModel(BaseModel):
+    level: int = 70
+    base: int = 60
+
+
+class AgentBuild(BaseModel):
+    agent_name: str = ""
+    agent_rep: int = 0
+    agent_level: int = 0
+    weapon_name: str = ""
+    weapon_rep: int = 0
+    weapon_level: int = 0
+    skills: SkillLevels = SkillLevels()
+    discs: DiscGroup = DiscGroup()
+
+
+class CalcInput(BaseModel):
+    agent1: AgentBuild = AgentBuild()
+    agent2: AgentBuild = AgentBuild()
+    agent3: AgentBuild = AgentBuild()
+    enemy: EnemyModel = EnemyModel()
+    combo: list[str] = []
 
 
 class ExtraMultiplier:

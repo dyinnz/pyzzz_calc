@@ -223,14 +223,14 @@ class ElectroLipGloss(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.10][self._repetition],
+                    [0, 0.10, 0.115, 0.13, 0.145, 0.16][self._repetition],
                     StatKind.ATK_RATIO,
                 ),
                 source=f"{self._name} atk ratio buff",
             ),
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.15][self._repetition],
+                    [0, 0.15, 0.175, 0.20, 0.225, 0.25][self._repetition],
                     StatKind.DMG_RATIO,
                 ),
                 source=f"{self._name} dmg ratio buff",
@@ -285,8 +285,7 @@ class GildedBlossom(WeaponWithData):
         ]
 
 
-def create_weapon(name: str, **kw):
-    name = name.replace(" ", "")
+def get_weapons_mapping():
     mappings = {
         "CannonRotor": CannonRotor,
         "StarlightEngine": StarlightEngine,
@@ -300,7 +299,23 @@ def create_weapon(name: str, **kw):
         "TheBrimstone": TheBrimstone,
         "GildedBlossom": GildedBlossom,
     }
-    if name in mappings:
-        return mappings[name](**kw)
+    return mappings
+
+
+def create_weapon(name: str, **kw):
+    name = name.replace(" ", "")
+    mapping = get_weapons_mapping()
+    if name in mapping:
+        return mapping[name](**kw)
     elif name:
         return Weapon(name, **kw)
+
+
+def list_weapons():
+    res = []
+    map = get_weapons_mapping()
+    for t in map.values():
+        weapon = t()
+        res.append({"name": weapon.name, "profession": weapon.profession})
+    res.sort(key=lambda x: (x["profession"], x["name"]))
+    return res

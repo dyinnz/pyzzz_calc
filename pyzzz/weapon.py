@@ -48,6 +48,10 @@ class Weapon:
         return self._repetition
 
     @property
+    def profession(self):
+        return self._profession
+
+    @property
     def atk_base(self) -> float:
         return self._atk_base
 

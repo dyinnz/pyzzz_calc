@@ -2,6 +2,7 @@ from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.model import *
 from pyzzz.buff import DynamicBuff
 from pyzzz.hit import Attack
+from typing import Sequence
 
 
 class JaneExtraMultiplier(ExtraMultiplier):
@@ -129,6 +130,23 @@ class Jane(AgentWithData):
         return Attack(
             AttackKind.Special, Attribute.Physical, value, self.dodge3["anomaly"]
         )
+
+    def hits(self) -> Sequence:
+        return [
+            Jane.A1,
+            Jane.A2,
+            Jane.A3,
+            Jane.A4,
+            Jane.A5,
+            Jane.A6,
+            Jane.AX,
+            Jane.AY,
+            Jane.E,
+            Jane.EX,
+            Jane.Dodge1,
+            Jane.Dodge2,
+            Jane.Dodge3,
+        ]
 
     def passion_stream(self):
         def create():

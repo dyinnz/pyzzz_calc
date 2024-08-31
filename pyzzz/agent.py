@@ -172,6 +172,9 @@ class Agent:
         else:
             self._calc_static()
 
+    def hits(self) -> Sequence:
+        return []
+
     def buffs(self) -> Sequence[Buff]:
         return []
 

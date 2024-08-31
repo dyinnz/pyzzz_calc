@@ -8,6 +8,7 @@ from pyzzz.model import (
     StatKind,
     StatValue,
 )
+from typing import Sequence
 
 from pyzzz.hit import Hit, Attack
 
@@ -65,6 +66,17 @@ class Ellen(AgentWithData):
     def Final(self):
         value = self.f["dmg"] + self.f["dmg_grow"] * (self.skill_levels.chain - 1)
         return Attack(AttackKind.Final, Attribute.Ice, value, self.f["anomaly"])
+
+    def hits(self) -> Sequence:
+        return [
+            Ellen.A1,
+            Ellen.A2,
+            Ellen.A3,
+            Ellen.EX1,
+            Ellen.EX2,
+            Ellen.Chain,
+            Ellen.Final,
+        ]
 
     def core_skill(self):
         def create():

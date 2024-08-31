@@ -18,6 +18,8 @@ class HitDMG:
 
         self._active_buffs = list[Buff]()
 
+        self.name = ''
+
         # common multiplier
         self.dmg_ratio = DMGMultiplier()
         self.resistance = ResistanceMutiplier()
@@ -68,7 +70,7 @@ class HitDMG:
 
         self.aa.attribute = self._hit.attribute
         self.ap.add(self._agent.static.anomaly_proficiency)
-        self.anomaly_level.level = self._enemy.level
+        self.anomaly_level.level = self._agent.level
         self.anomaly_acc = self._hit.anomaly
 
     def apply_stat(self, stat: StatValue):
@@ -151,7 +153,7 @@ class HitDMG:
     def show_normal(self):
         s = f"{self.show_common()} * {self.critical}* {self.skill} * {self.atk}"
         for extra in self.extras:
-            if extra.active(True, self._context):
+            if extra.active(False, self._context):
                 s += f" * {extra.show()}"
         s += f" = {self.calc_normal():.1f}\t# acc={self.anomaly_acc}"
         return s
@@ -159,7 +161,7 @@ class HitDMG:
     def show_anomaly(self):
         s = f"{self.show_common()} * {self.aa} * {self.ap} * {self.anomaly_level} * {self.atk}"
         for extra in self.extras:
-            if extra.active(False, self._context):
+            if extra.active(True, self._context):
                 s += f" * {extra.show()}"
         s += f" = {self.calc_anomaly():.1f}"
         return s

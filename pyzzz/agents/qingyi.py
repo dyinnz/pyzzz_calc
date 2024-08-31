@@ -37,13 +37,13 @@ class Qingyi(AgentWithData):
         self.a2 = self._skill["普通攻击：一煞-二段"]
         self.a3 = self._skill["普通攻击：一煞-三段"]
         self.a4 = self._skill["普通攻击：一煞-四段"]
-        self.a5 = self._skill["普通攻击:一煞-四段(强化)"]
-        self.a6 = self._skill["普通攻击:醉花月云转-突进攻击"]
-        self.a7 = self._skill["普通攻击:醉花月云转-终结一击"]
+        self.a5 = self._skill["普通攻击：一煞-四段（强化）"]
+        self.a6 = self._skill["普通攻击：醉花月云转-突进攻击"]
+        self.a7 = self._skill["普通攻击：醉花月云转-终结一击"]
 
-        self.e1 = self._skill["特殊技：昼锦堂"]
+        self.e1 = self._skill["特殊技：昼锦堂-"]
 
-        self.ex1 = self._skill["强化特殊技：月上海棠"]
+        self.ex1 = self._skill["强化特殊技：月上海棠-A"]
 
         self.dogde = self._skill["闪避反击：意不尽-"]
         self.chain = self._skill["连携技：太平令-"]
