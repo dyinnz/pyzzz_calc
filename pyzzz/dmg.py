@@ -18,7 +18,7 @@ class HitDMG:
 
         self._active_buffs = list[Buff]()
 
-        self.name = ''
+        self.name = ""
 
         # common multiplier
         self.dmg_ratio = DMGMultiplier()
@@ -44,6 +44,10 @@ class HitDMG:
         self.common_result = 0.0
         self.normal_result = 0.0
         self.anomaly_result = 0.0
+
+    @property
+    def hit(self):
+        return self._hit
 
     def fill_context(self):
         self._context.agent = self._agent.name

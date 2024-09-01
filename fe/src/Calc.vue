@@ -89,6 +89,16 @@ const handleReset = () => {
   enemy.value = new EnemyModel
 }
 
+const sortNumber = (a: any, b: any) => {
+  const lhs = a.ratio;
+  const rhs = b.ratio;
+  return lhs - rhs;
+}
+
+const printNumber = (row: any, column: any, value: number, index: number) => {
+  return (value * 100).toFixed(2) + '%'
+}
+
 </script>
 
 <template>
@@ -126,17 +136,19 @@ const handleReset = () => {
     <el-tabs>
       <el-tab-pane label="Hit DMG">
         <el-table :data="hits" style="width: 100%">
-          <el-table-column prop="name" label="Hit" width="120px" />
-          <el-table-column prop="dmg" label="DMG" width="120px" />
+          <el-table-column prop="name" label="Hit" width="160px" />
+          <el-table-column prop="mark" label="Mark" width="120px" />
+          <el-table-column prop="dmg" label="DMG" width="100px" />
           <el-table-column prop="anomaly_acc" label="Anomaly ACC" width="120px" />
           <el-table-column prop="detail" label="Detail" width="180" show-overflow-tooltip />
         </el-table>
       </el-tab-pane>
 
       <el-tab-pane label="Suggest">
-        <el-table :data="deltas" style="width: 100%">
+        <el-table :data="deltas" :default-sort="{ prop: 'ratio', order: 'descending' }" style="width: 100%">
           <el-table-column prop="name" label="Item" width="200px" />
-          <el-table-column prop="ratio" label="Ratio" width="120px" />
+          <el-table-column prop="ratio" label="Ratio" sortable :sort-method="sortNumber" :formatter="printNumber"
+            width="120px" />
           <el-table-column prop="detail" label="Detail" width="180" show-overflow-tooltip />
         </el-table>
       </el-tab-pane>

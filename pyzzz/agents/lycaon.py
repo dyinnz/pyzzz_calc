@@ -1,16 +1,12 @@
 from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.buff import StaticBuff
 from pyzzz.model import (
-    AttackKind,
     Attribute,
     HitContext,
     SkillLevels,
     StatKind,
     StatValue,
 )
-
-
-from pyzzz.hit import Attack
 
 
 class Lycaon(AgentWithData):
@@ -29,14 +25,6 @@ class Lycaon(AgentWithData):
 
         self._cn_name = "莱卡恩"
         self.load_cn_data(self._cn_name)
-
-        self.chain = self._skill["连携技：遵命-"]
-
-    def Chain(self):
-        value = self.chain["dmg"] + self.chain["dmg_grow"] * (
-            self.skill_levels.special - 1
-        )
-        return Attack(AttackKind.Chain, Attribute.Ice, value)
 
     def core_skill(self):
         return StaticBuff(

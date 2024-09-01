@@ -8,7 +8,6 @@ from pyzzz.model import (
     StatKind,
     StatValue,
 )
-from pyzzz.hit import Attack
 
 
 class Qingyi(AgentWithData):
@@ -33,76 +32,6 @@ class Qingyi(AgentWithData):
 
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
 
-        self.a1 = self._skill["普通攻击：一煞-一段"]
-        self.a2 = self._skill["普通攻击：一煞-二段"]
-        self.a3 = self._skill["普通攻击：一煞-三段"]
-        self.a4 = self._skill["普通攻击：一煞-四段"]
-        self.a5 = self._skill["普通攻击：一煞-四段（强化）"]
-        self.a6 = self._skill["普通攻击：醉花月云转-突进攻击"]
-        self.a7 = self._skill["普通攻击：醉花月云转-终结一击"]
-
-        self.e1 = self._skill["特殊技：昼锦堂-"]
-
-        self.ex1 = self._skill["强化特殊技：月上海棠-A"]
-
-        self.dogde = self._skill["闪避反击：意不尽-"]
-        self.chain = self._skill["连携技：太平令-"]
-        self.final = self._skill["终结技：八声甘州-"]
-
-    def A1(self):
-        value = self.a1["dmg"] + self.a1["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Physical, value)
-
-    def A2(self):
-        value = self.a2["dmg"] + self.a2["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Physical, value)
-
-    def A3(self):
-        value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Electric, value)
-
-    def A4(self):
-        value = self.a4["dmg"] + self.a4["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Electric, value)
-
-    def A5(self):
-        value = self.a5["dmg"] + self.a5["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Electric, value)
-
-    def A6(self):
-        value = self.a6["dmg"] + self.a6["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Electric, value)
-
-    def A7(self):
-        value = self.a7["dmg"] + self.a7["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Electric, value)
-
-    def E1(self):
-        value = self.e1["dmg"] + self.e1["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.Special, Attribute.Electric, value)
-
-    def EX1(self):
-        value = self.ex1["dmg"] + self.ex1["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.SpecialEx, Attribute.Electric, value)
-
-    def Dodge(self):
-        value = self.dogde["dmg"] + self.dogde["dmg_grow"] * (
-            self.skill_levels.dodge - 1
-        )
-        return Attack(AttackKind.Dodge, Attribute.Electric, value)
-
-    def Chain(self):
-        value = self.chain["dmg"] + self.chain["dmg_grow"] * (
-            self.skill_levels.chain - 1
-        )
-        return Attack(AttackKind.Chain, Attribute.Electric, value)
-
-    def Final(self):
-        value = self.final["dmg"] + self.final["dmg_grow"] * (
-            self.skill_levels.chain - 1
-        )
-        return Attack(AttackKind.Final, Attribute.Electric, value)
-
     def core_skill(self):
         def create():
             m0 = [0.02, 0.024, 0.027, 0.03, 0.034, 0.037, 0.04][self.skill_levels.core]
@@ -123,7 +52,7 @@ class Qingyi(AgentWithData):
 
     def rep1(self):
         return (
-            Buff(
+            StaticBuff(
                 StatValue(-0.15, StatKind.ENEMY_DEF_RATIO),
                 condition=HitContext(atk_attr=Attribute.Physical),
                 source="Qingyi ep1 def res",

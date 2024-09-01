@@ -1,10 +1,12 @@
 from typing import Sequence
+import abc
 import copy
 import itertools
 from pyzzz.model import *
 from pyzzz.buff import Buff
 from pyzzz.weapon import Weapon
 from pyzzz.discs import get_suit4_buff
+from pyzzz.hit import GenerateHit
 
 
 class Agent:
@@ -172,7 +174,11 @@ class Agent:
         else:
             self._calc_static()
 
-    def hits(self) -> Sequence:
+    @abc.abstractmethod
+    def gen_hit(self, mark: str) -> GenerateHit:
+        pass
+
+    def hit_marks(self) -> Sequence[str]:
         return []
 
     def buffs(self) -> Sequence[Buff]:

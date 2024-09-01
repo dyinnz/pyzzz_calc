@@ -1,24 +1,15 @@
 from pyzzz.env import Env
 from pyzzz.model import *
 from pyzzz.delta_analyzer import DeltaAnalyzer
+from pyzzz.hit import M
 
 from tests import build_test
 
 
 def test_ellen():
-    from pyzzz.agents.ellen import Ellen
-
-    # combo = [
-    #     Ellen.Chain,
-    #     Ellen.Final,
-    #     Ellen.A1,
-    #     Ellen.A2,
-    #     Ellen.A3,
-    #     Ellen.EX1,
-    # ]
     combo = [
-        Ellen.EX1,
-        Ellen.A3,
+        M.EX1,
+        M.A3,
     ]
     env = Env.from_full(build_test.full_ellen())
     # env.disable('Swing_Jazz suit4 DMG +15%')
@@ -40,9 +31,7 @@ def test_ellen():
 
 
 def test_lycaon():
-    from pyzzz.agents.lycaon import Lycaon
-
-    combo = [Lycaon.Chain]
+    combo = [M.Chain1]
     env = Env.from_full(build_test.full_lycaon())
     print(env)
 
@@ -54,9 +43,7 @@ def test_lycaon():
 
 
 def test_soukaku():
-    from pyzzz.agents.soukaku import Soukaku
-
-    combo = [Soukaku.Chain, Soukaku.EY1]
+    combo = [M.Chain1, M.E3]
     env = Env.from_full(build_test.full_soukaku3())
     env.disable("Soukaku core skill atk dynamic flat")
     # env.disable('Soukaku rep4 ice res ratio')
@@ -71,25 +58,20 @@ def test_soukaku():
     # for r in result:
     #     print(r.show_normal(normal_base))
 
-    combo = [Soukaku.Final, Soukaku.Dash, Soukaku.A3]
+    combo = [M.Final1, M.Dash2, M.AX3]
     env = Env.from_full(build_test.full_soukaku3())
     result = env.calc_combo(combo)
     print(result.show_normal())
 
 
 def test_jane():
-    from pyzzz.agents.jane import Jane
-
-    combo = [Jane.A1, Jane.A2, Jane.A3, Jane.A4, Jane.A5, Jane.A6]
-    # combo = [Jane.Dodge1, Jane.Dodge2, Jane.Dodge3]
+    combo = [M.A1, M.A2, M.A3, M.A4, M.A5, M.A6]
     env = Env.from_full(build_test.full_jane())
     print(env)
-    
+
     hits = env.calc_combo(combo)
-    print(hits.dmgs[0].name)
 
     print(env.agent(0).__class__.__dict__)
-
 
     # delta = DeltaAnalyzer(env, combo)
     # result = delta.quick()
@@ -101,7 +83,7 @@ def test_jane():
 
 
 if __name__ == "__main__":
-    # test_ellen()
-    # test_lycaon()
+    test_ellen()
+    test_lycaon()
     test_jane()
-    # test_soukaku()
+    test_soukaku()

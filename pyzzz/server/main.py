@@ -1,15 +1,27 @@
-import sys
-import os
+#!/usr/bin/env python3
 
-cwd = os.getcwd()
-sys.path.append(cwd)
-print(f"cwd {cwd}")
+import click
 
-reload = False
-if len(sys.argv) >= 2 and sys.argv[1] == "reload":
-    reload = True
 
-import uvicorn
-from pyzzz.server.app import app
+@click.command()
+@click.option("--reload", default="", help="reload dir")
+@click.option("--port", default=5704)
+def main(reload: str, port: int):
+    import uvicorn
 
-uvicorn.run(app, port=5000, log_level="debug", reload=reload)
+    # do something to make nuitka aware pyzzz
+    from pyzzz.server.app import app
+
+    print(app.version)
+
+    uvicorn.run(
+        "pyzzz.server.app:app",
+        port=port,
+        log_level="debug",
+        reload=len(reload) > 0,
+        reload_dirs=[reload] if len(reload) > 0 else [],
+    )
+
+
+if __name__ == "__main__":
+    main()

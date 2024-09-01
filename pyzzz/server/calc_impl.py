@@ -9,16 +9,17 @@ def calc(input: model.CalcInput):
     print(input)
 
     env = Env.from_input(input)
-    hits = env.agent(0).hits()
     print(env)
+    hit_marks = env.agent(0).hit_marks()
     is_anomaly = env.agent(0).profession == model.Profession.Anomaly
 
-    combo_dmg = env.calc_combo(hits)
+    combo_dmg = env.calc_combo(hit_marks)
     hit_dmgs = []
     if is_anomaly:
         hit_dmgs.append(
             {
-                "name": "Anomaly",
+                "name": "异常伤害",
+                "mark": "Anomaly",
                 "dmg": round(combo_dmg.calc_anomaly(), 1),
                 "anomaly_acc": 0.0,
                 "detail": combo_dmg.show_anomaly(),
@@ -28,7 +29,8 @@ def calc(input: model.CalcInput):
     for dmg in combo_dmg.dmgs:
         hit_dmgs.append(
             {
-                "name": dmg.name,
+                "name": dmg.hit._full,
+                "mark": dmg.hit.qualified,
                 "dmg": round(dmg.calc_normal(), 1),
                 "anomaly_acc": dmg.anomaly_acc,
                 "detail": dmg.show_normal(),
@@ -38,12 +40,8 @@ def calc(input: model.CalcInput):
     delta_dmgs = []
     try:
         combo = []
-        class_dict = env.agent(0).__class__.__dict__
-        for hit in input.combo:
-            combo.append(class_dict[hit])
-
         if not combo:
-            combo.append(hits[0])
+            combo.append(hit_marks[0])
 
         analyzer = DeltaAnalyzer(env, combo)
         analyzer_dmg = analyzer.quick()
@@ -59,7 +57,7 @@ def calc(input: model.CalcInput):
             delta_dmgs.append(
                 {
                     "name": dmg.comment,
-                    "ratio": f"{round(delta_value / base_value - 1, 4) * 100}%",
+                    "ratio": delta_value / base_value - 1,
                     "detail": dmg.show_anomaly() if is_anomaly else dmg.show_normal(),
                 }
             )

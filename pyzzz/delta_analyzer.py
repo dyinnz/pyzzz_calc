@@ -6,7 +6,7 @@ from pyzzz.model import *
 
 
 class DeltaAnalyzer:
-    def __init__(self, env: Env, combo: list):
+    def __init__(self, env: Env, combo: list[str]):
         self._env = env
         self._combo = combo
 
@@ -51,11 +51,20 @@ class DeltaAnalyzer:
                     StatValue(-0.48, StatKind.CRIT_MULTI),
                 ]
             )
-        disc5_stat_neg = -agent0.discs.at(5).primary
-        update([disc5_stat_neg, StatValue(0.3, StatKind.ATK_RATIO)])
-        update([disc5_stat_neg, StatValue(0.3, StatKind.DMG_RATIO)])
-        update([disc5_stat_neg, StatValue(0.24, StatKind.PEN_RATIO)])
-        # update([disc5_stat_neg, StatValue(-0.08, StatKind.CRIT_RATIO), StatValue(0.32, StatKind.PEN_RATIO)])
+        disc5_stat = agent0.discs.at(5).primary
+        if disc5_stat != StatValue(0.3, StatKind.ATK_RATIO):
+            update([-disc5_stat, StatValue(0.3, StatKind.ATK_RATIO)])
+        if disc5_stat != StatValue(0.3, StatKind.DMG_RATIO):
+            update([-disc5_stat, StatValue(0.3, StatKind.DMG_RATIO)])
+        if disc5_stat != StatValue(0.3, StatKind.PEN_RATIO):
+            update([-disc5_stat, StatValue(0.24, StatKind.PEN_RATIO)])
+        update(
+            [
+                -disc5_stat,
+                -agent0.discs.suit2_stats[0],
+                StatValue(0.32, StatKind.PEN_RATIO),
+            ]
+        )
 
         if agent0.level < 60:
             env = self._env.clone()

@@ -9,15 +9,12 @@ from pyzzz.model import (
     StatValue,
 )
 
-from pyzzz.hit import Attack
-
 
 class Zhuyuan(AgentWithData):
     def __init__(
         self,
         level=60,
         skill_levels: SkillLevels | None = None,
-        core_skill_atk=None,
         repetition=0,
     ):
         name = "Zhu Yuan"
@@ -31,63 +28,6 @@ class Zhuyuan(AgentWithData):
 
         self._cn_name = "朱鸢"
         self.load_cn_data(self._cn_name)
-
-        self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
-
-        self.a1 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
-        self.a2 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
-        self.a3 = self._skill["普通攻击：请勿抵抗-一段（以太）"]
-
-        self.e1 = self._skill["特殊技：鹿弹射击-"]
-
-        self.ex1 = self._skill["强化特殊技：全弹连射-"]
-
-        self.dash = self._skill["闪避反击：火力震爆-"]
-        self.dogde = self._skill["闪避反击：火力震爆-"]
-        self.chain = self._skill["连携技：歼灭模式-"]
-        self.final = self._skill["终结技：歼灭模式MAX-"]
-
-    def A1(self):
-        value = self.a1["dmg"] + self.a1["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ether, value)
-
-    def A2(self):
-        value = self.a2["dmg"] + self.a2["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ether, value)
-
-    def A3(self):
-        value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)
-        return Attack(AttackKind.Basic, Attribute.Ether, value)
-
-    def E1(self):
-        value = self.e1["dmg"] + self.e1["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.Special, Attribute.Ether, value)
-
-    def EX1(self):
-        value = self.ex1["dmg"] + self.ex1["dmg_grow"] * (self.skill_levels.special - 1)
-        return Attack(AttackKind.SpecialEx, Attribute.Ether, value)
-
-    def Dash(self):
-        value = self.dash["dmg"] + self.dash["dmg_grow"] * (self.skill_levels.dodge - 1)
-        return Attack(AttackKind.Dash, Attribute.Ether, value)
-
-    def Dodge(self):
-        value = self.dogde["dmg"] + self.dogde["dmg_grow"] * (
-            self.skill_levels.dodge - 1
-        )
-        return Attack(AttackKind.Dodge, Attribute.Ether, value)
-
-    def Chain(self):
-        value = self.chain["dmg"] + self.chain["dmg_grow"] * (
-            self.skill_levels.chain - 1
-        )
-        return Attack(AttackKind.Chain, Attribute.Ether, value)
-
-    def Final(self):
-        value = self.final["dmg"] + self.final["dmg_grow"] * (
-            self.skill_levels.chain - 1
-        )
-        return Attack(AttackKind.Final, Attribute.Ether, value)
 
     def core_skill1(self):
         def create():

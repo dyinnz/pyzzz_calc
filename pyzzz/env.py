@@ -8,6 +8,7 @@ from pyzzz.enemy import Enemy
 from pyzzz.buff import Buff
 from pyzzz.model import *
 from pyzzz.multiplier import *
+from pyzzz.hit import *
 
 from typing import Sequence
 
@@ -15,6 +16,7 @@ from typing import Sequence
 class Env:
     def __init__(self):
         self._agents = [Agent(), Agent(), Agent()]
+        self._name2index: dict[str, int] = {}
 
         self._enemy = Enemy()
 
@@ -28,6 +30,7 @@ class Env:
 
     def set_agent(self, i: int, agent: Agent):
         self._agents[i] = agent
+        self._name2index[agent.name] = i
 
     @property
     def captain(self) -> Agent:
@@ -64,18 +67,22 @@ class Env:
     def disable(self, buf: str):
         self._disable_buffs.add(buf)
 
-    def calc_combo(self, combo: Sequence, comment="") -> ComboDMG:
+    def calc_combo(self, combo: Sequence[str], comment="") -> ComboDMG:
         self.reset_static()
 
         result = ComboDMG()
 
-        for hit in combo:
-            dmg = HitDMG(hit(self.agent(0)), self.agent(0), self._enemy)
-            dmg.name = hit.__qualname__
+        for hit_mark in combo:
+            idx = 0
+            if "." in hit_mark:
+                agent, hit_mark = hit_mark.split(".")
+                idx = self._name2index[agent]
+
+            hit = self.agent(idx).gen_hit(hit_mark)()
+            dmg = HitDMG(hit, self.agent(idx), self._enemy)
             dmg.fill_context()
             dmg.fill_data()
-            # TODO: refactor me
-            for b in self._buffs[0].values():
+            for b in self._buffs[idx].values():
                 if b.source not in self._disable_buffs:
                     dmg._active_buffs.append(b)
             for b in self._team_buffs.values():

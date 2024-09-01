@@ -6,3 +6,5 @@ play/
 zzz.gg*
 .DS_store
 dist/
+main.bin
+main.exe

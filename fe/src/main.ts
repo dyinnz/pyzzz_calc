@@ -51,9 +51,33 @@ app.on("activate", () => {
   }
 });
 
-
-const p = app.getAppPath()
-console.log(p)
-
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+
+const runPython = () => {
+  const appPath = app.getAppPath();
+
+  const cp = require("child_process");
+  const util = require("util");
+  const fs = require("fs");
+  // const execFile = util.promisify(cp.execFile);
+
+  const workPath = path.join(__dirname, "..", '..', '..');
+  const makefile = path.join(__dirname, "..", '..', '..', 'Makefile');
+  console.log('makefile path: ', makefile);
+  console.log('resource path: ', process.resourcesPath);
+  if (fs.existsSync(makefile)) {
+    return cp.spawn('make', ['-f', makefile, 'runpy'], {
+      cwd: workPath,
+    });
+  } else {
+    const main = path.join(process.resourcesPath, 'main.exe');
+    return cp.spawn(main);
+  }
+};
+let child = runPython();
+
+app.on("quit", () => {
+  child.kill('SIGINT');
+})

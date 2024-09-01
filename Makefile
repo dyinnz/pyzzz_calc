@@ -1,11 +1,10 @@
 
+runpy:
+	rel-venv/bin/python3 -m pyzzz.server.main --reload pyzzz
+
 flit:
-	# flit install --symlink --python rel-venv/bin/python3
 	flit install --python rel-venv/bin/python3
 
-pyinstaller-init:
-	pyinstaller ./pyzzz/server/main.py
-	# pyinstaller --paths rel-venv/lib/python3.12/site-packages ./pyzzz/server/main.py
-	#
-pyinstaller:
-	pyinstaller ./main.spec
+compile:
+	rel-venv/bin/python3 -m nuitka --follow-imports ./pyzzz/server/main.py
+	mv main.bin main.exe

@@ -28,7 +28,12 @@ class StatKind(StrEnum):
     IMPACT_RATIO = auto()
     ENERGY_REGEN = auto()
 
-    DMG_RATIO = auto()  # TODO: support different DMG
+    DMG_RATIO = auto()
+    DMG_RATIO_PHYSICAL = auto()
+    DMG_RATIO_FIRE = auto()
+    DMG_RATIO_ICE = auto()
+    DMG_RATIO_ELECTRIC = auto()
+    DMG_RATIO_EHTER = auto()
 
     # on enemy
     RES_RATIO = auto()
@@ -85,7 +90,9 @@ class AttackKind(StrEnum):
     Basic = auto()
     Dash = auto()
     Dodge = auto()  # 闪避反击
-    Assit = auto()  # 支援攻击
+    QuickAssit = auto()  # 快速支援
+    DefenseAssit = auto()  # 招架支援
+    Assit = auto()  # 支援突击
     Special = auto()
     SpecialEx = auto()
     Chain = auto()
@@ -211,10 +218,28 @@ class DiscGroup:
 class SkillLevels:
     core: int = 6  # NaN=0, A=1, F=6
     basic: int = 11
-    assit: int = 11
     dodge: int = 11  # dash + dodge
+    assit: int = 11
     special: int = 11
     chain: int = 11  # chain + final
+
+    def get(self, kind: AttackKind) -> int:
+        if kind == AttackKind.Basic:
+            return self.basic
+        elif kind == AttackKind.Dash or kind == AttackKind.Dodge:
+            return self.dodge
+        elif (
+            kind == AttackKind.DefenseAssit
+            or kind == AttackKind.QuickAssit
+            or kind == AttackKind.Assit
+        ):
+            return self.assit
+        elif kind == AttackKind.Special or kind == AttackKind.SpecialEx:
+            return self.special
+        elif kind == AttackKind.Chain or kind == AttackKind.Final:
+            return self.chain
+
+        return 1
 
     def __post_init__(self):
         self.core = min(6, self.core)

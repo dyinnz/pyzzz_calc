@@ -3,6 +3,7 @@ from typing import Sequence
 from pyzzz import dataset
 from pyzzz.model import *
 from pyzzz.agent import Agent
+from pyzzz.hit import Hit, GenerateHit
 
 
 class AgentWithData(Agent):
@@ -24,6 +25,43 @@ class AgentWithData(Agent):
 
     def load_cn_data(self, cn_name):
         self._skill = dataset.load_skills()[cn_name]
+
+    def get_hit_attribute(self, mark: str) -> Attribute:
+        return self.attribute
+
+    def gen_hit(self, mark: str) -> GenerateHit:
+        if mark not in self._skill:
+            raise Exception(f"not supported skill mark {mark}")
+
+        skill = self._skill[mark]
+        kind = skill["kind"]
+        full = skill["full_name"]
+        base = skill["dmg"]
+        grow = skill["dmg_grow"]
+        anomaly = skill["anomaly"]
+        if anomaly == 0:
+            attr = Attribute.Physical
+        else:
+            attr = self.get_hit_attribute(mark)
+
+        def hit() -> Hit:
+            value = base + grow * (self.skill_levels.get(kind) - 1)
+            return Hit(
+                kind, attr, value, anomaly, agent=self.name, mark=mark, full=full
+            )
+
+        return hit
+
+    def hit_marks(self) -> Sequence[str]:
+        result = []
+        for mark, skill in self._skill.items():
+            if (
+                skill["kind"] != AttackKind.Assit
+                and skill["kind"] != AttackKind.QuickAssit
+                and skill["kind"] != AttackKind.DefenseAssit
+            ):
+                result.append(mark)
+        return result
 
     def _load_zzz_gg_data(self, name: str):
         db = dataset.load_zzz_gg_agents()

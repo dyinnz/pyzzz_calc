@@ -2,7 +2,7 @@ from pyzzz import agents
 from pyzzz.model import *
 
 
-if __name__ == "__main__":
+def all():
     agent = agents.AgentWithData(
         "Ellen", level=50, skill_levels=SkillLevels(4, 9, 9, 9, 9, 9)
     )
@@ -37,3 +37,15 @@ if __name__ == "__main__":
 
     agent = agents.Jane()
     print(agent)
+
+
+def new():
+    agent = agents.Ellen()
+    print(agent)
+    # for hit in agent.hit_marks():
+    #     print(hit())
+
+
+if __name__ == "__main__":
+    all()
+    new()
