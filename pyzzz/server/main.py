@@ -1,47 +1,15 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+import sys
+import os
 
-import agents
-from pyzzz import agents
-from pyzzz import weapons
-from pyzzz import model
-from pyzzz.server.calc_impl import calc
+cwd = os.getcwd()
+sys.path.append(cwd)
+print(f"cwd {cwd}")
 
+reload = False
+if len(sys.argv) >= 2 and sys.argv[1] == "reload":
+    reload = True
 
-app = FastAPI()
+import uvicorn
+from pyzzz.server.app import app
 
-
-origins = ["*"]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.get("/")
-def read_root():
-    return "hello world"
-
-
-@app.get("/list_agents")
-def list_agents():
-    return agents.list_agents()
-
-
-@app.get("/list_weapons")
-def list_weapons():
-    return weapons.list_weapons()
-
-
-@app.put("/calc")
-def read_calc(data: model.CalcInput):
-    return calc(data)
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run("pyzzz.server.main:app", port=5000, log_level="debug", reload=True)
+uvicorn.run(app, port=5000, log_level="debug", reload=reload)
