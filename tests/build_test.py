@@ -387,15 +387,18 @@ def full_jane():
     f.agent_name = "Jane"
     f.agent_level = 60
     f.skill_levels = SkillLevels(6, 11, 11, 11, 11, 11)
-    # f.weapon_name = "RainforestGourmet"
+    f.weapon_name = "RainforestGourmet"
+    f.weapon_level = 60
+    f.weapon_rep = 5
+    # f.weapon_name = "WeepingGemini"
     # f.weapon_level = 60
     # f.weapon_rep = 5
     f.weapon_name = "Electro-LipGloss"
     f.weapon_level = 60
+    f.weapon_rep = 5
+    f.weapon_name = "FusionCompiler"
+    f.weapon_level = 60
     f.weapon_rep = 1
-    # f.weapon_name = "FusionCompiler"
-    # f.weapon_level = 60
-    # f.weapon_rep = 1
     # f.weapon_name = "SharpenedStinger"
     # f.weapon_level = 60
     # f.weapon_rep = 1
@@ -407,7 +410,10 @@ def full_jane():
             StatValue(0, StatKind.HP_FLAT),
             [
                 StatValue(90, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(90, StatKind.ANOMALY_PROFICIENCY),
                 StatValue(0.3, StatKind.ATK_RATIO),
+                # StatValue(0.3848, StatKind.PEN_RATIO),
+                # StatValue(600, StatKind.ATK_FLAT),
             ],
         )
     )

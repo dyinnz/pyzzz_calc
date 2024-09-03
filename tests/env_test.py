@@ -9,7 +9,7 @@ from tests import build_test
 def test_ellen():
     combo = [
         M.EX1,
-        M.A3,
+        M.AX3,
     ]
     env = Env.from_full(build_test.full_ellen())
     # env.disable('Swing_Jazz suit4 DMG +15%')
@@ -19,9 +19,9 @@ def test_ellen():
 
     print(env)
 
-    # result = env.calc_combo(combo)
-    # s = result.show_normal()
-    # print(s)
+    result = env.calc_combo(combo)
+    s = result.show_normal()
+    print(s)
 
     delta = DeltaAnalyzer(env, combo)
     result = delta.quick()
@@ -69,9 +69,13 @@ def test_jane():
     env = Env.from_full(build_test.full_jane())
     print(env)
 
-    hits = env.calc_combo(combo)
+    env2 = Env.from_full(build_test.full_soukaku())
+    env.set_agent(1, env2.agent(0))
+    env.agent(1).core_skill_atk = 0
 
-    print(env.agent(0).__class__.__dict__)
+    result = env.calc_combo(combo)
+    print(result.show_normal())
+    print(result.show_anomaly())
 
     # delta = DeltaAnalyzer(env, combo)
     # result = delta.quick()
@@ -84,6 +88,6 @@ def test_jane():
 
 if __name__ == "__main__":
     test_ellen()
-    test_lycaon()
+    # test_lycaon()
     test_jane()
-    test_soukaku()
+    # test_soukaku()

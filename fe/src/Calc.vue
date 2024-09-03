@@ -16,6 +16,8 @@ const build2 = ref<AgentBuild>(new AgentBuild);
 const build3 = ref<AgentBuild>(new AgentBuild);
 const enemy = ref<EnemyModel>(new EnemyModel);
 
+const buildList = ref<Array<String>>([]);
+
 const hits = ref([]);
 const deltas = ref([])
 
@@ -105,13 +107,16 @@ const printNumber = (row: any, column: any, value: number, index: number) => {
   <div>
     <el-tabs>
       <el-tab-pane :label="build1.agent_name ? build1.agent_name : '队长'">
-        <Build v-model="build1" :agent-list="agentList" :weapon-list="weaponList"></Build>
+        <Build v-model:build="build1" v-model:build-list="buildList" :agent-list="agentList" :weapon-list="weaponList">
+        </Build>
       </el-tab-pane>
       <el-tab-pane :label="build2.agent_name ? build2.agent_name : '队员'">
-        <Build v-model="build2" :agent-list="agentList" :weapon-list="weaponList"></Build>
+        <Build v-model:build="build2" v-model:build-list="buildList" :agent-list="agentList" :weapon-list="weaponList">
+        </Build>
       </el-tab-pane>
       <el-tab-pane :label="build3.agent_name ? build3.agent_name : '队员'">
-        <Build v-model="build3" :agent-list="agentList" :weapon-list="weaponList"></Build>
+        <Build v-model:build="build3" v-model:build-list="buildList" :agent-list="agentList" :weapon-list="weaponList">
+        </Build>
       </el-tab-pane>
       <el-tab-pane label="敌人">
         <EnemyInput v-model="enemy" />
@@ -136,7 +141,7 @@ const printNumber = (row: any, column: any, value: number, index: number) => {
     <el-tabs>
       <el-tab-pane label="Hit DMG">
         <el-table :data="hits" style="width: 100%">
-          <el-table-column prop="name" label="Hit" width="160px" />
+          <el-table-column prop="name" label="Hit" width="160px" show-overflow-tooltip />
           <el-table-column prop="mark" label="Mark" width="120px" />
           <el-table-column prop="dmg" label="DMG" width="100px" />
           <el-table-column prop="anomaly_acc" label="Anomaly ACC" width="120px" />

@@ -1,5 +1,6 @@
+import typing as t
+import copy
 import abc
-import math
 from dataclasses import dataclass, field
 from enum import StrEnum, auto
 from pydantic import BaseModel
@@ -11,22 +12,24 @@ class StatKind(StrEnum):
     ATK_BASE = auto()
     ATK_RATIO = auto()
     ATK_FLAT = auto()
-    CRIT_RATIO = auto()
-    CRIT_MULTI = auto()
     HP_BASE = auto()
     HP_RATIO = auto()
     HP_FLAT = auto()
     DEF_BASE = auto()
     DEF_RATIO = auto()
     DEF_FLAT = auto()
-    PEN_RATIO = auto()
-    PEN_FLAT = auto()
-
-    ANOMALY_MASTER = auto()
-    ANOMALY_PROFICIENCY = auto()
     IMPACT = auto()
     IMPACT_RATIO = auto()
     ENERGY_REGEN = auto()
+    ENERGY_REGEN_RATIO = auto()
+
+    CRIT_RATIO = auto()
+    CRIT_MULTI = auto()
+    PEN_RATIO = auto()
+    PEN_FLAT = auto()
+    ANOMALY_MASTER = auto()
+    ANOMALY_PROFICIENCY = auto()
+    ACC_RATIO = auto()
 
     DMG_RATIO = auto()
     DMG_RATIO_PHYSICAL = auto()
@@ -300,140 +303,150 @@ class Camp(StrEnum):
 
 
 @dataclass
-class AgentData:
-    # NOTE: static data, buff not included here
-    atk_base: float = 0.0
-    atk_weapon: float = 0.0
-    atk_flat: float = 0.0
-    atk_ratio: float = 0.0
-    crit_ratio: float = 0.05
-    crit_multi: float = 0.50
-
-    # not important
-    hp_base: float = field(default=0.0, repr=False)
-    hp_flat: float = field(default=0.0, repr=False)
-    hp_ratio: float = field(default=0.0, repr=False)
-
-    def_base: float = field(default=0.0, repr=False)
-    def_flat: float = field(default=0.0, repr=False)
-    def_ratio: float = field(default=0.0, repr=False)
-
+class AgentRatioStats:
+    # TYPE-1 :  (init + base) * (1 + ratio) + flat
+    atk: float = 0.0
+    hp: float = 0.0
+    defense: float = 0.0
     impact: float = 0.0
-    impact_ratio: float = field(default=0.0, repr=False)
+    energy_regen: float = 0.0
+
+
+@dataclass
+class AgentBaseStats:
+    # base = init + init * grow
+    #           <          static         >   <    dynamic     >
+    # TYPE-1 :  (base * (1 + ratio) + flat) * (1 + ratio) + flat
+    atk: float = 0.0
+    hp: float = 0.0
+    defense: float = 0.0
+    impact: float = 0.0
+    energy_regen: float = 0.0
+
+    # TYPE-2 :  base + delta
+    crit_ratio: float = 0.0
+    crit_multi: float = 0.0
+
     anomaly_master: float = 0.0
     anomaly_proficiency: float = 0.0
-    energy_regen: float = field(default=0.0, repr=False)
-
+    acc_ratio: float = 0.0
     pen_ratio: float = 0.0
     pen_flat: float = 0.0
-    dmg_ratio: float = 0.0
 
-    def static_atk(self):
-        return math.floor(
-            (self.atk_base + self.atk_weapon) * (1.0 + self.atk_ratio) + self.atk_flat
-        )
+    dmg_ratio: float = 0.0
+    dmg_ratio_physical: float = 0.0
+    dmg_ratio_fire: float = 0.0
+    dmg_ratio_electric: float = 0.0
+    dmg_ratio_ice: float = 0.0
+    dmg_ratio_ether: float = 0.0
+
+    def calc_dmg_ratio(self, kind: Attribute) -> float:
+        result = self.dmg_ratio
+        if kind == Attribute.Physical:
+            result += self.dmg_ratio_physical
+        elif kind == Attribute.Fire:
+            result += self.dmg_ratio_fire
+        elif kind == Attribute.Electric:
+            result += self.dmg_ratio_electric
+        elif kind == Attribute.Ice:
+            result += self.dmg_ratio_ice
+        elif kind == Attribute.Ether:
+            result += self.dmg_ratio_ether
+        return result
+
+    def apply_ratio_delta(self, ratio: AgentRatioStats, delta: t.Self):
+        for attr, value in ratio.__dict__.items():
+            self.__dict__[attr] *= 1 + value
+
+        for attr, value in delta.__dict__.items():
+            self.__dict__[attr] += value
+
+    def apply_base_stat(self, stat: StatValue) -> bool:
+        if stat.kind == StatKind.ATK_BASE:
+            self.atk += stat.value
+        elif stat.kind == StatKind.HP_BASE:
+            self.hp += stat.value
+        elif stat.kind == StatKind.DEF_BASE:
+            self.defense += stat.value
+        elif stat.kind == StatKind.IMPACT:
+            self.impact += stat.value
+        elif stat.kind == StatKind.ENERGY_REGEN:
+            self.energy_regen += stat.value
+        else:
+            return False
+        return True
+
+
+AgentFlatStats = AgentBaseStats
+
+
+@dataclass
+class AgentBaseWithGrowth:
+    zero: AgentBaseStats = field(default_factory=AgentBaseStats)
+    atk_growth: float = 0.0
+    hp_growth: float = 0.0
+    defense_growth: float = 0.0
+
+
+@dataclass
+class AgentStats:
+    base: AgentBaseStats = field(default_factory=AgentBaseStats)
+    ratio: AgentRatioStats = field(default_factory=AgentRatioStats)
+    flat: AgentFlatStats = field(default_factory=AgentFlatStats)
+
+    def calc_final(self, weapon_atk=0.0):
+        result = AgentStats()
+        result.base = copy.deepcopy(self.base)
+        result.base.atk += weapon_atk
+        result.base.apply_ratio_delta(self.ratio, self.flat)
+        return result
 
     def apply_stat(self, stat: StatValue):
         if stat.kind == StatKind.EMPTY:
             pass
         elif stat.kind == StatKind.ATK_BASE:
-            self.atk_base += stat.value
+            self.base.atk += stat.value
         elif stat.kind == StatKind.ATK_RATIO:
-            self.atk_ratio += stat.value
+            self.ratio.atk += stat.value
         elif stat.kind == StatKind.ATK_FLAT:
-            self.atk_flat += stat.value
+            self.flat.atk += stat.value
         elif stat.kind == StatKind.HP_BASE:
-            self.hp_base += stat.value
+            self.base.hp += stat.value
         elif stat.kind == StatKind.HP_RATIO:
-            self.hp_ratio += stat.value
+            self.ratio.hp += stat.value
         elif stat.kind == StatKind.HP_FLAT:
-            self.hp_flat += stat.value
+            self.ratio.hp += stat.value
         elif stat.kind == StatKind.DEF_BASE:
-            self.def_base += stat.value
+            self.base.defense += stat.value
         elif stat.kind == StatKind.DEF_RATIO:
-            self.def_ratio += stat.value
+            self.ratio.defense += stat.value
         elif stat.kind == StatKind.DEF_FLAT:
-            self.def_flat += stat.value
+            self.flat.defense += stat.value
+        elif stat.kind == StatKind.IMPACT:
+            self.base.impact += stat.value
+        elif stat.kind == StatKind.IMPACT_RATIO:
+            self.ratio.impact += stat.value
+        elif stat.kind == StatKind.ENERGY_REGEN:
+            self.base.energy_regen += stat.value
+        elif stat.kind == StatKind.ENERGY_REGEN_RATIO:
+            self.ratio.energy_regen += stat.value
 
         elif stat.kind == StatKind.CRIT_RATIO:
-            self.crit_ratio += stat.value
+            self.flat.crit_ratio += stat.value
         elif stat.kind == StatKind.CRIT_MULTI:
-            self.crit_multi += stat.value
+            self.flat.crit_multi += stat.value
         elif stat.kind == StatKind.PEN_RATIO:
-            self.pen_ratio += stat.value
+            self.flat.pen_ratio += stat.value
         elif stat.kind == StatKind.PEN_FLAT:
-            self.pen_flat += stat.value
-        elif stat.kind == StatKind.DMG_RATIO:
-            self.dmg_ratio += stat.value
-
-        elif stat.kind == StatKind.IMPACT:
-            self.impact += stat.value
-        elif stat.kind == StatKind.IMPACT_RATIO:
-            self.impact_ratio += stat.value
-        elif stat.kind == StatKind.ENERGY_REGEN:
-            self.energy_regen += stat.value
+            self.flat.pen_flat += stat.value
         elif stat.kind == StatKind.ANOMALY_MASTER:
-            self.anomaly_master += stat.value
+            self.flat.anomaly_master += stat.value
         elif stat.kind == StatKind.ANOMALY_PROFICIENCY:
-            self.anomaly_proficiency += stat.value
-        else:
-            raise Exception(f"not supported stat kind {stat.kind} for agent data")
-
-    def __sub__(self, rhs):
-        return AgentData(
-            self.atk_base - rhs.atk_base,
-            self.atk_weapon - rhs.atk_weapon,
-            self.atk_flat - rhs.atk_flat,
-            self.atk_ratio - rhs.atk_ratio,
-            self.crit_ratio - rhs.crit_ratio,
-            self.crit_multi - rhs.crit_multi,
-            self.hp_base - rhs.hp_base,
-            self.hp_ratio - rhs.hp_ratio,
-            self.hp_flat - rhs.hp_flat,
-            self.def_base - rhs.def_base,
-            self.def_ratio - rhs.def_ratio,
-            self.def_flat - rhs.def_flat,
-            self.impact - rhs.impact,
-            self.impact_ratio - rhs.impact_ratio,
-            self.anomaly_proficiency - rhs.anomaiy_proficiency,
-            self.anomaly_master - rhs.attribte_master,
-            self.energy_regen - rhs.energy_regen,
-            self.pen_ratio - rhs.pen_ratio,
-            self.pen_flat - rhs.pen_flat,
-            self.dmg_ratio - rhs.dmg_ratio,
-        )
-
-    def __add__(self, rhs):
-        return AgentData(
-            self.atk_base + rhs.atk_base,
-            self.atk_weapon + rhs.atk_weapon,
-            self.atk_flat + rhs.atk_flat,
-            self.atk_ratio + rhs.atk_ratio,
-            self.crit_ratio + rhs.crit_ratio,
-            self.crit_multi + rhs.crit_multi,
-            self.hp_base + rhs.hp_base,
-            self.hp_ratio + rhs.hp_ratio,
-            self.hp_flat + rhs.hp_flat,
-            self.def_base + rhs.def_base,
-            self.def_ratio + rhs.def_ratio,
-            self.def_flat + rhs.def_flat,
-            self.impact + rhs.impact,
-            self.impact_ratio + rhs.impact_ratio,
-            self.anomaly_proficiency + rhs.anomaiy_proficiency,
-            self.anomaly_master + rhs.attribte_master,
-            self.energy_regen + rhs.energy_regen,
-            self.pen_ratio + rhs.pen_ratio,
-            self.pen_flat + rhs.pen_flat,
-            self.dmg_ratio + rhs.dmg_ratio,
-        )
-
-
-@dataclass
-class AgentDataWithGrowth:
-    init: AgentData = field(default_factory=AgentData)
-    atk_growth: float = 0.0
-    hp_growth: float = 0.0
-    defense_growth: float = 0.0
+            self.flat.anomaly_proficiency += stat.value
+        elif stat.kind == StatKind.ACC_RATIO:
+            self.flat.acc_ratio += stat.value
+        elif stat.kind.startswith(StatKind.DMG_RATIO):
+            self.flat.__dict__[stat.kind] += stat.value
 
 
 @dataclass

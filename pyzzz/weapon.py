@@ -1,3 +1,4 @@
+import math
 from typing import Sequence
 
 from pyzzz.buff import Buff
@@ -72,7 +73,7 @@ class Weapon:
             self._level % 10 == 0 and self._is_ascension
         )
         asc = self._ascensions[rank]
-        self._atk_base = round(
+        self._atk_base = math.floor(
             self._init_atk_base
             * (1 + asc.atk_rate + self._growths[self._level].atk_rate)
         )

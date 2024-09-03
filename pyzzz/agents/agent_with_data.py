@@ -34,20 +34,23 @@ class AgentWithData(Agent):
             raise Exception(f"not supported skill mark {mark}")
 
         skill = self._skill[mark]
-        kind = skill["kind"]
-        full = skill["full_name"]
-        base = skill["dmg"]
-        grow = skill["dmg_grow"]
-        anomaly = skill["anomaly"]
-        if anomaly == 0:
+        if skill.anomaly == 0:
             attr = Attribute.Physical
         else:
             attr = self.get_hit_attribute(mark)
 
         def hit() -> Hit:
-            value = base + grow * (self.skill_levels.get(kind) - 1)
+            value = skill.dmg_base + skill.dmg_grow * (
+                self.skill_levels.get(skill.kind) - 1
+            )
             return Hit(
-                kind, attr, value, anomaly, agent=self.name, mark=mark, full=full
+                skill.kind,
+                attr,
+                value,
+                anomaly=skill.anomaly,
+                agent=self.name,
+                mark=mark,
+                full=skill.cn_hit_name,
             )
 
         return hit
@@ -56,9 +59,9 @@ class AgentWithData(Agent):
         result = []
         for mark, skill in self._skill.items():
             if (
-                skill["kind"] != AttackKind.Assit
-                and skill["kind"] != AttackKind.QuickAssit
-                and skill["kind"] != AttackKind.DefenseAssit
+                skill.kind != AttackKind.Assit
+                and skill.kind != AttackKind.QuickAssit
+                and skill.kind != AttackKind.DefenseAssit
             ):
                 result.append(mark)
         return result
@@ -70,16 +73,16 @@ class AgentWithData(Agent):
         self._profession = Profession(agent["ProfessionName"].lower())
         self._attribute = Attribute(agent["ElementTypeName"].lower())
 
-        self._growth.init.hp_base = agent["HpMax"]
+        self._growth.zero.hp = agent["HpMax"]
         self._growth.hp_growth = agent["HPGrowth"] / 1e4
-        self._growth.init.atk_base = agent["Atk"]
+        self._growth.zero.atk = agent["Atk"]
         self._growth.atk_growth = agent["AttackGrowth"] / 1e4
-        self._growth.init.def_base = agent["Def"]
+        self._growth.zero.defense = agent["Def"]
         self._growth.defense_growth = agent["DefenceGrowth"] / 1e4
-        self._growth.init.impact = agent["BreakStun"]
-        self._growth.init.anomaly_master = agent["ElementMystery"]
-        self._growth.init.energy_regen = agent["SpRecover"]
-        self._growth.init.anomaly_proficiency = agent["ElementAbnormalPower"]
+        self._growth.zero.impact = agent["BreakStun"]
+        self._growth.zero.anomaly_master = agent["ElementMystery"]
+        self._growth.zero.energy_regen = agent["SpRecover"]
+        self._growth.zero.anomaly_proficiency = agent["ElementAbnormalPower"]
 
         ascension = db["ascensions"][name]
         for _, asc in ascension.items():

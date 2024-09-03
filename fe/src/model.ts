@@ -62,6 +62,8 @@ export class Discs {
 }
 
 export class AgentBuild {
+  name: string = "";
+
   agent_name: string = "";
   agent_rep: number = 0;
   agent_level: number = 60;

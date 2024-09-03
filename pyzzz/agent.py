@@ -32,18 +32,22 @@ class Agent:
         self._camp = ""
         self._profession = Profession.All
         self._attribute = Attribute.All
-        self._growth = AgentDataWithGrowth()
+        self._growth = AgentBaseWithGrowth()
         self._ascensions: list[list[StatValue]] = []
         self._passives: list[list[StatValue]] = []
         self._skill = {}
 
         # final stats board
-        self._basic = AgentData()  # init + growth
+        self._basic = AgentStats()  # basic = init + growth
+        self._static = AgentStats()  # static = (basic + base) * (1 + ratio) + flat
+        self._dynamic = AgentStats()  # dynamic = static * (1 + ratio) + flat
+
+        self._initial = AgentBaseStats()
+        self._final = AgentBaseStats()
+
         self._weapon = Weapon()
         self._discs = DiscGroup()
         self._extras = list[StatValue]()
-
-        self._static = AgentData()  # data + weapon + discs + extra
 
     @property
     def name(self):
@@ -82,10 +86,6 @@ class Agent:
         return self._attribute
 
     @property
-    def without_weapon(self):
-        return self._basic
-
-    @property
     def weapon(self):
         return self._weapon
 
@@ -97,11 +97,22 @@ class Agent:
     def static(self):
         return self._static
 
+    @property
+    def dynamic(self):
+        return self._dynamic
+
+    @property
+    def initial(self):
+        return self._initial
+
+    @property
+    def final(self):
+        return self._final
+
     def _calc_static(self):
-        # basic
-        self._static = copy.deepcopy(self._basic)
+        self._static = self._basic.calc_final()
+
         # weapon
-        self._static.atk_weapon = self._weapon.atk_base
         self._static.apply_stat(self._weapon.advanced_stat)
         # discs
         for s in self._discs.suit2_stats:
@@ -114,11 +125,20 @@ class Agent:
         for s in self._extras:
             self._static.apply_stat(s)
 
+        # merge static stats to dynamic
+        self._dynamic = self._static.calc_final(self._weapon.atk_base)
+        self._initial = self._dynamic.base
+
     def _fill_data(self):
-        self._basic = copy.deepcopy(self._growth.init)
-        self._basic.hp_base += round(self._growth.hp_growth * (self.level - 1))
-        self._basic.def_base += round(self._growth.defense_growth * (self.level - 1))
-        self._basic.atk_base += round(self._growth.atk_growth * (self.level - 1))
+        self._basic = AgentStats()
+        self._basic.base = copy.deepcopy(self._growth.zero)
+        self._basic.base.hp += round(self._growth.hp_growth * (self.level - 1))
+        self._basic.base.defense += round(
+            self._growth.defense_growth * (self.level - 1)
+        )
+        self._basic.base.atk += round(self._growth.atk_growth * (self.level - 1))
+        self._basic.base.crit_ratio = 0.05
+        self._basic.base.crit_multi = 0.50
 
         if not self._ascensions:
             raise Exception("expected ascension data")
@@ -161,7 +181,6 @@ class Agent:
         discs: DiscGroup | None = None,
         extras: list[StatValue] | None = None,
     ):
-        weapon_atk_changed = weapon and weapon.atk_base != self._weapon.atk_base
         if weapon:
             self._weapon = weapon
         if discs:
@@ -169,10 +188,12 @@ class Agent:
         if extras:
             self._extras = extras
 
-        if weapon_atk_changed:
-            self._fill_data()
-        else:
-            self._calc_static()
+        self._calc_static()
+
+    def apply_dynamic(self, stats: list[StatValue]):
+        for stat in stats:
+            self._dynamic.apply_stat(stat)
+        self._final = self._dynamic.calc_final().base
 
     @abc.abstractmethod
     def gen_hit(self, mark: str) -> GenerateHit:
@@ -198,4 +219,4 @@ class Agent:
         return f"{self}\n{self._growth}\n{self._ascensions}\n{self._passives}\n"
 
     def __str__(self):
-        return f"{self._name} - {self._camp}/{self._profession}/{self._attribute}\n{self._static}\n{self._weapon}\n{self._discs}\n"
+        return f"{self._name} - {self._camp}/{self._profession}/{self._attribute}\n{self._basic}\n{self._static}\n{self._weapon}\n{self._discs}\n"

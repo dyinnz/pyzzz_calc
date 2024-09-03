@@ -56,28 +56,29 @@ class HitDMG:
         self._context.daze = self._enemy.daze
 
     def fill_data(self):
-        self.dmg_ratio.add(self._agent.static.dmg_ratio)
+        self.dmg_ratio.add(self._agent.initial.calc_dmg_ratio(self._hit.attribute))
         self.defense.set_agent(self._agent.level)
         self.defense.set_enemy(self._enemy.level, self._enemy.defense_base)
-        self.defense.pen_ratio.add(self._agent.static.pen_ratio)
-        self.defense.pen_flat.add(self._agent.static.pen_flat)
+        self.defense.pen_ratio.add(self._agent.initial.pen_ratio)
+        self.defense.pen_flat.add(self._agent.initial.pen_flat)
         if self._enemy.daze:
             self.daze.add(0.5)
 
-        self.critical.ratio.add(self._agent.static.crit_ratio)
-        self.critical.multi.add(self._agent.static.crit_multi)
+        self.critical.ratio.add(self._agent.initial.crit_ratio)
+        self.critical.multi.add(self._agent.initial.crit_multi)
         self.skill.add(self._hit.multi)
-        self.atk.agent = Number(self._agent.static.atk_base)
-        self.atk.weapon = Number(self._agent.static.atk_weapon)
-        self.atk.static_ratio.add(self._agent.static.atk_ratio)
-        self.atk.static_flat.add(self._agent.static.atk_flat)
+        # XXX: shall we use initial atk ?
+        self.atk.agent = Number(self._agent.static.base.atk)
+        self.atk.weapon = Number(self._agent.weapon.atk_base)
+        self.atk.static_ratio.add(self._agent.static.ratio.atk)
+        self.atk.static_flat.add(self._agent.static.flat.atk)
 
         self.aa.attribute = self._hit.attribute
-        self.ap.add(self._agent.static.anomaly_proficiency)
+        self.ap.add(self._agent.initial.anomaly_proficiency)
         self.anomaly_level.level = self._agent.level
         self.anomaly_acc = self._hit.anomaly
 
-    def apply_stat(self, stat: StatValue):
+    def _apply_stat(self, stat: StatValue):
         number = Number(stat.value)
         if stat.kind == StatKind.ATK_RATIO:
             self.atk.dynamic_ratio.add(number)
@@ -105,9 +106,12 @@ class HitDMG:
             self.skill.add(number)
 
     def apply_buff(self):
+        stats = []
         for buf in self._active_buffs:
-            stat = buf.produce(self._context)  # TODO:
-            self.apply_stat(stat)
+            stat = buf.produce(self._context)
+            self._apply_stat(stat)
+            stats.append(stat)
+        self._agent.apply_dynamic(stats)
 
     def calc_common(self):
         if self.common_result == 0.0:

@@ -51,7 +51,7 @@ class Soukaku(AgentWithData):
             value = (
                 self.core_skill_atk
                 if self.core_skill_atk is not None
-                else self.static.static_atk() * m
+                else self.initial.atk * m
             )
             value = min(1000, value)
             return StatValue(value, StatKind.ATK_FLAT)

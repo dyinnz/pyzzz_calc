@@ -152,6 +152,24 @@ class DeepSeaVisitor(WeaponWithData):
         ]
 
 
+class WeepingGemini(WeaponWithData):
+    NAME = "WeepingGemini"
+
+    def __init__(self, level=60, is_ascension=False, repetition=1):
+        super().__init__(WeepingGemini.NAME, level, is_ascension, repetition)
+
+    def buffs(self):
+        return [
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 30, 34, 38, 42, 48][self._repetition] * 2,
+                    StatKind.ANOMALY_PROFICIENCY,
+                ),
+                source=f"{self._name} ap",
+            )
+        ]
+
+
 class RainforestGourmet(WeaponWithData):
     NAME = "RainforestGourmet"
 
@@ -187,7 +205,7 @@ class FusionCompiler(WeaponWithData):
             ),
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 25, 31, 37, 43, 50][self._repetition],
+                    [0, 25, 31, 37, 43, 50][self._repetition] * 1,
                     StatKind.ANOMALY_PROFICIENCY,
                 ),
                 source=f"{self._name} ap buff",
@@ -293,6 +311,7 @@ def get_weapons_mapping():
         "DeepSeaVisitor": DeepSeaVisitor,
         "PreciousFossilizedCore": PreciousFossilizedCore,
         "RainforestGourmet": RainforestGourmet,
+        "WeepingGemini": WeepingGemini,
         "FusionCompiler": FusionCompiler,
         "SharpenedStinger": SharpenedStinger,
         "Electro-LipGloss": ElectroLipGloss,

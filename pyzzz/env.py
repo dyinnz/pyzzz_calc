@@ -101,7 +101,7 @@ class Env:
     def __str__(self):
         self.reset_static()
         s = ""
-        for agent in self._agents:
+        for agent in self._agents[::-1]:
             if agent.name:
                 s += f"{agent}\n"
         s += "Buffs:\n"
