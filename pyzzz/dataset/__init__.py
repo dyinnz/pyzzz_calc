@@ -9,6 +9,7 @@ file_path = os.path.realpath(__file__)
 directory = os.path.dirname(file_path)
 
 from pyzzz.dataset.load_skills import load_skills
+from pyzzz.dataset.mappings import AGENTS_CN2EN, AGENTS_EN2CN
 
 
 @lru_cache
@@ -141,7 +142,7 @@ ZZZ_GG_STAT_PASSIVE = {
     "Impact": StatKind.IMPACT,
     "CRIT Rate": StatKind.CRIT_RATIO,
     "CRIT DMG": StatKind.CRIT_MULTI,
-    "Energy Regen": StatKind.ENERGY_REGEN,
+    "Energy Regen": StatKind.ENERGY_REGEN_RATIO,
     "Anomaly Mastery": StatKind.ANOMALY_MASTER,
     "Anomaly Proficiency": StatKind.ANOMALY_PROFICIENCY,
     "PEN Ratio": StatKind.PEN_RATIO,

@@ -97,7 +97,7 @@ def encode_skill_mark(skills: list[SkillData]) -> dict[str, SkillData]:
         AttackKind.SpecialEx: "EX",
         AttackKind.Chain: "Chain",
         AttackKind.Final: "Final",
-        AttackKind.All: "Unknown",
+        AttackKind.All: "NIL",
     }
 
     @dataclass

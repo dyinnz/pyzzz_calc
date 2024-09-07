@@ -20,7 +20,8 @@ class Env:
 
         self._enemy = Enemy()
 
-        self._buffs: list[dict[str, Buff]] = [{}, {}, {}]
+        self._prepared = False
+        self._agent_buffs: list[dict[str, Buff]] = [{}, {}, {}]
         self._team_buffs: dict[str, Buff] = {}
 
         self._disable_buffs: set[str] = set()
@@ -30,7 +31,9 @@ class Env:
 
     def set_agent(self, i: int, agent: Agent):
         self._agents[i] = agent
-        self._name2index[agent.name] = i
+        self._name2index.clear()
+        for a in self._agents:
+            self._name2index[a.name] = i
 
     @property
     def captain(self) -> Agent:
@@ -52,23 +55,36 @@ class Env:
 
     def reset_static(self):
         # Reset all states to static which dynamic buff shall be reset
-        self._buffs = [{}, {}, {}]
+        self._agent_buffs = [{}, {}, {}]
         self._team_buffs.clear()
         for i, agent in enumerate(self.agents):
             for b in agent.all_buffs():
-                if b.for_team:
-                    self._team_buffs[b.source] = b
+                if b._for_team:
+                    self._team_buffs[b.key] = b
                 else:
-                    self._buffs[i][b.source] = b
+                    self._agent_buffs[i][b.key] = b
 
     def debug_str(self):
         pass
 
-    def disable(self, buf: str):
-        self._disable_buffs.add(buf)
+    def get_buff(self, key: str) -> Buff | None:
+        if key in self._team_buffs:
+            return self._team_buffs[key]
+        for buffs in self._agent_buffs:
+            if key in buffs:
+                return buffs[key]
+        return None
+
+    def disable_buf(self, key: str):
+        self._disable_buffs.add(key)
+
+    def prepare(self):
+        if not self._prepared:
+            self.reset_static()
+            self._prepared = True
 
     def calc_combo(self, combo: Sequence[str], comment="") -> ComboDMG:
-        self.reset_static()
+        self.prepare()
 
         result = ComboDMG()
 
@@ -82,11 +98,11 @@ class Env:
             dmg = HitDMG(hit, self.agent(idx), self._enemy)
             dmg.fill_context()
             dmg.fill_data()
-            for b in self._buffs[idx].values():
-                if b.source not in self._disable_buffs:
+            for b in self._agent_buffs[idx].values():
+                if b.key not in self._disable_buffs:
                     dmg._active_buffs.append(b)
             for b in self._team_buffs.values():
-                if b.source not in self._disable_buffs:
+                if b.key not in self._disable_buffs:
                     dmg._active_buffs.append(b)
             dmg.apply_buff()
             result.dmgs.append(dmg)
@@ -99,17 +115,17 @@ class Env:
         return result
 
     def __str__(self):
-        self.reset_static()
+        self.prepare()
         s = ""
         for agent in self._agents[::-1]:
             if agent.name:
                 s += f"{agent}\n"
         s += "Buffs:\n"
         for buff in self._team_buffs.values():
-            s += f"\tteam - {buff}\n"
-        for i, agent_buffs in enumerate(self._buffs):
+            s += f"\tTeam    - {buff}\n"
+        for i, agent_buffs in enumerate(self._agent_buffs):
             for buff in agent_buffs.values():
-                s += f"\tagent#{i+1} - {buff}\n"
+                s += f"\tAgent#{i+1} - {buff}\n"
         return s
 
     @staticmethod

@@ -26,9 +26,6 @@ class Zhuyuan(AgentWithData):
             repetition=repetition,
         )
 
-        self._cn_name = "朱鸢"
-        self.load_cn_data(self._cn_name)
-
     def core_skill1(self):
         def create():
             m = [0.20, 0.233, 0.266, 0.30, 0.333, 0.366, 0.40]
@@ -37,7 +34,8 @@ class Zhuyuan(AgentWithData):
         return DynamicBuff(
             create,
             condition=HitContext(atk_kind=AttackKind.Basic),
-            source="Zhuyuan core skill dmg ratio",
+            owner=self.name,
+            source="core skill dmg ratio",
         )
 
     def core_skill2(self):
@@ -48,28 +46,32 @@ class Zhuyuan(AgentWithData):
         return DynamicBuff(
             create,
             condition=HitContext(atk_kind=AttackKind.Basic),
-            source="Zhuyuan core daze skill dmg ratio",
+            owner=self.name,
+            source="core daze skill dmg ratio",
         )
 
     def extra_skill(self):
         return StaticBuff(
             StatValue(0.30, StatKind.CRIT_RATIO),
             condition=HitContext(atk_attr=Attribute.All),
-            source="Zhuyuan extra skill crit ratio",
+            owner=self.name,
+            source="extra skill crit ratio",
         )
 
     def rep2(self):
         return StaticBuff(
             StatValue(0.50, StatKind.DMG_RATIO),
             condition=HitContext(atk_attr=Attribute.Ether),
-            source="Zhuyuan ep2 Ether dmg ratio",
+            owner=self.name,
+            source="ep2 Ether dmg ratio",
         )
 
     def rep4(self):
         return StaticBuff(
             StatValue(-0.25, StatKind.RES_RATIO),
             condition=HitContext(atk_attr=Attribute.Ether),
-            source="Zhuyuan ep4 Ether res ratio",
+            owner=self.name,
+            source="ep4 Ether res ratio",
         )
 
     def rep6(self):
@@ -78,7 +80,8 @@ class Zhuyuan(AgentWithData):
             condition=HitContext(
                 atk_attr=Attribute.Ether, atk_kind=AttackKind.SpecialEx
             ),
-            source="Zhuyuan rep6 skill",
+            owner=self.name,
+            source="rep6 skill",
         )
 
     def buffs(self):

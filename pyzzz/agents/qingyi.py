@@ -27,9 +27,6 @@ class Qingyi(AgentWithData):
             repetition=repetition,
         )
 
-        self._cn_name = "青衣"
-        self.load_cn_data(self._cn_name)
-
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
 
     def core_skill(self):
@@ -40,14 +37,16 @@ class Qingyi(AgentWithData):
 
         return DynamicBuff(
             create,
-            source="Qingyi core skill stun dmg ratio",
+            owner=self.name,
+            source="core skill stun dmg ratio",
         )
 
     def extra_skill(self):
-        m = max((self.static.impact - 120) * 6, 0)
+        m = max((self.initial.impact - 120) * 6, 0)
         return StaticBuff(
             StatValue(m, StatKind.ATK_FLAT),
-            source="Qingyi extra skill atk flat",
+            owner=self.name,
+            source="extra skill atk flat",
         )
 
     def rep1(self):
@@ -55,12 +54,14 @@ class Qingyi(AgentWithData):
             StaticBuff(
                 StatValue(-0.15, StatKind.ENEMY_DEF_RATIO),
                 condition=HitContext(atk_attr=Attribute.Physical),
-                source="Qingyi ep1 def res",
+                owner=self.name,
+                source="ep1 def res",
             ),
             StaticBuff(
                 StatValue(0.2, StatKind.CRIT_RATIO),
                 condition=HitContext(atk_attr=Attribute.Physical),
-                source="Qingyi ep1 crit ratio",
+                owner=self.name,
+                source="ep1 crit ratio",
             ),
         )
 
@@ -72,14 +73,16 @@ class Qingyi(AgentWithData):
 
         return DynamicBuff(
             create,
-            source="Qingyi ep2 stun dmg ratio",
+            owner=self.name,
+            source="ep2 stun dmg ratio",
         )
 
     def rep6(self):
         return StaticBuff(
             StatValue(0.2, StatKind.RES_RATIO),
             condition=HitContext(atk_attr=Attribute.All, atk_kind=AttackKind.All),
-            source="Qingyi rep6 res ratio",
+            owner=self.name,
+            source="rep6 res ratio",
         )
 
     def buffs(self):

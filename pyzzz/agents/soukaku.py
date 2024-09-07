@@ -29,9 +29,6 @@ class Soukaku(AgentWithData):
             **kw,
         )
 
-        self._cn_name = "苍角"
-        self.load_cn_data(self._cn_name)
-
         self.core_skill_atk = int(core_skill_atk) if core_skill_atk else None
 
     def final_buff(self):
@@ -42,7 +39,8 @@ class Soukaku(AgentWithData):
                 HitContext(atk_kind=AttackKind.Basic, agent=self.name),
                 HitContext(atk_kind=AttackKind.Dash, agent=self.name),
             ],
-            source=f"{self.name} final buff +15% critical ratio",
+            owner=self.name,
+            source="final buff +15% critical ratio",
         )
 
     def core_skill(self):
@@ -58,7 +56,8 @@ class Soukaku(AgentWithData):
 
         return DynamicBuff(
             create,
-            source="Soukaku core skill atk dynamic flat",
+            owner=self.name,
+            source="core skill atk dynamic flat",
             for_team=True,
         )
 
@@ -66,7 +65,8 @@ class Soukaku(AgentWithData):
         return StaticBuff(
             StatValue(0.2, StatKind.DMG_RATIO),
             condition=HitContext(atk_attr=Attribute.Ice),
-            source="Soukaku extra skill ice dmg ratio",
+            owner=self.name,
+            source="extra skill ice dmg ratio",
             for_team=True,
         )
 
@@ -74,7 +74,8 @@ class Soukaku(AgentWithData):
         return StaticBuff(
             StatValue(-0.1, StatKind.RES_RATIO),
             condition=HitContext(atk_attr=Attribute.Ice),
-            source="Soukaku rep4 ice res ratio",
+            owner=self.name,
+            source="rep4 ice res ratio",
             for_team=True,
         )
 
@@ -89,7 +90,7 @@ class Soukaku(AgentWithData):
                     agent=self.name, atk_attr=Attribute.Ice, atk_kind=AttackKind.Dash
                 ),
             ],
-            source="Soukaku rep6 ice dmg ratio",
+            source="rep6 ice dmg ratio",
         )
 
     def buffs(self):

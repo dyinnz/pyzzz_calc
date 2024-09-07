@@ -22,12 +22,13 @@ class StatKind(StrEnum):
     IMPACT_RATIO = auto()
     ENERGY_REGEN = auto()
     ENERGY_REGEN_RATIO = auto()
+    ANOMALY_MASTER = auto()
+    ANOMALY_MASTER_RATIO = auto()
 
     CRIT_RATIO = auto()
     CRIT_MULTI = auto()
     PEN_RATIO = auto()
     PEN_FLAT = auto()
-    ANOMALY_MASTER = auto()
     ANOMALY_PROFICIENCY = auto()
     ACC_RATIO = auto()
 
@@ -40,10 +41,54 @@ class StatKind(StrEnum):
 
     # on enemy
     RES_RATIO = auto()
+    ANOMALY_RES_RATIO = auto()
     STUN_DMG_RATIO = auto()
     ENEMY_DEF_RATIO = auto()
 
     SKILL_MULTI = auto()
+
+    def is_pct(self):
+        return "ratio" in self or "multi" in self
+
+    def __str__(self):
+        return {
+            StatKind.EMPTY: "EMPTY",
+            StatKind.ATK_BASE: "ATK_BASE",
+            StatKind.ATK_RATIO: "ATK",
+            StatKind.ATK_FLAT: "ATK",
+            StatKind.HP_BASE: "HP",
+            StatKind.HP_RATIO: "HP",
+            StatKind.HP_FLAT: "HP",
+            StatKind.DEF_BASE: "DEF",
+            StatKind.DEF_RATIO: "DEF",
+            StatKind.DEF_FLAT: "DEF",
+            StatKind.IMPACT: "IMPACT",
+            StatKind.IMPACT_RATIO: "IMPACT",
+            StatKind.ENERGY_REGEN: "ENERGY_REGEN",
+            StatKind.ENERGY_REGEN_RATIO: "ENERGY_REGEN",
+            StatKind.ANOMALY_MASTER: "AM",
+            StatKind.ANOMALY_MASTER_RATIO: "AM",
+            StatKind.CRIT_RATIO: "CRIT_RATIO",
+            StatKind.CRIT_MULTI: "CRIT_MULTI",
+            StatKind.PEN_RATIO: "PEN",
+            StatKind.PEN_FLAT: "PEN",
+            StatKind.ANOMALY_PROFICIENCY: "AP",
+            StatKind.ACC_RATIO: "ACC_RATIO",
+            StatKind.DMG_RATIO: "DMG",
+            StatKind.DMG_RATIO_PHYSICAL: "PHYSICAL",
+            StatKind.DMG_RATIO_FIRE: "FIRE",
+            StatKind.DMG_RATIO_ICE: "ICE",
+            StatKind.DMG_RATIO_ELECTRIC: "ELECTRIC",
+            StatKind.DMG_RATIO_EHTER: "EHTER",
+            StatKind.RES_RATIO: "RESISTANCE",
+            StatKind.ANOMALY_RES_RATIO: "ANOMALY_RES",
+            StatKind.STUN_DMG_RATIO: "STUN_DMG",
+            StatKind.ENEMY_DEF_RATIO: "ENEMY_DEF",
+            StatKind.SKILL_MULTI: "SKILL",
+        }[self]
+
+    def with_pct(self):
+        return f"{self}" + ("%" if self.is_pct() else "")
 
 
 @dataclass
@@ -59,10 +104,12 @@ class StatValue:
         return self.kind != StatKind.EMPTY
 
     def __repr__(self):
-        if abs(self.value) > 1.0 or self.value == 0.0:
-            return f"{self.kind}:{self.value:.3f}".rstrip("0").rstrip(".")
+        sign = "+" if self.value >= 0.0 else "-"
+        if self.kind.is_pct():
+            s = f"{self.kind} {sign}{abs(self.value) * 100.0:.1f}"
+            return s.rstrip("0").rstrip(".") + "%"
         else:
-            return f"{self.kind}:{self.value * 100.0:.1f}%"
+            return f"{self.kind} {sign}{abs(self.value):.3f}".rstrip("0").rstrip(".")
 
     def __sub__(self, rhs):
         if self.kind != rhs.kind:
@@ -126,15 +173,16 @@ class DiscKind(StrEnum):
 
 def get_suit2_stat(kind: DiscKind) -> StatValue:
     mapping = {
-        DiscKind.Fanged_Metal: StatValue(0.10, StatKind.DMG_RATIO),
-        DiscKind.Polar_Metal: StatValue(0.10, StatKind.DMG_RATIO),
-        DiscKind.Thunder_Metal: StatValue(0.10, StatKind.DMG_RATIO),
-        DiscKind.Chaotic_Metal: StatValue(0.10, StatKind.DMG_RATIO),
-        DiscKind.Inferno_Metal: StatValue(0.10, StatKind.DMG_RATIO),
+        DiscKind.Fanged_Metal: StatValue(0.10, StatKind.DMG_RATIO_PHYSICAL),
+        DiscKind.Polar_Metal: StatValue(0.10, StatKind.DMG_RATIO_ICE),
+        DiscKind.Thunder_Metal: StatValue(0.10, StatKind.DMG_RATIO_ELECTRIC),
+        DiscKind.Chaotic_Metal: StatValue(0.10, StatKind.DMG_RATIO_EHTER),
+        DiscKind.Inferno_Metal: StatValue(0.10, StatKind.DMG_RATIO_FIRE),
         DiscKind.Hormone_Punk: StatValue(0.10, StatKind.ATK_RATIO),
         DiscKind.Puffer_Electro: StatValue(0.08, StatKind.PEN_RATIO),
         DiscKind.Woodpecker_Electro: StatValue(0.08, StatKind.CRIT_RATIO),
         DiscKind.Freedom_Blues: StatValue(30, StatKind.ANOMALY_PROFICIENCY),
+        DiscKind.Swing_Jazz: StatValue(0.20, StatKind.ENERGY_REGEN_RATIO),
     }
 
     return mapping.get(kind, StatValue.create_empty())
@@ -150,6 +198,27 @@ class Disc:
     def empty(self):
         return self.primary.value == 0 and self.kind == DiscKind.Empty
 
+    def __str__(self):
+        head = f"#{self.index} {self.kind:<20}{self.primary}"
+        s = f"{head: <40}"
+        s += "[ "
+        s += " / ".join((str(s) for s in self.secondaries))
+        s += " ]"
+        return s
+
+    def set_index(self, i: int):
+        self.index = i
+        return self
+
+    def set_kind(self, k: DiscKind):
+        self.kind = k
+        return self
+
+    def set_stats(self, p: StatValue, s: list[StatValue]):
+        self.primary = p
+        self.secondaries = s
+        return self
+
 
 @dataclass
 class DiscGroup:
@@ -159,9 +228,9 @@ class DiscGroup:
             Disc(1, DiscKind.Empty, StatValue(2200, StatKind.HP_FLAT)),
             Disc(2, DiscKind.Empty, StatValue(316, StatKind.ATK_FLAT)),
             Disc(3, DiscKind.Empty, StatValue(184, StatKind.DEF_FLAT)),
-            Disc(4, DiscKind.Empty, StatValue(24, StatKind.CRIT_RATIO)),
-            Disc(5, DiscKind.Empty, StatValue(30, StatKind.DMG_RATIO)),
-            Disc(6, DiscKind.Empty, StatValue(30, StatKind.ATK_RATIO)),
+            Disc(4, DiscKind.Empty, StatValue(0.24, StatKind.CRIT_RATIO)),
+            Disc(5, DiscKind.Empty, StatValue(0.30, StatKind.DMG_RATIO)),
+            Disc(6, DiscKind.Empty, StatValue(0.30, StatKind.ATK_RATIO)),
         ]
 
     discs: list[Disc] = field(default_factory=_default_discs)
@@ -206,14 +275,14 @@ class DiscGroup:
                 if not disc.empty():
                     s += f"\t{disc}\n"
         if self.suit2_stats:
-            s += "\tSuit2 stats:\t"
+            s += "\tSuit2 Stats:"
             for stat in self.suit2_stats:
                 s += f"\t{stat}"
-            s += "\n"
-        s += "\tSuit2: ["
+            s += "\t"
+        s += " Suits #2 ["
         s += ", ".join([str(k) for k in self.suit2])
-        s += "]\t"
-        s += f"Suit4: {self.suit4}"
+        s += "] "
+        s += f"#4 {self.suit4}"
         return s
 
 
@@ -285,8 +354,7 @@ class Camp(StrEnum):
     Belobog_Heavy_Industries = auto()
     Section_6 = auto()
     Sons_of_Calydon = auto()
-    Public_Security = auto()
-    Criminal_Investigation_Special_Response_Team = auto()
+    Criminal_Investigation = auto()
 
     @staticmethod
     def from_full_name(name: str):
@@ -294,11 +362,10 @@ class Camp(StrEnum):
             "Belobog Heavy Industries": Camp.Belobog_Heavy_Industries,
             "Cunning Hares": Camp.Cunning_Hares,
             "Hollow Special Operations Section 6": Camp.Section_6,
-            "New Eridu Public Security": Camp.Public_Security,
             "Obol Squad": Camp.Obol_Squad,
             "Sons of Calydon": Camp.Sons_of_Calydon,
             "Victoria Housekeeping Co.": Camp.Victoria_Housekeeping,
-            "Criminal Investigation Special Response Team": Camp.Criminal_Investigation_Special_Response_Team,
+            "Criminal Investigation Special Response Team": Camp.Criminal_Investigation,
         }[name]
 
 
@@ -310,10 +377,11 @@ class AgentRatioStats:
     defense: float = 0.0
     impact: float = 0.0
     energy_regen: float = 0.0
+    anomaly_master: float = 0.0
 
 
 @dataclass
-class AgentBaseStats:
+class AgentValueStats:
     # base = init + init * grow
     #           <          static         >   <    dynamic     >
     # TYPE-1 :  (base * (1 + ratio) + flat) * (1 + ratio) + flat
@@ -322,12 +390,12 @@ class AgentBaseStats:
     defense: float = 0.0
     impact: float = 0.0
     energy_regen: float = 0.0
+    anomaly_master: float = 0.0
 
     # TYPE-2 :  base + delta
     crit_ratio: float = 0.0
     crit_multi: float = 0.0
 
-    anomaly_master: float = 0.0
     anomaly_proficiency: float = 0.0
     acc_ratio: float = 0.0
     pen_ratio: float = 0.0
@@ -339,6 +407,15 @@ class AgentBaseStats:
     dmg_ratio_electric: float = 0.0
     dmg_ratio_ice: float = 0.0
     dmg_ratio_ether: float = 0.0
+
+    def dmg_ratio_attrs(self):
+        return {
+            StatKind.DMG_RATIO_PHYSICAL: self.dmg_ratio_physical,
+            StatKind.DMG_RATIO_FIRE: self.dmg_ratio_fire,
+            StatKind.DMG_RATIO_ELECTRIC: self.dmg_ratio_electric,
+            StatKind.DMG_RATIO_ICE: self.dmg_ratio_ice,
+            StatKind.DMG_RATIO_EHTER: self.dmg_ratio_ether,
+        }
 
     def calc_dmg_ratio(self, kind: Attribute) -> float:
         result = self.dmg_ratio
@@ -372,17 +449,33 @@ class AgentBaseStats:
             self.impact += stat.value
         elif stat.kind == StatKind.ENERGY_REGEN:
             self.energy_regen += stat.value
+        elif stat.kind == StatKind.ANOMALY_MASTER:
+            self.anomaly_master += stat.value
         else:
             return False
         return True
 
+    def __str__(self):
+        s = ""
+        s += f"> ATK  {self.atk:<8}\tCRIT {self.crit_ratio * 100:.1f}% x {self.crit_multi * 100:.1f}%\t"
+        s += f"\tDMG  {self.dmg_ratio * 100:.1f}%"
+        for k, d in self.dmg_ratio_attrs().items():
+            if d > 0:
+                kind = k[len(StatKind.DMG_RATIO) + 1 :].upper()
+                s += f"\t{kind} {d * 100:.1f}%"
+        s += "\n"
+        s += f"> HP   {self.hp:<8}\tDEF  {self.defense:<8}\tIMPACT {self.impact:<8}\tENERGY_REGEN {self.energy_regen:<8}\n"
+        s += f"> AM   {self.anomaly_master:<8}\tAP   {self.anomaly_proficiency:<8}\tPEN_RATIO {self.pen_ratio * 100:.1f}%\tPEN_FLAT {self.pen_flat}\n"
+        return s
 
-AgentFlatStats = AgentBaseStats
+
+AgentBaseStats = AgentValueStats
+AgentFlatStats = AgentValueStats
 
 
 @dataclass
-class AgentBaseWithGrowth:
-    zero: AgentBaseStats = field(default_factory=AgentBaseStats)
+class AgentGrowthStats:
+    zero: AgentValueStats = field(default_factory=AgentValueStats)
     atk_growth: float = 0.0
     hp_growth: float = 0.0
     defense_growth: float = 0.0
@@ -393,6 +486,9 @@ class AgentStats:
     base: AgentBaseStats = field(default_factory=AgentBaseStats)
     ratio: AgentRatioStats = field(default_factory=AgentRatioStats)
     flat: AgentFlatStats = field(default_factory=AgentFlatStats)
+
+    def calc_ap(self):
+        return self.base.anomaly_proficiency + self.flat.anomaly_proficiency
 
     def calc_final(self, weapon_atk=0.0):
         result = AgentStats()
@@ -415,7 +511,7 @@ class AgentStats:
         elif stat.kind == StatKind.HP_RATIO:
             self.ratio.hp += stat.value
         elif stat.kind == StatKind.HP_FLAT:
-            self.ratio.hp += stat.value
+            self.flat.hp += stat.value
         elif stat.kind == StatKind.DEF_BASE:
             self.base.defense += stat.value
         elif stat.kind == StatKind.DEF_RATIO:
@@ -430,6 +526,10 @@ class AgentStats:
             self.base.energy_regen += stat.value
         elif stat.kind == StatKind.ENERGY_REGEN_RATIO:
             self.ratio.energy_regen += stat.value
+        elif stat.kind == StatKind.ANOMALY_MASTER:
+            self.base.anomaly_master += stat.value
+        elif stat.kind == StatKind.ANOMALY_MASTER_RATIO:
+            self.ratio.anomaly_master += stat.value
 
         elif stat.kind == StatKind.CRIT_RATIO:
             self.flat.crit_ratio += stat.value
@@ -439,8 +539,6 @@ class AgentStats:
             self.flat.pen_ratio += stat.value
         elif stat.kind == StatKind.PEN_FLAT:
             self.flat.pen_flat += stat.value
-        elif stat.kind == StatKind.ANOMALY_MASTER:
-            self.flat.anomaly_master += stat.value
         elif stat.kind == StatKind.ANOMALY_PROFICIENCY:
             self.flat.anomaly_proficiency += stat.value
         elif stat.kind == StatKind.ACC_RATIO:

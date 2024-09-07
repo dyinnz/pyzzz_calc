@@ -11,22 +11,23 @@ def get_suit4_buff(kind: DiscKind):
                 HitContext(atk_kind=AttackKind.Dash),
             ],
             cov=0.8,
-            source="Polar_Metal suit4 Ice DMG +20%+20%",
+            owner="Polar_Metal",
+            source="+20%/+20%",
         ),
         DiscKind.Woodpecker_Electro: StaticBuff(
-            StatValue(0.09 * 2, StatKind.ATK_RATIO),
-            cov=1.0,
-            source="Woodpecker_Electro suit4 ATK 9%+9%+9%",
+            StatValue(0.09, StatKind.ATK_RATIO),
+            cov=2.0,
+            owner="Woodpecker_Electro",
+            source="+9%/+9%/+9%",
         ),
         DiscKind.Swing_Jazz: StaticBuff(
             StatValue(0.15, StatKind.DMG_RATIO),
-            # condition=HitContext(daze=True),
-            source="Swing_Jazz suit4 DMG +15%",
+            owner="Swing_Jazz",
             for_team=True,
         ),
         DiscKind.Fanged_Metal: StaticBuff(
             StatValue(0.35, StatKind.DMG_RATIO),
-            source="Freedom_Blues suit4 DMG +35%",
+            owner="Freedom_Blues",
         ),
     }
 

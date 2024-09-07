@@ -56,7 +56,7 @@ class CannonRotor(WeaponWithData):
                 StatKind.ATK_RATIO,
             )
 
-        return [DynamicBuff(create, source="CannonRotor buff")]
+        return [DynamicBuff(create, owner=self.name)]
 
 
 class StarlightEngine(WeaponWithData):
@@ -72,12 +72,7 @@ class StarlightEngine(WeaponWithData):
                 StatKind.ATK_RATIO,
             )
 
-        return [
-            DynamicBuff(
-                create,
-                source="CannonRotor buff",
-            )
-        ]
+        return [DynamicBuff(create, source=self.name)]
 
 
 class BashfulDemon(WeaponWithData):
@@ -99,14 +94,8 @@ class BashfulDemon(WeaponWithData):
             )
 
         return [
-            DynamicBuff(
-                create1,
-                source="BashfulDemon buff 1",
-            ),
-            DynamicBuff(
-                create2,
-                source="BashfulDemon buff 2",
-            ),
+            DynamicBuff(create1, owner=self.name),
+            DynamicBuff(create2, owner=self.name),
         ]
 
 
@@ -133,21 +122,23 @@ class DeepSeaVisitor(WeaponWithData):
                     [0, 0.25, 0.315, 0.38, 0.445, 0.50][self._repetition],
                     StatKind.DMG_RATIO,
                 ),
-                source=f"{self._name} ice dmg buff",
+                owner=self.name,
             ),
             DynamicBuff(
                 lambda: StatValue(
                     [0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition],
                     StatKind.CRIT_RATIO,
                 ),
-                source=f"{self._name} ice crit ratio buff 1",
+                owner=self.name,
+                source="#1",
             ),
             DynamicBuff(
                 lambda: StatValue(
                     [0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition],
                     StatKind.CRIT_RATIO,
                 ),
-                source=f"{self._name} ice crit ratio buff 2",
+                owner=self.name,
+                source="#1",
             ),
         ]
 
@@ -162,10 +153,10 @@ class WeepingGemini(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 30, 34, 38, 42, 48][self._repetition] * 2,
+                    [0, 30, 34, 38, 42, 48][self._repetition] * 4,
                     StatKind.ANOMALY_PROFICIENCY,
                 ),
-                source=f"{self._name} ap",
+                owner=self.name,
             )
         ]
 
@@ -180,10 +171,10 @@ class RainforestGourmet(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.025, 0.028, 0.032, 0.036, 0.04][self._repetition] * 6,
+                    [0, 0.025, 0.028, 0.032, 0.036, 0.04][self._repetition] * 10,
                     StatKind.ATK_RATIO,
                 ),
-                source=f"{self._name} atk buff",
+                owner=self.name,
             )
         ]
 
@@ -201,14 +192,14 @@ class FusionCompiler(WeaponWithData):
                     [0, 0.12, 0.15, 0.18, 0.21, 0.24][self._repetition],
                     StatKind.ATK_RATIO,
                 ),
-                source=f"{self._name} atk ratio buff",
+                owner=self.name,
             ),
             DynamicBuff(
                 lambda: StatValue(
                     [0, 25, 31, 37, 43, 50][self._repetition] * 1,
                     StatKind.ANOMALY_PROFICIENCY,
                 ),
-                source=f"{self._name} ap buff",
+                owner=self.name,
             ),
         ]
 
@@ -226,7 +217,7 @@ class SharpenedStinger(WeaponWithData):
                     [0, 0.12, 0.15, 0.18, 0.21, 0.24][self._repetition] * 3,
                     StatKind.DMG_RATIO,
                 ),
-                source=f"{self._name} dmg ratio buff",
+                owner=self.name,
             ),
         ]
 
@@ -244,14 +235,14 @@ class ElectroLipGloss(WeaponWithData):
                     [0, 0.10, 0.115, 0.13, 0.145, 0.16][self._repetition],
                     StatKind.ATK_RATIO,
                 ),
-                source=f"{self._name} atk ratio buff",
+                owner=self.name,
             ),
             DynamicBuff(
                 lambda: StatValue(
                     [0, 0.15, 0.175, 0.20, 0.225, 0.25][self._repetition],
                     StatKind.DMG_RATIO,
                 ),
-                source=f"{self._name} dmg ratio buff",
+                owner=self.name,
             ),
         ]
 
@@ -270,7 +261,7 @@ class TheBrimstone(WeaponWithData):
                     StatKind.ATK_RATIO,
                 ),
                 cov=4.0,
-                source=f"{self._name} atk ratio buff",
+                owner=self.name,
             ),
         ]
 
@@ -289,7 +280,7 @@ class GildedBlossom(WeaponWithData):
                     StatKind.ATK_RATIO,
                 ),
                 cov=1.0,
-                source=f"{self._name} atk ratio buff",
+                owner=self.name,
             ),
             DynamicBuff(
                 lambda: StatValue(
@@ -298,7 +289,27 @@ class GildedBlossom(WeaponWithData):
                 ),
                 condition=HitContext(atk_kind=AttackKind.SpecialEx),
                 cov=1.0,
-                source=f"{self._name} special ex dmg buff",
+                owner=self.name,
+                source="SpecialEx",
+            ),
+        ]
+
+
+class KaboomCannon(WeaponWithData):
+    NAME = "KaboomtheCannon"
+
+    def __init__(self, level=60, is_ascension=False, repetition=1):
+        super().__init__(KaboomCannon.NAME, level, is_ascension, repetition)
+
+    def buffs(self):
+        return [
+            DynamicBuff(
+                lambda: StatValue(
+                    [0, 0.025, 0.028, 0.032, 0.036, 0.04][self._repetition],
+                    StatKind.ATK_RATIO,
+                ),
+                cov=4.0,
+                owner=self.name,
             ),
         ]
 
@@ -317,17 +328,18 @@ def get_weapons_mapping():
         "Electro-LipGloss": ElectroLipGloss,
         "TheBrimstone": TheBrimstone,
         "GildedBlossom": GildedBlossom,
+        "KaboomtheCannon": KaboomCannon,
     }
     return mappings
 
 
-def create_weapon(name: str, **kw):
+def create_weapon(name: str, **kw) -> Weapon:
     name = name.replace(" ", "")
     mapping = get_weapons_mapping()
     if name in mapping:
         return mapping[name](**kw)
-    elif name:
-        return Weapon(name, **kw)
+    else:
+        return WeaponWithData(name, **kw)
 
 
 def list_weapons():

@@ -26,9 +26,6 @@ class Soldier11(AgentWithData):
             repetition=repetition,
         )
 
-        self._cn_name = "「11号」"
-        self.load_cn_data(self.cn_name)
-
     def core_skill(self):
         def create():
             m = [0.35, 0.408, 0.466, 0.525, 0.583, 0.641, 0.70]
@@ -36,7 +33,8 @@ class Soldier11(AgentWithData):
 
         return DynamicBuff(
             create,
-            source="Soldier11 core skill dmg ratio",
+            owner=self.name,
+            source="core skill dmg ratio",
         )
 
     def extra_skill(self):
@@ -44,12 +42,14 @@ class Soldier11(AgentWithData):
             StaticBuff(
                 StatValue(0.1, StatKind.DMG_RATIO),
                 condition=HitContext(atk_attr=Attribute.Fire),
-                source="Soldier11 extra skill dmg ratio",
+                owner=self.name,
+                source="extra skill dmg ratio",
             ),
             StaticBuff(
                 StatValue(0.225, StatKind.DMG_RATIO),
                 condition=HitContext(atk_attr=Attribute.Fire),
-                source="Soldier11 extra skill daze fire dmg ratio",
+                owner=self.name,
+                source="extra skill daze fire dmg ratio",
             ),
         )
 
@@ -61,7 +61,8 @@ class Soldier11(AgentWithData):
                 HitContext(atk_kind=AttackKind.Dash),
                 HitContext(atk_kind=AttackKind.Dodge),
             ],
-            source="Soldier11 ep2 Physical res ratio",
+            owner=self.name,
+            source="ep2 Physical res ratio",
         )
 
     def rep6(self):
@@ -71,7 +72,8 @@ class Soldier11(AgentWithData):
                 HitContext(atk_attr=Attribute.Fire, atk_kind=AttackKind.Basic),
                 HitContext(atk_attr=Attribute.Fire, atk_kind=AttackKind.Dash),
             ],
-            source="Soldier11 rep6 Fire res ratio",
+            owner=self.name,
+            source="rep6 Fire res ratio",
         )
 
     def buffs(self):

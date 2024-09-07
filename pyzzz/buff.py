@@ -1,33 +1,53 @@
 import abc
 from typing import Callable
 
-from pyzzz.model import HitContext, StatValue
+from pyzzz.model import HitContext, StatValue, StatKind
 
 
 class Buff:
     def __init__(
         self,
+        /,
+        kind: StatKind = StatKind.EMPTY,
+        owner: str = "",
         source: str = "",
         cov: float = 1.0,
         condition: HitContext | list[HitContext] | None = None,
         for_team: bool = False,
+        priority: int = 0,
     ):
-        self.source = source
+        self._kind = kind
+        self._owner = owner
+        self._source = source
         self.cov = cov
-        self.condition: list[HitContext] = []
-        self.for_team = for_team
+        self.enable = 1
+        self._condition: list[HitContext] = []
+        self._for_team = for_team
+        self._priority = priority
         if isinstance(condition, list):
-            self.condition.extend(condition)
+            self._condition.extend(condition)
         elif isinstance(condition, HitContext):
-            self.condition.append(condition)
+            self._condition.append(condition)
+
+    @property
+    def key(self):
+        return f"{self._owner} {self._kind.with_pct()} {self._source}".strip(' ')
+
+    @property
+    def for_team(self):
+        return self._for_team
+
+    @property
+    def priority(self):
+        return self._priority
 
     @abc.abstractmethod
     def gen_stat(self) -> StatValue:
         pass
 
     def active(self, context: HitContext) -> bool:
-        if self.condition:
-            for cond in self.condition:
+        if self._condition:
+            for cond in self._condition:
                 if context.contains(cond):
                     return True
             return False
@@ -39,22 +59,34 @@ class Buff:
         return StatValue.create_empty()
 
     def __str__(self):
-        if self.cov < 1.0:
-            return f"{self.gen_stat()} with cov={self.cov} from '{self.source}'"
-        else:
-            return f"{self.gen_stat()} from '{self.source}'"
+        s = ""
+        s += "{:<16}".format(str(self.gen_stat()))
+        s += f" from '{self.key}'"
+        if self.cov != 1:
+            s += f"\tcov={self.cov}"
+        return s
 
 
 class StaticBuff(Buff):
     def __init__(
         self,
         stat: StatValue,
+        /,
+        owner: str = "",
         source: str = "",
         cov: float = 1.0,
         condition: HitContext | list[HitContext] | None = None,
         for_team: bool = False,
     ):
-        super().__init__(source, cov, condition, for_team)
+        super().__init__(
+            kind=stat.kind,
+            owner=owner,
+            source=source,
+            cov=cov,
+            condition=condition,
+            for_team=for_team,
+            priority=0,  # always zero
+        )
         self.stat = stat
 
     def gen_stat(self) -> StatValue:
@@ -65,12 +97,24 @@ class DynamicBuff(Buff):
     def __init__(
         self,
         stat_call: Callable[[], StatValue],
+        /,
+        owner: str = "",
         source: str = "",
         cov: float = 1.0,
         condition: HitContext | list[HitContext] | None = None,
         for_team: bool = False,
+        priority: int = 0,
     ):
-        super().__init__(source, cov, condition, for_team)
+        dummy = stat_call()
+        super().__init__(
+            kind=dummy.kind,
+            owner=owner,
+            source=source,
+            cov=cov,
+            condition=condition,
+            for_team=for_team,
+            priority=priority,
+        )
         self.stat_call = stat_call
 
     def gen_stat(self) -> StatValue:

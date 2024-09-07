@@ -93,7 +93,7 @@ class HitDMG:
         elif stat.kind == StatKind.PEN_FLAT:
             self.defense.pen_flat.add(number)
         elif stat.kind == StatKind.ENEMY_DEF_RATIO:
-            self.defense.enemy_def_ratio.add(number)
+            self.defense.enemy_def_ratio.add(-number)
         elif stat.kind == StatKind.DMG_RATIO:
             self.dmg_ratio.add(number)
         elif stat.kind == StatKind.RES_RATIO:
@@ -106,12 +106,12 @@ class HitDMG:
             self.skill.add(number)
 
     def apply_buff(self):
-        stats = []
+        self._active_buffs.sort(key=lambda b: b._priority)
+
         for buf in self._active_buffs:
             stat = buf.produce(self._context)
+            self._agent.apply_dynamic([stat])
             self._apply_stat(stat)
-            stats.append(stat)
-        self._agent.apply_dynamic(stats)
 
     def calc_common(self):
         if self.common_result == 0.0:
@@ -156,18 +156,18 @@ class HitDMG:
         return self.anomaly_result
 
     def show_common(self):
-        return f"{self.dmg_ratio} * {self.resistance} * {self.defense} * {self.daze}"
+        return f"{self._hit._mark:<6} {self.dmg_ratio} * {self.resistance} * {self.defense} * {self.daze}"
 
     def show_normal(self):
-        s = f"{self.show_common()} * {self.critical}* {self.skill} * {self.atk}"
+        s = f"{self.show_common()} * {self.critical} * {self.skill} * {self.atk}"
         for extra in self.extras:
             if extra.active(False, self._context):
                 s += f" * {extra.show()}"
-        s += f" = {self.calc_normal():.1f}\t# acc={self.anomaly_acc}"
+        s += f" = {self.calc_normal():.1f}    # acc={self.anomaly_acc}"
         return s
 
     def show_anomaly(self):
-        s = f"{self.show_common()} * {self.aa} * {self.ap} * {self.anomaly_level} * {self.atk}"
+        s = f"{self.show_common()} * {self.ap} * {self.aa} * {self.anomaly_level} * {self.atk}"
         for extra in self.extras:
             if extra.active(True, self._context):
                 s += f" * {extra.show()}"
@@ -212,12 +212,12 @@ class ComboDMG:
 
         s = "\n".join(
             (
-                f"{d.show_anomaly()}\t# pct={d.anomaly_acc/total_acc * 100:.1f}%" ""
+                f"{d.show_anomaly()}    # pct={d.anomaly_acc/total_acc * 100:.1f}%" ""
                 for d in self.dmgs
             )
         )
         for multi in self.anomaly_multiplier:
-            s += f"\n* {multi.show()}"
+            s += f"\n    * {multi.show()}"
 
         if base == 0.0:
             s += f"\nAnomaly DMG : {total:.1f}; by {self.comment}\n"

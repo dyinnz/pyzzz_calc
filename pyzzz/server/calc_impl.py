@@ -10,7 +10,7 @@ def calc(input: model.CalcInput):
 
     env = Env.from_input(input)
     print(env)
-    hit_marks = env.agent(0).hit_marks()
+    hit_marks = env.agent(0).list_marks()
     is_anomaly = env.agent(0).profession == model.Profession.Anomaly
 
     combo_dmg = env.calc_combo(hit_marks)

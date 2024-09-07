@@ -291,10 +291,10 @@ class Lucy:
     DAssit2 = "DAssit2"
     DAssit3 = "DAssit3"
     Assit1 = "Assit1"
-    Unknown1 = "Unknown1"
-    Unknown2 = "Unknown2"
-    Unknown3 = "Unknown3"
-    Unknown4 = "Unknown4"
+    NIL1 = "NIL1"
+    NIL2 = "NIL2"
+    NIL3 = "NIL3"
+    NIL4 = "NIL4"
 
 
 class Grace:

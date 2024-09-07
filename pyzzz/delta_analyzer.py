@@ -1,3 +1,4 @@
+import typing
 from pyzzz.env import Env
 import dataclasses
 
@@ -6,7 +7,7 @@ from pyzzz.model import *
 
 
 class DeltaAnalyzer:
-    def __init__(self, env: Env, combo: list[str]):
+    def __init__(self, env: Env, combo: t.Sequence[str]):
         self._env = env
         self._combo = combo
 
@@ -15,7 +16,7 @@ class DeltaAnalyzer:
 
     def update_stat(self, extras: list[StatValue], idx=0):
         env = self._env.clone()
-        env.agent(idx).set_equipment(extras=extras)
+        env.agent(idx).set_equipment(static=extras)
         return env.calc_combo(self._combo, str(extras))
 
     def quick(self) -> list[ComboDMG]:
@@ -33,6 +34,7 @@ class DeltaAnalyzer:
         update([StatValue(0.048, StatKind.CRIT_MULTI)])
         update([StatValue(0.024, StatKind.PEN_RATIO)])
         update([StatValue(9, StatKind.ANOMALY_PROFICIENCY)])
+        # update([StatValue(90, StatKind.ANOMALY_PROFICIENCY)])
 
         agent0 = self._env.agent(0)
 

@@ -19,12 +19,8 @@ class AgentWithData(Agent):
 
         if self.name:
             self._load_zzz_gg_data(self.name)
-
-    def extra_multiplier(self) -> Sequence[ExtraMultiplier]:
-        return []
-
-    def load_cn_data(self, cn_name):
-        self._skill = dataset.load_skills()[cn_name]
+            self._cn_name = dataset.AGENTS_EN2CN[self.name.replace(' ', '')]
+            self._skill = dataset.load_skills()[self.cn_name]
 
     def get_hit_attribute(self, mark: str) -> Attribute:
         return self.attribute
@@ -55,7 +51,7 @@ class AgentWithData(Agent):
 
         return hit
 
-    def hit_marks(self) -> Sequence[str]:
+    def list_marks(self) -> Sequence[str]:
         result = []
         for mark, skill in self._skill.items():
             if (
@@ -81,7 +77,7 @@ class AgentWithData(Agent):
         self._growth.defense_growth = agent["DefenceGrowth"] / 1e4
         self._growth.zero.impact = agent["BreakStun"]
         self._growth.zero.anomaly_master = agent["ElementMystery"]
-        self._growth.zero.energy_regen = agent["SpRecover"]
+        self._growth.zero.energy_regen = agent["SpRecover"] / 1e2
         self._growth.zero.anomaly_proficiency = agent["ElementAbnormalPower"]
 
         ascension = db["ascensions"][name]
@@ -106,7 +102,7 @@ class AgentWithData(Agent):
                 elif k == "CRIT DMG":
                     result.append(StatValue(v / 1e4, StatKind.CRIT_MULTI))
                 elif k == "Energy Regen":
-                    result.append(StatValue(v, StatKind.ENERGY_REGEN))
+                    result.append(StatValue(v / 1e2, StatKind.ENERGY_REGEN))
                 elif k == "Anomaly Mastery":
                     result.append(StatValue(v, StatKind.ANOMALY_MASTER))
                 elif k == "Anomaly Proficiency":

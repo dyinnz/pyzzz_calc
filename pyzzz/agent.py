@@ -1,4 +1,5 @@
 from typing import Sequence
+import math
 import abc
 import copy
 import itertools
@@ -32,22 +33,27 @@ class Agent:
         self._camp = ""
         self._profession = Profession.All
         self._attribute = Attribute.All
-        self._growth = AgentBaseWithGrowth()
-        self._ascensions: list[list[StatValue]] = []
-        self._passives: list[list[StatValue]] = []
+        self._growth = AgentGrowthStats()
+        self._ascensions: list[list[StatValue]] = []  # level -> [stats]
+        self._passives: list[list[StatValue]] = []  # level -> [stats]
         self._skill = {}
 
-        # final stats board
-        self._basic = AgentStats()  # basic = init + growth
-        self._static = AgentStats()  # static = (basic + base) * (1 + ratio) + flat
-        self._dynamic = AgentStats()  # dynamic = static * (1 + ratio) + flat
+        # basic : lazy repr { init + growth }
+        self._basic = AgentStats()
+        # static : lazy repr { basic * (1 + ratio) + flat }
+        self._static = AgentStats()
+        # dynamic : lazy repr { static * (1 + ratio) + flat }
+        self._dynamic = AgentStats()
 
-        self._initial = AgentBaseStats()
-        self._final = AgentBaseStats()
+        # calc-ed static
+        self._initial = AgentValueStats()
+        # calc-ed dynamic
+        self._final = AgentValueStats()
 
         self._weapon = Weapon()
         self._discs = DiscGroup()
-        self._extras = list[StatValue]()
+        self._static_extras: list[StatValue] = []
+        self._dynamic_extras: list[StatValue] = []
 
     @property
     def name(self):
@@ -105,11 +111,11 @@ class Agent:
     def initial(self):
         return self._initial
 
-    @property
-    def final(self):
-        return self._final
+    # @property
+    # def final(self):
+    #     return self._final
 
-    def _calc_static(self):
+    def _re_calc(self):
         self._static = self._basic.calc_final()
 
         # weapon
@@ -122,21 +128,25 @@ class Agent:
             for s in d.secondaries:
                 self._static.apply_stat(s)
         # extra
-        for s in self._extras:
+        for s in self._static_extras:
             self._static.apply_stat(s)
 
         # merge static stats to dynamic
         self._dynamic = self._static.calc_final(self._weapon.atk_base)
+        for s in self._dynamic_extras:
+            self._dynamic.apply_stat(s)
+
+        # calc initial
         self._initial = self._dynamic.base
 
     def _fill_data(self):
         self._basic = AgentStats()
         self._basic.base = copy.deepcopy(self._growth.zero)
-        self._basic.base.hp += round(self._growth.hp_growth * (self.level - 1))
-        self._basic.base.defense += round(
+        self._basic.base.hp += math.floor(self._growth.hp_growth * (self.level - 1))
+        self._basic.base.defense += math.floor(
             self._growth.defense_growth * (self.level - 1)
         )
-        self._basic.base.atk += round(self._growth.atk_growth * (self.level - 1))
+        self._basic.base.atk += math.floor(self._growth.atk_growth * (self.level - 1))
         self._basic.base.crit_ratio = 0.05
         self._basic.base.crit_multi = 0.50
 
@@ -155,7 +165,7 @@ class Agent:
         for stat in stats:
             self._basic.apply_stat(stat)
 
-        self._calc_static()
+        self._re_calc()
 
     def set_stats(
         self,
@@ -179,27 +189,33 @@ class Agent:
         self,
         weapon: Weapon | None = None,
         discs: DiscGroup | None = None,
-        extras: list[StatValue] | None = None,
+        static: list[StatValue] | None = None,
+        dynamic: list[StatValue] | None = None,
     ):
         if weapon:
             self._weapon = weapon
         if discs:
+            discs.generate_suits()
             self._discs = discs
-        if extras:
-            self._extras = extras
+        if static:
+            self._static_extras = static
+        if dynamic:
+            self._dynamic_extras = dynamic
 
-        self._calc_static()
+        self._re_calc()
 
     def apply_dynamic(self, stats: list[StatValue]):
         for stat in stats:
             self._dynamic.apply_stat(stat)
+
+    def calc_final(self):
         self._final = self._dynamic.calc_final().base
 
     @abc.abstractmethod
     def gen_hit(self, mark: str) -> GenerateHit:
         pass
 
-    def hit_marks(self) -> Sequence[str]:
+    def list_marks(self) -> Sequence[str]:
         return []
 
     def buffs(self) -> Sequence[Buff]:
@@ -215,8 +231,11 @@ class Agent:
     def extra_multiplier(self) -> Sequence[ExtraMultiplier]:
         return []
 
-    def debug_str(self):
-        return f"{self}\n{self._growth}\n{self._ascensions}\n{self._passives}\n"
-
     def __str__(self):
-        return f"{self._name} - {self._camp}/{self._profession}/{self._attribute}\n{self._basic}\n{self._static}\n{self._weapon}\n{self._discs}\n"
+        self._re_calc()
+        return (
+            f"{self._name} - {self._attribute.capitalize()}/{self.profession.capitalize()} - {self.camp}"
+            + f" - ATK[{self._static.base.atk + self._weapon.atk_base} = {self._static.base.atk} + {self._weapon.atk_base}]\n"
+            + f"{self._static.base}\n"
+            + f"{self._initial}\n{self._weapon}{self._discs}\n"
+        )

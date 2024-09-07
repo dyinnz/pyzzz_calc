@@ -23,15 +23,13 @@ class Lycaon(AgentWithData):
             **kw,
         )
 
-        self._cn_name = "莱卡恩"
-        self.load_cn_data(self._cn_name)
-
     def core_skill(self):
         return StaticBuff(
             StatValue(-0.25, StatKind.RES_RATIO),
             condition=HitContext(atk_attr=Attribute.Ice),
             for_team=True,
-            source=f"{self._name} core skill Ice DMG RES",
+            owner=self.name,
+            source="core skill Ice DMG RES",
         )
 
     def extra_skill(self):
@@ -39,7 +37,8 @@ class Lycaon(AgentWithData):
             StatValue(0.35, StatKind.STUN_DMG_RATIO),
             condition=HitContext(daze=True),
             for_team=True,
-            source=f"{self._name} extra skill Stun DMG Multiplier",
+            owner=self.name,
+            source="extra skill",
         )
 
     def buffs(self, _: bool = True):

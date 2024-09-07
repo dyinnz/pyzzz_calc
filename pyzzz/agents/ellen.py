@@ -22,9 +22,6 @@ class Ellen(AgentWithData):
             **kw,
         )
 
-        self._cn_name = "艾莲"
-        self.load_cn_data(self._cn_name)
-
     def core_skill(self):
         def create():
             multi = [0.50, 0.583, 0.66, 0.75, 0.8333, 0.916, 1]
@@ -33,12 +30,15 @@ class Ellen(AgentWithData):
         return DynamicBuff(
             create,
             condition=HitContext(atk_kind=AttackKind.Basic),
-            source="Ellen core skill criti multi",
+            owner=self.name,
+            source="core skill - basic-atk",
         )
 
     def extra_skill(self):
         return StaticBuff(
-            StatValue(0.3, StatKind.DMG_RATIO), source="Ellen extra skill ice ratio"
+            StatValue(0.3, StatKind.DMG_RATIO),
+            owner=self.name,
+            source="extra skill",
         )
 
     def buffs(self):

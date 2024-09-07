@@ -25,9 +25,6 @@ class Nicole(AgentWithData):
             repetition=repetition,
         )
 
-        self._cn_name = "妮可"
-        self.load_cn_data(self.cn_name)
-
     def core_skill(self):
         def create():
             m = [0.2, 0.25, 0.30, 0.34, 0.36, 0.38, 0.40][self.skill_levels.core]
@@ -35,21 +32,24 @@ class Nicole(AgentWithData):
 
         return DynamicBuff(
             create,
-            source="Nicole core skill def res",
+            owner=self.name,
+            source="core skill def res",
         )
 
     def extra_skill(self):
         return StaticBuff(
             StatValue(0.25, StatKind.DMG_RATIO),
             condition=HitContext(atk_attr=Attribute.Ether, atk_kind=AttackKind.All),
-            source="Nicole extra skill Ether dmg ratio",
+            owner=self.name,
+            source="extra skill Ether dmg ratio",
         )
 
     def rep6(self):
         return StaticBuff(
             StatValue(0.15, StatKind.CRIT_RATIO),
             condition=HitContext(atk_attr=Attribute.All, atk_kind=AttackKind.All),
-            source="Nicole rep6 crit ratio",
+            owner=self.name,
+            source="rep6 crit ratio",
         )
 
     def buffs(self):

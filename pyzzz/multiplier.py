@@ -86,7 +86,7 @@ class ATKMultiplier:
         ) * self.dynamic_ratio + self.dynamic_flat
 
     def __str__(self):
-        return f"( ( ({self.agent} + {self.weapon}) * {self.static_ratio} + {self.static_flat} ) * {self.dynamic_ratio} + {self.dynamic_flat} )"
+        return f"( ({self.agent + self.weapon} * {self.static_ratio} + {self.static_flat}) * {self.dynamic_ratio} + {self.dynamic_flat} )"
 
 
 # 1.2
@@ -106,7 +106,7 @@ class DefenseMultiplier:
         self.enemy = Number(util.calc_defense(70))
 
         self.pen_ratio = LazyAdd([])
-        self.pen_flat = LazyAdd([0.0])
+        self.pen_flat = LazyAdd([])
         self.enemy_def_ratio = LazyAdd([])
 
     def set_agent(self, level):
@@ -126,7 +126,7 @@ class DefenseMultiplier:
 
     def __str__(self):
         pen = (Number(1.0) - self.pen_ratio) * (Number(1.0) + self.enemy_def_ratio)
-        return f"( {self.agent} / ({self.agent} + {self.enemy} * {pen} - {self.pen_flat}) )"
+        return f"{self.agent}/({self.agent} + {self.enemy} * {pen} - {self.pen_flat})"
 
 
 # 5
@@ -144,9 +144,9 @@ class CriticalMultiplier:
     def __str__(self):
         ratio = self.ratio.value()
         if ratio > 1.0:
-            return f"(1.0 + 1.0 * {self.multi})"
+            return f"(1 + 1 * {self.multi})"
         else:
-            return f"(1.0 + {self.ratio} * {self.multi})"
+            return f"(1 + {self.ratio} * {self.multi})"
 
 
 # 7
@@ -156,13 +156,13 @@ DazeMultiplier = ListMultiplier
 # ap
 class AnomalyProficiencyMultiplier(LazyAdd):
     def __init__(self):
-        LazyAdd.__init__(self, [0.0])
+        LazyAdd.__init__(self, [])
 
     def calc(self):
         return Number(self.value() / 100.0)
 
     def __str__(self):
-        return f"({super().__str__()} / 100.0)"
+        return f"({super().__str__()} /100)"
 
 
 class AnomalyAttributeMultiplier:

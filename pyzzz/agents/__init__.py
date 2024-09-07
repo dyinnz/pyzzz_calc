@@ -1,3 +1,6 @@
+from pyzzz.model import AgentBuild
+from pyzzz.weapons import create_weapon
+from pyzzz.agent import Agent
 from pyzzz.agents.agent_with_data import AgentWithData
 from pyzzz.agents.ellen import Ellen
 from pyzzz.agents.grace import Grace
@@ -10,6 +13,8 @@ from pyzzz.agents.zhuyuan import Zhuyuan
 from pyzzz.agents.nicole import Nicole
 from pyzzz.agents.qingyi import Qingyi
 from pyzzz.agents.jane import Jane
+from pyzzz.agents.lucy import Lucy
+from pyzzz.agents.seth import Seth
 
 
 def get_agents_mapping():
@@ -25,11 +30,29 @@ def get_agents_mapping():
         "Nicole": Nicole,
         "Qingyi": Qingyi,
         "Jane": Jane,
+        "Lucy": Lucy,
+        "Seth": Seth,
     }
 
 
-def create_agent(name: str, **kw):
+def create_agent(name: str, **kw) -> Agent:
     return get_agents_mapping()[name](**kw)
+
+
+def from_agent_build(b: AgentBuild):
+    agent = create_agent(
+        name=b.agent_name,
+        repetition=b.agent_rep,
+        level=b.agent_level,
+        skill_levels=b.skills,
+    )
+    weapon = create_weapon(
+        name=b.weapon_name,
+        repetition=b.weapon_rep,
+        level=b.weapon_level,
+    )
+    agent.set_equipment(weapon=weapon, discs=b.discs)
+    return agent
 
 
 def list_agents():
@@ -40,5 +63,5 @@ def list_agents():
         res.append(
             {"name": agent.name, "cn_name": agent.cn_name, "attribute": agent.attribute}
         )
-    res.sort(key=lambda x: (x['attribute'], x['name']))
+    res.sort(key=lambda x: (x["attribute"], x["name"]))
     return res

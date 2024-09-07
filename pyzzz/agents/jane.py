@@ -13,7 +13,7 @@ class JaneExtraMultiplier(ExtraMultiplier):
         multi = [0.0010, 0.0011, 0.0012, 0.0013, 0.0014, 0.0015, 0.0016][
             self.agent.skill_levels.core
         ]
-        return min(base + multi * self.agent.final.anomaly_proficiency, 1.0)
+        return min(base + multi * self.agent.dynamic.calc_ap(), 1.0)
 
     def active(self, anomaly: bool, context: HitContext):
         return anomaly
@@ -46,17 +46,16 @@ class Jane(AgentWithData):
             **kw,
         )
 
-        self._cn_name = "简"
-        self.load_cn_data(self._cn_name)
-
     def passion_stream(self):
         def create():
-            value = min((self.dynamic.base.anomaly_proficiency - 120) * 2, 600)
+            value = min((self.dynamic.calc_ap() - 120) * 2, 600)
             return StatValue(value, StatKind.ATK_FLAT)
 
         return DynamicBuff(
             create,
-            source=f"{self.name} passion stream atk",
+            owner=self.name,
+            source="passion stream atk",
+            priority=100,
         )
 
     def buffs(self):

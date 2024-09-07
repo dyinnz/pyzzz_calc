@@ -95,4 +95,4 @@ class Weapon:
         return []
 
     def __str__(self):
-        return f"{self.name} - {self._profession}\nATK Base: {self._atk_base} Advanced Stat: {self._advanced_stat}"
+        return f"{self.name} - {self._profession.capitalize()}  |  ATK Base: {self._atk_base}\tStat: {self._advanced_stat}\n"

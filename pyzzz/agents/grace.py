@@ -26,9 +26,6 @@ class Grace(AgentWithData):
             **kw,
         )
 
-        self._cn_name = "格莉丝"
-        self.load_cn_data(self._cn_name)
-
     # TODO:
     # def A31(self):
     #     value = self.a3["dmg"] + self.a3["dmg_grow"] * (self.skill_levels.basic - 1)

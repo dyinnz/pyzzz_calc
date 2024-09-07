@@ -26,52 +26,54 @@ class Rina(AgentWithData):
             repetition=repetition,
         )
 
-        self._cn_name = "丽娜"
-        self.load_cn_data(self._cn_name)
-
     def core_skill(self):
         def create():
             m = [0.06, 0.075, 0.09, 0.102, 0.108, 0.114, 0.12][self.skill_levels.core]
-            value = self.static.pen_ratio * 0.25 + m
+            value = self.initial.pen_ratio * 0.25 + m
             value = min(0.3, value)
             return StatValue(value, StatKind.PEN_RATIO)
 
         return DynamicBuff(
             create,
-            source="Rina core skill pen ratio",
+            owner=self.name,
+            source="core skill pen ratio",
         )
 
     def extra_skill(self):
         return StaticBuff(
             StatValue(0.1, StatKind.DMG_RATIO),
             condition=HitContext(atk_attr=Attribute.Electric),
-            source="Rina extra skill Electric dmg ratio",
+            owner=self.name,
+            source="extra skill Electric dmg ratio",
         )
 
     def rep1(self):
         def create():
             m = [0.06, 0.075, 0.09, 0.102, 0.108, 0.114, 0.12][self.skill_levels.core]
-            value = self.static.pen_ratio * 0.25 + m
+            value = self.initial.pen_ratio * 0.25 + m
             value = min(0.3, value) * 0.3
             return StatValue(value, StatKind.PEN_RATIO)
 
         return DynamicBuff(
             create,
-            source="Rina ep1 pen ratio",
+            owner=self.name,
+            source="ep1 pen ratio",
         )
 
     def rep2(self):
         return StaticBuff(
             StatValue(0.15, StatKind.DMG_RATIO),
             condition=HitContext(atk_attr=Attribute.All, atk_kind=AttackKind.All),
-            source="Rina rep2 dmg ratio",
+            owner=self.name,
+            source="rep2 dmg ratio",
         )
 
     def rep6(self):
         return StaticBuff(
             StatValue(0.15, StatKind.DMG_RATIO),
             condition=HitContext(atk_attr=Attribute.Electric, atk_kind=AttackKind.All),
-            source="Rina rep6 Electric dmg ratio",
+            owner=self.name,
+            source="rep6 Electric dmg ratio",
         )
 
     def buffs(self):

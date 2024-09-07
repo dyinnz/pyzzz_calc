@@ -387,18 +387,18 @@ def full_jane():
     f.agent_name = "Jane"
     f.agent_level = 60
     f.skill_levels = SkillLevels(6, 11, 11, 11, 11, 11)
-    f.weapon_name = "RainforestGourmet"
-    f.weapon_level = 60
-    f.weapon_rep = 5
+    # f.weapon_name = "RainforestGourmet"
+    # f.weapon_level = 60
+    # f.weapon_rep = 5
     # f.weapon_name = "WeepingGemini"
     # f.weapon_level = 60
     # f.weapon_rep = 5
     f.weapon_name = "Electro-LipGloss"
     f.weapon_level = 60
-    f.weapon_rep = 5
-    f.weapon_name = "FusionCompiler"
-    f.weapon_level = 60
     f.weapon_rep = 1
+    # f.weapon_name = "FusionCompiler"
+    # f.weapon_level = 60
+    # f.weapon_rep = 1
     # f.weapon_name = "SharpenedStinger"
     # f.weapon_level = 60
     # f.weapon_rep = 1
@@ -409,11 +409,10 @@ def full_jane():
             DiscKind.Freedom_Blues,
             StatValue(0, StatKind.HP_FLAT),
             [
-                StatValue(90, StatKind.ANOMALY_PROFICIENCY),
-                StatValue(90, StatKind.ANOMALY_PROFICIENCY),
-                StatValue(0.3, StatKind.ATK_RATIO),
-                # StatValue(0.3848, StatKind.PEN_RATIO),
-                # StatValue(600, StatKind.ATK_FLAT),
+                StatValue(0.06, StatKind.ATK_RATIO),
+                StatValue(27, StatKind.PEN_FLAT),
+                StatValue(0.024, StatKind.CRIT_RATIO),
+                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
             ],
         )
     )
@@ -422,14 +421,32 @@ def full_jane():
             2,
             DiscKind.Freedom_Blues,
             StatValue(316, StatKind.ATK_FLAT),
+            [
+                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(0.06, StatKind.ATK_RATIO),
+            ],
         )
     )
-    f.discs.set(Disc(3, DiscKind.Fanged_Metal, StatValue(0, StatKind.DEF_FLAT), []))
+    f.discs.set(
+        Disc(
+            3,
+            DiscKind.Fanged_Metal,
+            StatValue(0, StatKind.DEF_FLAT),
+            [
+                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(0.09, StatKind.ATK_RATIO),
+            ],
+        )
+    )
     f.discs.set(
         Disc(
             4,
             DiscKind.Fanged_Metal,
-            StatValue(90, StatKind.ANOMALY_PROFICIENCY),
+            StatValue(92, StatKind.ANOMALY_PROFICIENCY),
+            [
+                StatValue(0.06, StatKind.ATK_RATIO),
+                StatValue(38, StatKind.ATK_FLAT),
+            ],
         )
     )
     f.discs.set(
@@ -437,16 +454,106 @@ def full_jane():
             5,
             DiscKind.Fanged_Metal,
             StatValue(0.3, StatKind.DMG_RATIO),
+            [
+                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(9, StatKind.PEN_FLAT),
+                StatValue(0.048, StatKind.CRIT_MULTI),
+            ],
         )
     )
     f.discs.set(
         Disc(
             6,
             DiscKind.Fanged_Metal,
-            StatValue(0.3, StatKind.ANOMALY_MASTER),
+            StatValue(0.3, StatKind.ANOMALY_MASTER_RATIO),
+            [
+                StatValue(19, StatKind.ATK_FLAT),
+                StatValue(9, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(0.12, StatKind.ATK_RATIO),
+            ],
         )
     )
     return f
+
+
+def full_lucy():
+    b = AgentBuild()
+    b.agent_name = "Lucy"
+    b.agent_rep = 1
+    b.agent_level = 60
+    b.skills = SkillLevels(4)
+
+    b.weapon_name = "KaboomtheCannon"
+    b.weapon_level = 60
+    b.weapon_rep = 1
+
+    b.discs.set(
+        Disc(
+            1,
+            DiscKind.Swing_Jazz,
+            StatValue(0, StatKind.HP_FLAT),
+            [
+                StatValue(0.03, StatKind.ATK_RATIO),
+            ],
+        )
+    )
+    b.discs.set(
+        Disc(
+            2,
+            DiscKind.Swing_Jazz,
+            StatValue(316, StatKind.ATK_FLAT),
+            [
+                StatValue(0.048, StatKind.CRIT_RATIO),
+                StatValue(0.06, StatKind.ATK_RATIO),
+            ],
+        )
+    )
+    b.discs.set(
+        Disc(
+            3,
+            DiscKind.Swing_Jazz,
+            StatValue(0, StatKind.DEF_FLAT),
+            [
+                StatValue(19, StatKind.ATK_FLAT),
+                StatValue(0.024, StatKind.CRIT_RATIO),
+                StatValue(9, StatKind.PEN_FLAT),
+                StatValue(0.03, StatKind.ATK_RATIO),
+            ],
+        )
+    )
+    b.discs.set(
+        Disc(
+            4,
+            DiscKind.Swing_Jazz,
+            StatValue(0.3, StatKind.ATK_RATIO),
+            [
+                StatValue(0.072, StatKind.ATK_RATIO),
+                StatValue(9, StatKind.PEN_FLAT),
+            ],
+        )
+    )
+    b.discs.set(
+        Disc(
+            5,
+            DiscKind.Hormone_Punk,
+            StatValue(0.3, StatKind.ATK_RATIO),
+            [
+                StatValue(0.048, StatKind.ATK_RATIO),
+            ],
+        )
+    )
+    b.discs.set(
+        Disc(
+            6,
+            DiscKind.Hormone_Punk,
+            # StatValue(0.42, StatKind.ENERGY_REGEN_RATIO),
+            StatValue(0.30, StatKind.ATK_RATIO),
+            [
+                # StatValue(0.024, StatKind.CRIT_RATIO),
+            ],
+        )
+    )
+    return b
 
 
 if __name__ == "__main__":
