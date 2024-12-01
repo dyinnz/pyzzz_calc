@@ -1,0 +1,21 @@
+name,camp,profession,attribute,atk_base,atk_growth,hp_base,hp_growth,def_base,def_growth,impact,energy_regen,anomaly_master,anomaly_proficiency
+Anby,Cunning Hares,Stun,Electric,95,5.423,603,81.8426,49,6.6882,118,1.2,94,93
+Nekomata,Cunning Hares,Attack,Physical,131,7.9762,608,82.4778,47,6.4166,92,1.2,97,96
+Nicole,Cunning Hares,Support,Ether,93,5.3249,655,88.8787,50,6.7901,88,1.2,90,93
+Soldier 11,Obol Squad,Attack,Fire,128,7.7554,617,83.7238,49,6.6882,93,1.2,94,93
+Corin,Victoria Housekeeping Co.,Attack,Physical,116,6.9346,561,76.1177,49,6.5864,93,1.2,93,96
+Billy,Cunning Hares,Attack,Physical,113,6.7335,555,75.3604,49,6.6203,91,1.2,92,91
+Koleda,Belobog Heavy Industries,Stun,Fire,106,6.2007,653,88.6832,48,6.4845,116,1.2,97,96
+Anton,Belobog Heavy Industries,Attack,Electric,114,6.7737,580,78.7644,50,6.7901,95,1.2,86,90
+Ben,Belobog Heavy Industries,Defense,Fire,94,5.3574,690,93.5856,58,7.8989,95,1.2,86,90
+Soukaku,Hollow Special Operations Section 6,Support,Ice,96,5.4887,645,87.5757,48,6.5185,86,1.2,93,96
+Lycaon,Victoria Housekeeping Co.,Stun,Ice,105,6.1287,677,91.8185,49,6.6203,119,1.2,91,90
+Lucy,Sons of Calydon,Support,Fire,95,5.423,645,87.5757,49,6.6882,86,1.2,94,93
+Grace,Belobog Heavy Industries,Anomaly,Electric,119,7.1181,602,81.6391,48,6.5524,83,1.2,115,116
+Ellen,Victoria Housekeeping Co.,Attack,Ice,135,8.2578,617,83.7238,49,6.6203,93,1.2,94,93
+Rina,Victoria Housekeeping Co.,Support,Electric,103,6.0201,692,93.9358,48,6.5524,83,1.2,93,92
+Zhu Yuan,Criminal Investigation Special Response Team,Attack,Ether,132,8.0729,602,81.6391,48,6.5524,90,1.2,93,92
+Qingyi,Criminal Investigation Special Response Team,Stun,Electric,109,6.4272,663,90.0269,49,6.6882,118,1.2,94,93
+Jane,Criminal Investigation Special Response Team,Anomaly,Physical,127,7.6728,626,84.9779,49,6.6203,86,1.2,112,114
+Seth,Criminal Investigation Special Response Team,Defense,Electric,93,5.2593,699,94.9375,60,8.1379,94,1.2,86,90
+Piper,Sons of Calydon,Anomaly,Physical,109,6.4308,561,76.1177,49,6.6882,86,1.2,116,118

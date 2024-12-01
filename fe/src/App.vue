@@ -23,7 +23,7 @@ const currentView = computed(() => {
 <template>
   <div class="common-layout">
     <el-container width="100%">
-      <el-aside width="100px">
+      <el-aside width="85px">
         <el-menu @select="handleSelect" default-active="/calc">
           <el-menu-item index="/agents" disabled>
             <span>Agents</span>
@@ -39,7 +39,7 @@ const currentView = computed(() => {
           </el-menu-item>
         </el-menu>
       </el-aside>
-      <el-main width="600px">
+      <el-main width="800px">
         <component :is="currentView" />
       </el-main>
     </el-container>

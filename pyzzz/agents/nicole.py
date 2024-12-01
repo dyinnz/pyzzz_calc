@@ -28,7 +28,7 @@ class Nicole(AgentWithData):
     def core_skill(self):
         def create():
             m = [0.2, 0.25, 0.30, 0.34, 0.36, 0.38, 0.40][self.skill_levels.core]
-            return StatValue(m, StatKind.ENEMY_DEF_RATIO)
+            return StatValue(m, StatKind.DEF_REDUCE)
 
         return DynamicBuff(
             create,

@@ -41,8 +41,11 @@ def full_ellen():
             DiscKind.Woodpecker_Electro,
             StatValue.create_empty(),
             [
-                StatValue(0.144, StatKind.CRIT_MULTI),
                 StatValue(0.072, StatKind.CRIT_RATIO),
+                StatValue(0.144, StatKind.CRIT_MULTI),
+                # StatValue(0.024, StatKind.CRIT_RATIO),
+                # StatValue(0.06, StatKind.ATK_RATIO),
+                # StatValue(0.144, StatKind.CRIT_MULTI),
             ],
         )
     )
@@ -64,9 +67,13 @@ def full_ellen():
             DiscKind.Polar_Metal,
             StatValue.create_empty(),
             [
-                StatValue(0.096, StatKind.CRIT_MULTI),
+                StatValue(18, StatKind.PEN_FLAT),
                 StatValue(0.072, StatKind.CRIT_RATIO),
-                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(0.096, StatKind.CRIT_MULTI),
+                StatValue(0.03, StatKind.ATK_RATIO),
+                # StatValue(0.048, StatKind.CRIT_RATIO),
+                # StatValue(0.06, StatKind.ATK_RATIO),
+                # StatValue(0.144, StatKind.CRIT_MULTI),
             ],
         )
     )
@@ -76,15 +83,13 @@ def full_ellen():
             DiscKind.Polar_Metal,
             StatValue(0.48, StatKind.CRIT_MULTI),
             [
-                StatValue(0.03, StatKind.ATK_RATIO),
-                StatValue(18, StatKind.PEN_FLAT),
+                StatValue(0.06, StatKind.ATK_RATIO),
+                StatValue(19, StatKind.ATK_FLAT),
                 StatValue(0.048, StatKind.CRIT_RATIO),
-                StatValue(57, StatKind.ATK_FLAT),
             ],
+            # StatValue(0.24, StatKind.CRIT_RATIO),
             # [
-            #     StatValue(0.12, StatKind.ATK_RATIO),
-            #     StatValue(19, StatKind.ATK_FLAT),
-            #     StatValue(0.024, StatKind.CRIT_RATIO),
+            #     StatValue(0.192, StatKind.CRIT_MULTI),
             # ],
         )
     )
@@ -92,12 +97,16 @@ def full_ellen():
         Disc(
             5,
             DiscKind.Polar_Metal,
-            StatValue(0.30, StatKind.ATK_RATIO),
+            # StatValue(0.30, StatKind.ATK_RATIO),
+            # [
+            #     StatValue(19, StatKind.ATK_FLAT),
+            #     StatValue(0.048, StatKind.CRIT_RATIO),
+            #     StatValue(0.192, StatKind.CRIT_MULTI),
+            # ],
+            StatValue(0.24, StatKind.PEN_RATIO),
             [
-                StatValue(19, StatKind.ATK_FLAT),
-                StatValue(0.048, StatKind.CRIT_RATIO),
-                StatValue(18, StatKind.PEN_FLAT),
-                StatValue(0.144, StatKind.CRIT_MULTI),
+                StatValue(0.072, StatKind.CRIT_RATIO),
+                StatValue(0.048, StatKind.CRIT_MULTI),
             ],
         )
     )
@@ -107,8 +116,9 @@ def full_ellen():
             DiscKind.Polar_Metal,
             StatValue(0.30, StatKind.ATK_RATIO),
             [
+                StatValue(38, StatKind.ATK_FLAT),
                 StatValue(0.096, StatKind.CRIT_MULTI),
-                StatValue(0.048, StatKind.CRIT_RATIO),
+                StatValue(0.072, StatKind.CRIT_RATIO),
             ],
         )
     )
@@ -395,7 +405,7 @@ def full_jane():
     # f.weapon_rep = 5
     f.weapon_name = "Electro-LipGloss"
     f.weapon_level = 60
-    f.weapon_rep = 1
+    f.weapon_rep = 3
     # f.weapon_name = "FusionCompiler"
     # f.weapon_level = 60
     # f.weapon_rep = 1
@@ -409,10 +419,9 @@ def full_jane():
             DiscKind.Freedom_Blues,
             StatValue(0, StatKind.HP_FLAT),
             [
-                StatValue(0.06, StatKind.ATK_RATIO),
-                StatValue(27, StatKind.PEN_FLAT),
-                StatValue(0.024, StatKind.CRIT_RATIO),
-                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(0.048, StatKind.CRIT_MULTI),
+                StatValue(0.09, StatKind.ATK_RATIO),
+                StatValue(27, StatKind.ANOMALY_PROFICIENCY),
             ],
         )
     )
@@ -422,8 +431,9 @@ def full_jane():
             DiscKind.Freedom_Blues,
             StatValue(316, StatKind.ATK_FLAT),
             [
-                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(27, StatKind.ANOMALY_PROFICIENCY),
                 StatValue(0.06, StatKind.ATK_RATIO),
+                # StatValue(18, StatKind.PEN_FLAT),
             ],
         )
     )
@@ -433,8 +443,10 @@ def full_jane():
             DiscKind.Fanged_Metal,
             StatValue(0, StatKind.DEF_FLAT),
             [
-                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
                 StatValue(0.09, StatKind.ATK_RATIO),
+                StatValue(0.024, StatKind.CRIT_RATIO),
+                StatValue(27, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(9, StatKind.PEN_FLAT),
             ],
         )
     )
@@ -445,7 +457,8 @@ def full_jane():
             StatValue(92, StatKind.ANOMALY_PROFICIENCY),
             [
                 StatValue(0.06, StatKind.ATK_RATIO),
-                StatValue(38, StatKind.ATK_FLAT),
+                # StatValue(38, StatKind.ATK_FLAT),
+                # StatValue(19, StatKind.ATK_FLAT),
             ],
         )
     )
@@ -453,11 +466,16 @@ def full_jane():
         Disc(
             5,
             DiscKind.Fanged_Metal,
-            StatValue(0.3, StatKind.DMG_RATIO),
+            # StatValue(0.3, StatKind.DMG_RATIO),
+            # [
+            #     StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+            #     # StatValue(18, StatKind.PEN_FLAT),
+            #     StatValue(9, StatKind.PEN_FLAT),
+            # ],
+            StatValue(0.24, StatKind.PEN_RATIO),
             [
                 StatValue(18, StatKind.ANOMALY_PROFICIENCY),
-                StatValue(9, StatKind.PEN_FLAT),
-                StatValue(0.048, StatKind.CRIT_MULTI),
+                StatValue(0.12, StatKind.ATK_RATIO),
             ],
         )
     )
@@ -554,6 +572,90 @@ def full_lucy():
         )
     )
     return b
+
+
+def full_piper():
+    f = FullBuild()
+    f.agent_name = "Piper"
+    f.agent_level = 60
+    f.skill_levels = SkillLevels(6, 11, 11, 11, 11, 11)
+    # f.weapon_name = "FusionCompiler"
+    # f.weapon_level = 60
+    # f.weapon_rep = 1
+
+    f.weapon_name = "RoaringRide"
+    f.weapon_level = 60
+    f.weapon_rep = 3
+
+    f.discs.set(
+        Disc(
+            1,
+            DiscKind.Freedom_Blues,
+            StatValue(0, StatKind.HP_FLAT),
+            [
+                StatValue(9, StatKind.PEN_FLAT),
+                StatValue(0.12, StatKind.ATK_RATIO),
+                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+            ],
+        )
+    )
+    f.discs.set(
+        Disc(
+            2,
+            DiscKind.Freedom_Blues,
+            StatValue(316, StatKind.ATK_FLAT),
+            [
+                StatValue(18, StatKind.PEN_FLAT),
+                StatValue(0.09, StatKind.ATK_RATIO),
+                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+            ],
+        )
+    )
+    f.discs.set(
+        Disc(
+            3,
+            DiscKind.Chaos_Jazz,
+            StatValue(0, StatKind.DEF_FLAT),
+            [
+                StatValue(27, StatKind.ANOMALY_PROFICIENCY),
+                StatValue(18, StatKind.PEN_FLAT),
+                StatValue(0.03, StatKind.ATK_RATIO),
+            ],
+        )
+    )
+    f.discs.set(
+        Disc(
+            4,
+            DiscKind.Freedom_Blues,
+            StatValue(92, StatKind.ANOMALY_PROFICIENCY),
+            [
+                StatValue(0.06, StatKind.ATK_RATIO),
+                StatValue(38, StatKind.ATK_FLAT),
+            ],
+        )
+    )
+    f.discs.set(
+        Disc(
+            5,
+            DiscKind.Freedom_Blues,
+            StatValue(0.30, StatKind.DMG_RATIO_PHYSICAL),
+            [
+                StatValue(18, StatKind.PEN_FLAT),
+                StatValue(18, StatKind.ANOMALY_PROFICIENCY),
+            ],
+        )
+    )
+    f.discs.set(
+        Disc(
+            6,
+            DiscKind.Chaos_Jazz,
+            StatValue(0.3, StatKind.ANOMALY_MASTER_RATIO),
+            [
+                StatValue(27, StatKind.ANOMALY_PROFICIENCY),
+            ],
+        )
+    )
+    return f
 
 
 if __name__ == "__main__":

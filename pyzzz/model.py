@@ -40,10 +40,10 @@ class StatKind(StrEnum):
     DMG_RATIO_EHTER = auto()
 
     # on enemy
-    RES_RATIO = auto()
-    ANOMALY_RES_RATIO = auto()
+    ATTR_RES = auto()
+    ANOMALY_RES = auto()
     STUN_DMG_RATIO = auto()
-    ENEMY_DEF_RATIO = auto()
+    DEF_REDUCE = auto()
 
     SKILL_MULTI = auto()
 
@@ -70,8 +70,8 @@ class StatKind(StrEnum):
             StatKind.ANOMALY_MASTER_RATIO: "AM",
             StatKind.CRIT_RATIO: "CRIT_RATIO",
             StatKind.CRIT_MULTI: "CRIT_MULTI",
-            StatKind.PEN_RATIO: "PEN",
-            StatKind.PEN_FLAT: "PEN",
+            StatKind.PEN_RATIO: "PEN_RATIO",
+            StatKind.PEN_FLAT: "PEN_FLAT",
             StatKind.ANOMALY_PROFICIENCY: "AP",
             StatKind.ACC_RATIO: "ACC_RATIO",
             StatKind.DMG_RATIO: "DMG",
@@ -80,10 +80,10 @@ class StatKind(StrEnum):
             StatKind.DMG_RATIO_ICE: "ICE",
             StatKind.DMG_RATIO_ELECTRIC: "ELECTRIC",
             StatKind.DMG_RATIO_EHTER: "EHTER",
-            StatKind.RES_RATIO: "RESISTANCE",
-            StatKind.ANOMALY_RES_RATIO: "ANOMALY_RES",
+            StatKind.ATTR_RES: "RESISTANCE",
+            StatKind.ANOMALY_RES: "ANOMALY_RES",
             StatKind.STUN_DMG_RATIO: "STUN_DMG",
-            StatKind.ENEMY_DEF_RATIO: "ENEMY_DEF",
+            StatKind.DEF_REDUCE: "DEF_REDUCE",
             StatKind.SKILL_MULTI: "SKILL",
         }[self]
 
@@ -135,18 +135,18 @@ class Attribute(StrEnum):
 
 
 class AttackKind(StrEnum):
-    All = auto()
-    Anomaly = auto()
-    Basic = auto()
-    Dash = auto()
-    Dodge = auto()  # 闪避反击
-    QuickAssit = auto()  # 快速支援
-    DefenseAssit = auto()  # 招架支援
-    Assit = auto()  # 支援突击
-    Special = auto()
-    SpecialEx = auto()
-    Chain = auto()
-    Final = auto()
+    All = "All"
+    Anomaly = "Anomaly"
+    Basic = "Basic"
+    Dash = "Dash"
+    Dodge = "Dodge"  # 闪避反击
+    QuickAssit = "QuickAssit"  # 快速支援
+    DefenseAssit = "DefenseAssit"  # 招架支援
+    Assit = "Assit"  # 支援突击
+    Special = "Special"
+    SpecialEx = "SpecialEx"
+    Chain = "Chain"
+    Final = "Final"
 
 
 class DiscKind(StrEnum):
@@ -163,6 +163,7 @@ class DiscKind(StrEnum):
     Soul_Rock = auto()  # def
     Hormone_Punk = auto()  # ATK%
     Freedom_Blues = auto()  # Anomaly Proficiency
+    Chaos_Jazz = auto()  # Anomaly Proficiency
     Shockstar_Disco = auto()  # impact
     Puffer_Electro = auto()  # pen
     Woodpecker_Electro = auto()  # crit
@@ -183,6 +184,7 @@ def get_suit2_stat(kind: DiscKind) -> StatValue:
         DiscKind.Woodpecker_Electro: StatValue(0.08, StatKind.CRIT_RATIO),
         DiscKind.Freedom_Blues: StatValue(30, StatKind.ANOMALY_PROFICIENCY),
         DiscKind.Swing_Jazz: StatValue(0.20, StatKind.ENERGY_REGEN_RATIO),
+        DiscKind.Chaos_Jazz: StatValue(30, StatKind.ANOMALY_PROFICIENCY),
     }
 
     return mapping.get(kind, StatValue.create_empty())
@@ -383,7 +385,7 @@ class AgentRatioStats:
 @dataclass
 class AgentValueStats:
     # base = init + init * grow
-    #           <          static         >   <    dynamic     >
+    #           (          static         )   (    dynamic     )
     # TYPE-1 :  (base * (1 + ratio) + flat) * (1 + ratio) + flat
     atk: float = 0.0
     hp: float = 0.0
@@ -602,12 +604,21 @@ class AgentBuild(BaseModel):
     discs: DiscGroup = DiscGroup()
 
 
+class BuffModel(BaseModel):
+    idx: int = 0  # 0 for team, 1 for first agent ...
+    key: str = ""
+    origin_cov: float = 1.0
+    cov: float = 1.0
+    stat_str: str = ""
+
+
 class CalcInput(BaseModel):
     agent1: AgentBuild = AgentBuild()
     agent2: AgentBuild = AgentBuild()
     agent3: AgentBuild = AgentBuild()
     enemy: EnemyModel = EnemyModel()
     combo: list[str] = []
+    buffs: dict[str, dict] = {}
 
 
 class ExtraMultiplier:

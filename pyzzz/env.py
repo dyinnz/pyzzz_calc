@@ -25,6 +25,7 @@ class Env:
         self._team_buffs: dict[str, Buff] = {}
 
         self._disable_buffs: set[str] = set()
+        self._modified_buffs: dict[str, dict] = {}
 
     def agent(self, i: int) -> Agent:
         return self._agents[i]
@@ -51,6 +52,8 @@ class Env:
         env = Env()
         env._agents = copy.deepcopy(self._agents)
         env._disable_buffs = copy.deepcopy(self._disable_buffs)
+        env._modified_buffs = copy.deepcopy(self._modified_buffs)
+        env._enemy = copy.deepcopy(self._enemy)
         return env
 
     def reset_static(self):
@@ -63,6 +66,17 @@ class Env:
                     self._team_buffs[b.key] = b
                 else:
                     self._agent_buffs[i][b.key] = b
+
+        for buffs in self.collect_buffs():
+            for b in buffs.values():
+                if b.key in self._modified_buffs:
+                    print(
+                        "modified_buff",
+                        b,
+                        "new cov",
+                        self._modified_buffs[b.key]["cov"],
+                    )
+                    b.modified_cov = self._modified_buffs[b.key]["cov"]
 
     def debug_str(self):
         pass
@@ -77,6 +91,11 @@ class Env:
 
     def disable_buf(self, key: str):
         self._disable_buffs.add(key)
+
+    def collect_buffs(self):
+        buffs = [self._team_buffs]
+        buffs.extend(self._agent_buffs)
+        return buffs
 
     def prepare(self):
         if not self._prepared:

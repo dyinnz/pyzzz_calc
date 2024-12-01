@@ -47,7 +47,7 @@ class Nekomata(AgentWithData):
 
     def rep1(self):
         return StaticBuff(
-            StatValue(-0.16, StatKind.RES_RATIO),
+            StatValue(-0.16, StatKind.ATTR_RES),
             condition=HitContext(atk_attr=Attribute.Physical),
             owner=self.name,
             source="rep1 res ratio",

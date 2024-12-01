@@ -72,7 +72,7 @@ class Soukaku(AgentWithData):
 
     def rep4(self):
         return StaticBuff(
-            StatValue(-0.1, StatKind.RES_RATIO),
+            StatValue(-0.1, StatKind.ATTR_RES),
             condition=HitContext(atk_attr=Attribute.Ice),
             owner=self.name,
             source="rep4 ice res ratio",

@@ -67,7 +67,7 @@ class Soldier11(AgentWithData):
 
     def rep6(self):
         return StaticBuff(
-            StatValue(-0.25, StatKind.RES_RATIO),
+            StatValue(-0.25, StatKind.ATTR_RES),
             condition=[
                 HitContext(atk_attr=Attribute.Fire, atk_kind=AttackKind.Basic),
                 HitContext(atk_attr=Attribute.Fire, atk_kind=AttackKind.Dash),

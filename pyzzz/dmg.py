@@ -92,11 +92,11 @@ class HitDMG:
             self.defense.pen_ratio.add(number)
         elif stat.kind == StatKind.PEN_FLAT:
             self.defense.pen_flat.add(number)
-        elif stat.kind == StatKind.ENEMY_DEF_RATIO:
+        elif stat.kind == StatKind.DEF_REDUCE:
             self.defense.enemy_def_ratio.add(-number)
         elif stat.kind == StatKind.DMG_RATIO:
             self.dmg_ratio.add(number)
-        elif stat.kind == StatKind.RES_RATIO:
+        elif stat.kind == StatKind.ATTR_RES:
             self.resistance.add(-number)
         elif stat.kind == StatKind.STUN_DMG_RATIO:
             self.daze.add(number)
@@ -106,8 +106,9 @@ class HitDMG:
             self.skill.add(number)
 
     def apply_buff(self):
-        self._active_buffs.sort(key=lambda b: b._priority)
+        self._agent.reset_dynamic()
 
+        self._active_buffs.sort(key=lambda b: b._priority)
         for buf in self._active_buffs:
             stat = buf.produce(self._context)
             self._agent.apply_dynamic([stat])
@@ -199,6 +200,7 @@ class ComboDMG:
     def calc_anomaly(self):
         anomaly_dmgs = [(d.calc_anomaly(), d.anomaly_acc) for d in self.dmgs]
         total_acc = sum(t[1] for t in anomaly_dmgs)
+
         result = 0.0
         for value, acc in anomaly_dmgs:
             result += value * acc / total_acc

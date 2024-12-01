@@ -2,16 +2,14 @@ from pyzzz.env import Env
 from pyzzz import model
 from pyzzz.delta_analyzer import DeltaAnalyzer
 
+import copy
 import traceback
 
 
-def calc(input: model.CalcInput):
-    print(input)
-
-    env = Env.from_input(input)
-    print(env)
-    hit_marks = env.agent(0).list_marks()
+def calc_hit_dmgs(env: Env):
     is_anomaly = env.agent(0).profession == model.Profession.Anomaly
+
+    hit_marks = env.agent(0).list_marks()
 
     combo_dmg = env.calc_combo(hit_marks)
     hit_dmgs = []
@@ -36,12 +34,17 @@ def calc(input: model.CalcInput):
                 "detail": dmg.show_normal(),
             }
         )
+    return hit_dmgs
+
+
+def calc_delta_dmgs(env: Env):
+    is_anomaly = env.agent(0).profession == model.Profession.Anomaly
 
     delta_dmgs = []
     try:
         combo = []
         if not combo:
-            combo.append(hit_marks[0])
+            combo.append("EX1")
 
         analyzer = DeltaAnalyzer(env, combo)
         analyzer_dmg = analyzer.quick()
@@ -64,7 +67,51 @@ def calc(input: model.CalcInput):
     except Exception as e:
         traceback.print_tb(e.__traceback__)
 
+    return delta_dmgs
+
+
+def calc_agent_initials(env: Env):
+    initials = []
+    initials.append(copy.deepcopy(env.agent(0).initial))
+    initials.append(copy.deepcopy(env.agent(1).initial))
+    initials.append(copy.deepcopy(env.agent(2).initial))
+
+    for i, stats in enumerate(initials):
+        stats.dmg_ratio = stats.calc_dmg_ratio(env.agent(i).attribute)
+
+    return initials
+
+
+def collect_buffs(env: Env):
+    result = []
+
+    total_buffs = env.collect_buffs()
+    for idx, agent_buffs in enumerate(total_buffs):
+        for key, buff in agent_buffs.items():
+            result.append(
+                model.BuffModel(
+                    idx=idx,
+                    key=key,
+                    origin_cov=buff._cov,
+                    cov=buff._cov,
+                    stat_str=str(buff.origin_stat()),
+                )
+            )
+
+    return result
+
+
+def calc(input: model.CalcInput):
+    print(input)
+
+    env = Env.from_input(input)
+    env._modified_buffs = input.buffs
+    env.prepare()
+
+
     return {
-        "hit_dmgs": hit_dmgs,
-        "delta_dmgs": delta_dmgs,
+        "hit_dmgs": calc_hit_dmgs(env),
+        "delta_dmgs": calc_delta_dmgs(env),
+        "initials": calc_agent_initials(env),
+        "buffs": collect_buffs(env),
     }

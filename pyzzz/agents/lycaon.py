@@ -25,7 +25,7 @@ class Lycaon(AgentWithData):
 
     def core_skill(self):
         return StaticBuff(
-            StatValue(-0.25, StatKind.RES_RATIO),
+            StatValue(-0.25, StatKind.ATTR_RES),
             condition=HitContext(atk_attr=Attribute.Ice),
             for_team=True,
             owner=self.name,
@@ -42,4 +42,19 @@ class Lycaon(AgentWithData):
         )
 
     def buffs(self, _: bool = True):
-        return [self.core_skill(), self.extra_skill()]
+        return [
+            self.core_skill(),
+            self.extra_skill(),
+            StaticBuff(
+                StatValue(1000, StatKind.ATK_FLAT),
+                for_team=True,
+                owner="Caesar",
+                source="Caesar 1000 ATK",
+            ),
+            StaticBuff(
+                StatValue(0.20, StatKind.DMG_RATIO),
+                for_team=True,
+                owner="Caesar",
+                source="Caesar 20% DMG",
+            ),
+        ]

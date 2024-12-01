@@ -25,6 +25,10 @@ def get_suit4_buff(kind: DiscKind):
             owner="Swing_Jazz",
             for_team=True,
         ),
+        DiscKind.Chaos_Jazz: StaticBuff(
+            StatValue(0.35, StatKind.DMG_RATIO),
+            owner="Chaos_Jazz",
+        ),
         DiscKind.Fanged_Metal: StaticBuff(
             StatValue(0.35, StatKind.DMG_RATIO),
             owner="Freedom_Blues",

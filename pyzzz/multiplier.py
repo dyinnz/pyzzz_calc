@@ -1,3 +1,4 @@
+import math
 from functools import reduce
 from pyzzz import util
 
@@ -81,9 +82,8 @@ class ATKMultiplier:
         self.dynamic_flat = LazyAdd([])
 
     def calc(self):
-        return (
-            (self.agent + self.weapon) * self.static_ratio + self.static_flat
-        ) * self.dynamic_ratio + self.dynamic_flat
+        r = ((self.agent + self.weapon) * self.static_ratio + self.static_flat) * self.dynamic_ratio + self.dynamic_flat
+        return Number(math.floor(r.value()))
 
     def __str__(self):
         return f"( ({self.agent + self.weapon} * {self.static_ratio} + {self.static_flat}) * {self.dynamic_ratio} + {self.dynamic_flat} )"

@@ -19,7 +19,8 @@ class Buff:
         self._kind = kind
         self._owner = owner
         self._source = source
-        self.cov = cov
+        self._cov = cov
+        self.modified_cov = None
         self.enable = 1
         self._condition: list[HitContext] = []
         self._for_team = for_team
@@ -30,8 +31,12 @@ class Buff:
             self._condition.append(condition)
 
     @property
+    def cov(self):
+        return self.modified_cov if self.modified_cov is not None else self._cov
+
+    @property
     def key(self):
-        return f"{self._owner} {self._kind.with_pct()} {self._source}".strip(' ')
+        return f"{self._owner} {self._kind.with_pct()} {self._source}".strip(" ")
 
     @property
     def for_team(self):
@@ -43,6 +48,10 @@ class Buff:
 
     @abc.abstractmethod
     def gen_stat(self) -> StatValue:
+        pass
+
+    @abc.abstractmethod
+    def origin_stat(self) -> StatValue:
         pass
 
     def active(self, context: HitContext) -> bool:
@@ -89,6 +98,9 @@ class StaticBuff(Buff):
         )
         self.stat = stat
 
+    def origin_stat(self) -> StatValue:
+        return StatValue(self.stat.value * self._cov, self.stat.kind)
+
     def gen_stat(self) -> StatValue:
         return StatValue(self.stat.value * self.cov, self.stat.kind)
 
@@ -116,6 +128,10 @@ class DynamicBuff(Buff):
             priority=priority,
         )
         self.stat_call = stat_call
+
+    def origin_stat(self) -> StatValue:
+        stat = self.stat_call()
+        return StatValue(stat.value * self._cov, stat.kind)
 
     def gen_stat(self) -> StatValue:
         stat = self.stat_call()

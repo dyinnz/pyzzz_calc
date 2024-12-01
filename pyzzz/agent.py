@@ -131,6 +131,9 @@ class Agent:
         for s in self._static_extras:
             self._static.apply_stat(s)
 
+        self.reset_dynamic()
+
+    def reset_dynamic(self):
         # merge static stats to dynamic
         self._dynamic = self._static.calc_final(self._weapon.atk_base)
         for s in self._dynamic_extras:

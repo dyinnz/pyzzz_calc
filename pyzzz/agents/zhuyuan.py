@@ -68,7 +68,7 @@ class Zhuyuan(AgentWithData):
 
     def rep4(self):
         return StaticBuff(
-            StatValue(-0.25, StatKind.RES_RATIO),
+            StatValue(-0.25, StatKind.ATTR_RES),
             condition=HitContext(atk_attr=Attribute.Ether),
             owner=self.name,
             source="ep4 Ether res ratio",

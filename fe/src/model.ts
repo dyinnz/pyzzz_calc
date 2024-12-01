@@ -47,7 +47,7 @@ export class Discs {
 
     let disc4 = new Disc(4)
     disc4.primary.kind = 'crit_ratio'
-    disc4.primary.value = 0.3
+    disc4.primary.value = 0.24
 
     let disc5 = new Disc(5)
     disc5.primary.kind = 'dmg_ratio'
@@ -62,6 +62,8 @@ export class Discs {
 }
 
 export class AgentBuild {
+  id: string = "";
+
   name: string = "";
 
   agent_name: string = "";
@@ -79,6 +81,19 @@ export class AgentBuild {
 export class EnemyModel {
   level: number = 70;
   base: number = 60;
+}
+
+export class BuffOperations {
+  cov: number = 1.0;
+}
+
+export class TeamModel {
+  id: string = "";
+  agent1: string = "";
+  agent2: string = "";
+  agent3: string = "";
+  enemy: EnemyModel = new EnemyModel;
+  buffs: Map<string, BuffOperations> = new Map<string, BuffOperations>()
 }
 
 export default {

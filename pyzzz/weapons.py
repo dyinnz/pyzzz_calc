@@ -52,7 +52,7 @@ class CannonRotor(WeaponWithData):
     def buffs(self):
         def create():
             return StatValue(
-                [0, 0.075, 0.086, 0.097, 0.108, 0.120][self._repetition],
+                [0.0, 0.075, 0.086, 0.097, 0.108, 0.120][self._repetition],
                 StatKind.ATK_RATIO,
             )
 
@@ -68,7 +68,7 @@ class StarlightEngine(WeaponWithData):
     def buffs(self):
         def create():
             return StatValue(
-                [0, 0.12, 0.138, 0.156, 0.174, 0.192][self._repetition],
+                [0.0, 0.12, 0.138, 0.156, 0.174, 0.192][self._repetition],
                 StatKind.ATK_RATIO,
             )
 
@@ -84,12 +84,13 @@ class BashfulDemon(WeaponWithData):
     def buffs(self):
         def create1():
             return StatValue(
-                [0, 0.15, 0.175, 0.20, 0.22, 0.24][self._repetition], StatKind.DMG_RATIO
+                [0.0, 0.15, 0.175, 0.20, 0.22, 0.24][self._repetition],
+                StatKind.DMG_RATIO,
             )
 
         def create2():
             return StatValue(
-                [0, 0.02, 0.023, 0.026, 0.029, 0.032][self._repetition],
+                [0.0, 0.02, 0.023, 0.026, 0.029, 0.032][self._repetition],
                 StatKind.ATK_RATIO,
             )
 
@@ -119,14 +120,14 @@ class DeepSeaVisitor(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.25, 0.315, 0.38, 0.445, 0.50][self._repetition],
+                    [0.0, 0.25, 0.315, 0.38, 0.445, 0.50][self._repetition],
                     StatKind.DMG_RATIO,
                 ),
                 owner=self.name,
             ),
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition],
+                    [0.0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition],
                     StatKind.CRIT_RATIO,
                 ),
                 owner=self.name,
@@ -134,7 +135,7 @@ class DeepSeaVisitor(WeaponWithData):
             ),
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition],
+                    [0.0, 0.1, 0.125, 0.15, 0.175, 0.2][self._repetition],
                     StatKind.CRIT_RATIO,
                 ),
                 owner=self.name,
@@ -153,7 +154,7 @@ class WeepingGemini(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 30, 34, 38, 42, 48][self._repetition] * 4,
+                    [0.0, 30, 34, 38, 42, 48][self._repetition] * 4,
                     StatKind.ANOMALY_PROFICIENCY,
                 ),
                 owner=self.name,
@@ -171,7 +172,7 @@ class RainforestGourmet(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.025, 0.028, 0.032, 0.036, 0.04][self._repetition] * 10,
+                    [0.0, 0.025, 0.028, 0.032, 0.036, 0.04][self._repetition] * 10,
                     StatKind.ATK_RATIO,
                 ),
                 owner=self.name,
@@ -189,14 +190,14 @@ class FusionCompiler(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.12, 0.15, 0.18, 0.21, 0.24][self._repetition],
+                    [0.0, 0.12, 0.15, 0.18, 0.21, 0.24][self._repetition],
                     StatKind.ATK_RATIO,
                 ),
                 owner=self.name,
             ),
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 25, 31, 37, 43, 50][self._repetition] * 1,
+                    [0.0, 25, 31, 37, 43, 50][self._repetition] * 3,
                     StatKind.ANOMALY_PROFICIENCY,
                 ),
                 owner=self.name,
@@ -214,7 +215,7 @@ class SharpenedStinger(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.12, 0.15, 0.18, 0.21, 0.24][self._repetition] * 3,
+                    [0.0, 0.12, 0.15, 0.18, 0.21, 0.24][self._repetition] * 3,
                     StatKind.DMG_RATIO,
                 ),
                 owner=self.name,
@@ -232,14 +233,14 @@ class ElectroLipGloss(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.10, 0.115, 0.13, 0.145, 0.16][self._repetition],
+                    [0.0, 0.10, 0.115, 0.13, 0.145, 0.16][self._repetition],
                     StatKind.ATK_RATIO,
                 ),
                 owner=self.name,
             ),
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.15, 0.175, 0.20, 0.225, 0.25][self._repetition],
+                    [0.0, 0.15, 0.175, 0.20, 0.225, 0.25][self._repetition],
                     StatKind.DMG_RATIO,
                 ),
                 owner=self.name,
@@ -257,7 +258,7 @@ class TheBrimstone(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.035][self._repetition],
+                    [0.0, 0.035][self._repetition],
                     StatKind.ATK_RATIO,
                 ),
                 cov=4.0,
@@ -276,7 +277,7 @@ class GildedBlossom(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.06, 0.069, 0.078, 0.087, 0.096][self._repetition],
+                    [0.0, 0.06, 0.069, 0.078, 0.087, 0.096][self._repetition],
                     StatKind.ATK_RATIO,
                 ),
                 cov=1.0,
@@ -284,7 +285,7 @@ class GildedBlossom(WeaponWithData):
             ),
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.15, 0.172, 0.195, 0.218, 0.24][self._repetition],
+                    [0.0, 0.15, 0.172, 0.195, 0.218, 0.24][self._repetition],
                     StatKind.DMG_RATIO,
                 ),
                 condition=HitContext(atk_kind=AttackKind.SpecialEx),
@@ -305,10 +306,35 @@ class KaboomCannon(WeaponWithData):
         return [
             DynamicBuff(
                 lambda: StatValue(
-                    [0, 0.025, 0.028, 0.032, 0.036, 0.04][self._repetition],
+                    [0.0, 0.025, 0.028, 0.032, 0.036, 0.04][self._repetition],
                     StatKind.ATK_RATIO,
                 ),
                 cov=4.0,
+                owner=self.name,
+            ),
+        ]
+
+
+class RoaringRide(WeaponWithData):
+    NAME = "RoaringRide"
+
+    def __init__(self, level=60, is_ascension=False, repetition=5):
+        super().__init__(RoaringRide.NAME, level, is_ascension, repetition)
+
+    def buffs(self):
+        return [
+            DynamicBuff(
+                lambda: StatValue(
+                    [0.0, 0.08, 0.092, 0.104, 0.116, 0.128][self._repetition],
+                    StatKind.ATK_RATIO,
+                ),
+                owner=self.name,
+            ),
+            DynamicBuff(
+                lambda: StatValue(
+                    [0.0, 40, 46, 52, 58, 64][self._repetition],
+                    StatKind.ANOMALY_PROFICIENCY,
+                ),
                 owner=self.name,
             ),
         ]
@@ -329,6 +355,7 @@ def get_weapons_mapping():
         "TheBrimstone": TheBrimstone,
         "GildedBlossom": GildedBlossom,
         "KaboomtheCannon": KaboomCannon,
+        "RoaringRide": RoaringRide,
     }
     return mappings
 

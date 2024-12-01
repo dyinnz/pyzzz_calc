@@ -15,6 +15,7 @@ from pyzzz.agents.qingyi import Qingyi
 from pyzzz.agents.jane import Jane
 from pyzzz.agents.lucy import Lucy
 from pyzzz.agents.seth import Seth
+from pyzzz.agents.piper import Piper
 
 
 def get_agents_mapping():
@@ -32,6 +33,7 @@ def get_agents_mapping():
         "Jane": Jane,
         "Lucy": Lucy,
         "Seth": Seth,
+        "Piper": Piper,
     }
 
 

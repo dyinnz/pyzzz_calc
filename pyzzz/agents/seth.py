@@ -43,7 +43,7 @@ class Seth(AgentWithData):
 
     def ap_res_buff(self):
         return StaticBuff(
-            StatValue(0.2, StatKind.ANOMALY_RES_RATIO),
+            StatValue(0.2, StatKind.ANOMALY_RES),
             owner=self.name,
             source="passive skill",
             for_team=True,

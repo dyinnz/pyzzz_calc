@@ -52,7 +52,7 @@ class Qingyi(AgentWithData):
     def rep1(self):
         return (
             StaticBuff(
-                StatValue(-0.15, StatKind.ENEMY_DEF_RATIO),
+                StatValue(-0.15, StatKind.DEF_REDUCE),
                 condition=HitContext(atk_attr=Attribute.Physical),
                 owner=self.name,
                 source="ep1 def res",
@@ -79,7 +79,7 @@ class Qingyi(AgentWithData):
 
     def rep6(self):
         return StaticBuff(
-            StatValue(0.2, StatKind.RES_RATIO),
+            StatValue(0.2, StatKind.ATTR_RES),
             condition=HitContext(atk_attr=Attribute.All, atk_kind=AttackKind.All),
             owner=self.name,
             source="rep6 res ratio",

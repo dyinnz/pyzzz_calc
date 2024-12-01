@@ -48,7 +48,9 @@ class Jane(AgentWithData):
 
     def passion_stream(self):
         def create():
-            value = min((self.dynamic.calc_ap() - 120) * 2, 600)
+            value = (self.dynamic.calc_ap() - 120) * 2
+            value = min(value, 600)
+            value = max(0, value)
             return StatValue(value, StatKind.ATK_FLAT)
 
         return DynamicBuff(
